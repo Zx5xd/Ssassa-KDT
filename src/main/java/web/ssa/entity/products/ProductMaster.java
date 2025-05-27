@@ -1,4 +1,4 @@
-package web.ssa.entity;
+package web.ssa.entity.products;
 
 import jakarta.persistence.*;
 import lombok.*;

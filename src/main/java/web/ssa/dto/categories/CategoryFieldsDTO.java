@@ -1,12 +1,11 @@
-package web.ssa.dto;
+package web.ssa.dto.categories;
 
 import lombok.Data;
 
 @Data
-public class DetailCategoryFieldsDTO {
+public class CategoryFieldsDTO {
     private int id;
     private int categoryId;
-    private int detailCategoryId;
     private String attributeKey;
     private String displayName;
     private String dataType;

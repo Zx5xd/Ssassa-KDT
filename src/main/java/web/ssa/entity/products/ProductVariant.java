@@ -1,9 +1,7 @@
-package web.ssa.entity;
+package web.ssa.entity.products;
 
 import jakarta.persistence.*;
 import lombok.*;
-
-import java.util.Map;
 
 @Entity
 @Table(name = "PRODUCT_VARIANT")
