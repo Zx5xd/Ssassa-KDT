@@ -13,8 +13,9 @@ public class ProductVariant {
     @Id
     private int id;
 
-    @Column(name = "MASTER_ID", nullable = false)
-    private int masterId;
+    @ManyToOne
+    @JoinColumn(name = "MASTER_ID", nullable = false)
+    private ProductMaster masterId;
 
     @Column(nullable = false)
     private int price;

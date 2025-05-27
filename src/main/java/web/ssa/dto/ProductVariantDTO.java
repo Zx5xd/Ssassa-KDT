@@ -1,12 +1,11 @@
 package web.ssa.dto;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Id;
-import lombok.Getter;
-import lombok.Setter;
 
-@Setter
-@Getter
+import lombok.Data;
+
+import java.util.Map;
+
+@Data
 public class ProductVariantDTO {
     private int id;
     private int masterId;
@@ -14,5 +13,5 @@ public class ProductVariantDTO {
     private String name;
     private String simpleImg;
     private String detailImg;
-    private Object detail;
+    private Map<String, Map<String, String>> detail;
 }

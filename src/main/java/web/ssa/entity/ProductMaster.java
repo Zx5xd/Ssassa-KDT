@@ -2,11 +2,8 @@ package web.ssa.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
-import web.ssa.dto.ProductVariantDTO;
-
 import java.util.Date;
 import java.util.List;
-
 
 @Entity
 @Table(name = "PRODUCT_MASTER")
@@ -19,7 +16,7 @@ public class ProductMaster {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
-    @Column(nullable = false, length = 255)
+    @Column(nullable = false)
     private String name;
 
     @Column(name = "CATEOGRY_ID", nullable = false)
@@ -34,14 +31,14 @@ public class ProductMaster {
     @Column(name = "DETAIL_IMG")
     private int detailImg;
 
-    @Column()
+    @Column
     private int price;
 
     @Column(columnDefinition = "json")
     private String detail;
 
-    @Column(name = "DEFAULT_VARIANT")
-    int defaultVariant;
+    @OneToMany(mappedBy = "masterId", cascade = CascadeType.ALL)
+    List<ProductVariant> defaultVariant;
 
     @Column(nullable = false)
     private Date reg;
