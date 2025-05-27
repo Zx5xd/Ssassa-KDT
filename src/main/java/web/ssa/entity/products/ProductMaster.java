@@ -37,9 +37,15 @@ public class ProductMaster {
     @Column(columnDefinition = "json")
     private String detail;
 
-    @OneToMany(mappedBy = "masterId", cascade = CascadeType.ALL)
-    List<ProductVariant> defaultVariant;
+    @Column(name = "DEFAULT_VARIANT") // ✅ 컬럼 생성됨
+    private Integer defaultVariantId;
 
     @Column(nullable = false)
     private Date reg;
+
+    @OneToMany(mappedBy = "masterId", cascade = CascadeType.ALL)
+    List<ProductVariant> variants;
+
+    @OneToMany(mappedBy = "productId", cascade = CascadeType.ALL)
+    List<ProductReview> reviews;
 }

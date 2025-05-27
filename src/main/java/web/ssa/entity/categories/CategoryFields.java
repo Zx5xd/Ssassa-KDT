@@ -13,9 +13,8 @@ public class CategoryFields {
     @SequenceGenerator(name = "cat_field_gen", sequenceName = "cat_field_seq", initialValue = 1, allocationSize = 1)
     private int id;
 
-//    @Column(name = "CATEGORY_ID", nullable = false)
     @ManyToOne
-    @JoinColumn(name = "category_id")
+    @JoinColumn(name = "CATEGORY_ID")
     private Categories categoryId;
 
     @Column(name = "ATTRIBUTE_KEY", nullable = false)

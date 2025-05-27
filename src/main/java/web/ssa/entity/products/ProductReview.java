@@ -20,11 +20,13 @@ public class ProductReview {
     @Column(name = "USER_IMGS", columnDefinition = "json")
     private String userImgs;
 
-    @Column(name = "PRODUCT_ID", nullable = false)
-    private int productId;
+    @ManyToOne
+    @JoinColumn(name = "PRODUCT_ID", nullable = false)
+    private ProductMaster productId;
 
-    @Column(name = "PRODUCT_VARIANT_ID", nullable = false)
-    private int productVariantId;
+    @OneToOne
+    @JoinColumn(name = "PRODUCT_VARIANT_ID", nullable = false)
+    private ProductVariant productVariant;
 
     @Column(name = "RECOMMEND_COUNT", nullable = false)
     private Integer recommendCount;

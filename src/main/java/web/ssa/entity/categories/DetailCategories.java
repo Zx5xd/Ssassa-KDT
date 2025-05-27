@@ -3,6 +3,8 @@ package web.ssa.entity.categories;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.util.List;
+
 @Entity
 @Table(name = "DETAIL_CATEGORIES")
 @Getter @Setter @NoArgsConstructor
@@ -23,5 +25,8 @@ public class DetailCategories {
 
     @Column(nullable = false)
     private String name;
+
+    @OneToMany(mappedBy = "detailCategoryId")
+    private List<DetailCategoryFields> detailCategoryFields;
 }
 
