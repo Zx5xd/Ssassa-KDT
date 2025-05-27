@@ -9,13 +9,19 @@ import lombok.*;
 @Setter @NoArgsConstructor @AllArgsConstructor @Builder
 public class DetailCategoryFields {
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY, generator = "cat_detail_field_gen")
+    @SequenceGenerator(name = "cat_detail_field_gen", sequenceName = "cat_detail_field_seq", initialValue = 1, allocationSize = 1)
     private int id;
 
-    @Column(name = "CATEGORY_ID", nullable = false)
-    private int categoryId;
+//    @Column(name = "CATEGORY_ID", nullable = false)
+    @ManyToOne
+    @JoinColumn(name = "category_id")
+    private Categories categoryId;
 
-    @Column(name = "DETAIL_CATEGORY_ID", nullable = false)
-    private int detailCategoryId;
+//    @Column(name = "DETAIL_CATEGORY_ID", nullable = false)
+    @ManyToOne
+    @JoinColumn(name = "category_detail_id")
+    private DetailCategories detailCategoryId;
 
     @Column(name = "ATTRIBUTE_KEY", nullable = false)
     private String attributeKey;

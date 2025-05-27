@@ -9,11 +9,14 @@ import lombok.*;
 @AllArgsConstructor @Builder
 public class DetailCategories {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.IDENTITY, generator = "cat_detail_gen")
+    @SequenceGenerator(name = "cat_detail_gen",sequenceName = "cat_detail_seq", initialValue = 1, allocationSize = 1)
     private int id;
 
-    @Column(name = "CATEGORY_ID", nullable = false)
-    private int categoryId;
+//    @Column(name = "CATEGORY_ID", nullable = false)
+    @ManyToOne
+    @JoinColumn(name = "category_id")
+    private Categories categoryId;
 
     @Column(nullable = false)
     private String code;
