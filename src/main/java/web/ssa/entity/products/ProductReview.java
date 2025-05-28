@@ -9,6 +9,7 @@ import lombok.*;
 @Setter @NoArgsConstructor @AllArgsConstructor @Builder
 public class ProductReview {
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
     @Column(nullable = false)

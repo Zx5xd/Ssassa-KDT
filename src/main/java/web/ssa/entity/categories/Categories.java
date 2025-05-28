@@ -11,8 +11,7 @@ import java.util.List;
 @Setter @NoArgsConstructor @AllArgsConstructor @Builder
 public class Categories {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY, generator = "cat_gen")
-    @SequenceGenerator(name = "cat_gen", sequenceName = "cat_seq", initialValue = 1, allocationSize = 1)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
     @Column(nullable = false, length = 100)
@@ -21,12 +20,12 @@ public class Categories {
     @Column(nullable = false, length = 255)
     private String name;
 
-    @OneToMany(mappedBy = "categoryId", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "categoryDetailId", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<DetailCategories> detailCategories;
 
     @OneToMany(mappedBy = "categoryFieldId", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<CategoryFields> categoriesFields;
 
     @OneToMany(mappedBy = "categoryDetailFieldId", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<DetailCategories> detailCategoriesFields;
+    private List<DetailCategoryFields> detailCategoriesFields;
 }
