@@ -40,6 +40,9 @@ public class ProductMaster {
     @Column(name = "DEFAULT_VARIANT") // ✅ 컬럼 생성됨
     private Integer defaultVariantId;
 
+    @Column
+    private int amount;
+
     @Column(nullable = false)
     private Date reg;
 

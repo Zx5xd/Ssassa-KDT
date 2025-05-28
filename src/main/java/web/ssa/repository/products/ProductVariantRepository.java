@@ -9,5 +9,7 @@ import java.util.List;
 
 @Repository
 public interface ProductVariantRepository extends JpaRepository<ProductVariant, Integer> {
-
+    List<ProductVariant> findByMasterId(ProductMaster masterId);
+    int deleteById(int id);
+    int deleteByMasterId(ProductMaster productId);
 }

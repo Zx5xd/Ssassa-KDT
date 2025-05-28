@@ -30,4 +30,7 @@ public class ProductVariant {
 
     @Column(columnDefinition = "json", nullable = false)
     private String detail;
+
+    @Column
+    private int amount;
 }
