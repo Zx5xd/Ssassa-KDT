@@ -16,5 +16,6 @@ public class ProductDTO {
     private int price;
     private Map<String, Map<String, String>> detail;
     int defaultVariant;
+    private int amount;
     private Date reg;
 }

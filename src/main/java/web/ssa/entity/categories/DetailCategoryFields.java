@@ -9,14 +9,13 @@ import lombok.*;
 @Setter @NoArgsConstructor @AllArgsConstructor @Builder
 public class DetailCategoryFields {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY, generator = "cat_detail_field_gen")
-    @SequenceGenerator(name = "cat_detail_field_gen", sequenceName = "cat_detail_field_seq", initialValue = 1, allocationSize = 1)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
 //    @Column(name = "CATEGORY_ID", nullable = false)
     @ManyToOne
     @JoinColumn(name = "category_id")
-    private Categories categoryId;
+    private Categories categoryDetailFieldId;
 
 //    @Column(name = "DETAIL_CATEGORY_ID", nullable = false)
     @ManyToOne
@@ -44,6 +43,6 @@ public class DetailCategoryFields {
     @Column(columnDefinition = "text")
     private String tooltip;
 
-    @Column(name = "VALUE_LIST", columnDefinition = "text")
+    @Column(name = "VALUE_LIST", columnDefinition = "json")
     private String valueList;
 }

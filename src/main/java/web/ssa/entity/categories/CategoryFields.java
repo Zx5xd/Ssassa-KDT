@@ -9,14 +9,12 @@ import lombok.*;
 @Setter @NoArgsConstructor @AllArgsConstructor @Builder
 public class CategoryFields {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY, generator = "cat_field_gen")
-    @SequenceGenerator(name = "cat_field_gen", sequenceName = "cat_field_seq", initialValue = 1, allocationSize = 1)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
-//    @Column(name = "CATEGORY_ID", nullable = false)
     @ManyToOne
-    @JoinColumn(name = "category_id")
-    private Categories categoryId;
+    @JoinColumn(name = "CATEGORY_ID")
+    private Categories categoryFieldId;
 
     @Column(name = "ATTRIBUTE_KEY", nullable = false)
     private String attributeKey;

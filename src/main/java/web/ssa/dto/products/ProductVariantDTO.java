@@ -14,4 +14,5 @@ public class ProductVariantDTO {
     private String simpleImg;
     private String detailImg;
     private Map<String, Map<String, String>> detail;
+    private int amount;
 }
