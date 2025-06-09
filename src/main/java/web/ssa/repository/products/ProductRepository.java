@@ -13,4 +13,10 @@ public interface ProductRepository extends JpaRepository<ProductMaster, Integer>
     List<ProductMaster> findById(int id);
 
     int deleteById(int id);
+
+    // 관리자 관련
+    int deleteByProductId(Integer id);
+    int updateByProductMaster(ProductMaster productMaster);
+    int createByProductMaster(ProductMaster productMaster);
+
 }

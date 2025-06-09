@@ -9,7 +9,7 @@ import java.util.List;
 
 @Repository
 public interface ProductReviewRepository extends JpaRepository<ProductReview, Integer> {
-    List<ProductReview> findByProductId(ProductMaster productId);
+    ProductReview findByProductId(int productId);
     int countProductReviewByProductId(ProductMaster productId);
     int deleteById(int id);
 }
