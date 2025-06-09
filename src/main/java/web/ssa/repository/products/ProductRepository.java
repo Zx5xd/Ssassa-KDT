@@ -1,8 +1,9 @@
 package web.ssa.repository.products;
 
-import org.springframework.data.jpa.repository.JpaRepository;
+import jakarta.transaction.Transactional;
+import org.springframework.data.jpa.repository.*;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
-import web.ssa.entity.products.ProductImg;
 import web.ssa.entity.products.ProductMaster;
 
 import java.util.List;
@@ -13,10 +14,8 @@ public interface ProductRepository extends JpaRepository<ProductMaster, Integer>
     List<ProductMaster> findById(int id);
 
     int deleteById(int id);
-
-    // 관리자 관련
-    int deleteByProductId(Integer id);
-    int updateByProductMaster(ProductMaster productMaster);
-    int createByProductMaster(ProductMaster productMaster);
-
+    @Modifying
+    @Transactional
+    @Query("UPDATE ProductMaster p SET p.name = :name WHERE p.id = :id")
+    int updateProductNameById(@Param("id") int id, @Param("name") String name);
 }

@@ -1,5 +1,6 @@
 package web.ssa.service.categories;
 
+import web.ssa.entity.categories.Categories;
 import web.ssa.entity.categories.DetailCategories;
 import web.ssa.repository.categories.CategoryRepository;
 import web.ssa.repository.categories.DetailCategoryRepository;
@@ -16,12 +17,12 @@ public class CategoryDetailsServImpl implements CategoryDetailsServ {
     }
 
     @Override
-    public List<DetailCategories> getCategoryDetails(int id) {
-        return this.detailCategoryRepository.findByCategoryId(id);
+    public List<DetailCategories> getCategoryDetails(Categories id) {
+        return this.detailCategoryRepository.findByCategoryDetailId(id);
     }
 
     @Override
-    public List<DetailCategories> getCategoryDetails(int id, String name) {
-        return this.detailCategoryRepository.findByCategoryIdAndCategoryName(id, name);
+    public List<DetailCategories> getCategoryDetails(Categories id, String name) {
+        return this.detailCategoryRepository.findByCategoryDetailIdAndCode(id, name);
     }
 }
