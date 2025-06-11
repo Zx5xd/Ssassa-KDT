@@ -11,12 +11,15 @@
 <a href="/inquiry/write" class="write-button">+ 문의 작성</a>
 
 <table>
+    <thead>
     <tr>
         <th>ID</th>
         <th>제목</th>
         <th>작성자</th>
         <th>상세보기</th>
     </tr>
+    </thead>
+    <tbody>
     <c:forEach var="inq" items="${inquiryList}">
         <tr>
             <td>${inq.id}</td>
@@ -25,6 +28,7 @@
             <td><a class="detail-link" href="/inquiry/detail/${inq.id}">보기</a></td>
         </tr>
     </c:forEach>
+    </tbody>
 </table>
 
 </body>
