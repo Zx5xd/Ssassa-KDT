@@ -68,31 +68,7 @@ public class PayController {
         return "redirect:/mypage";
     }
 
-    // 관리자 환불 요청 리스트
-    @GetMapping("/admin/refunds")
-    public String refundList(Model model) {
-        model.addAttribute("refunds", kakaoPayService.getPendingRefunds());
-        return "adminRefunds";
-    }
-
-    // 관리자 환불 처리 (카카오페이 실제 환불)
-    @PostMapping("/admin/refund/complete")
-    public String refundComplete(@RequestParam("paymentId") Long paymentId, Model model) {
-        Payment payment = kakaoPayService.getPaymentById(paymentId);
-        if (payment == null || payment.getTid() == null) {
-            model.addAttribute("message", "환불 대상 결제가 존재하지 않습니다.");
-            return "error";
-        }
-
-        KakaoPayCancelResponse response = kakaoPayService.kakaoPayCancel(payment.getTid(), payment.getAmount());
-        payment.setStatus("CANCELLED");
-        kakaoPayService.savePayment(payment);
-
-        model.addAttribute("cancel", response);
-        return "payCancelResult";
-    }
-
-
+    // 일반 환불 처리
     @PostMapping("/pay/refund")
     public String kakaoPayRefund(@RequestParam("id") Long id, Model model) {
         Payment payment = kakaoPayService.getPaymentById(id);

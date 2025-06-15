@@ -27,4 +27,10 @@ public class InquiryServiceImpl implements InquiryService {
     public Inquiry save(Inquiry inquiry) {
         return inquiryRepository.save(inquiry);
     }
+
+
+    @Override
+    public void delete(Long id) {
+        inquiryRepository.deleteById(id); // 👈 delete 구현
+    }
 }

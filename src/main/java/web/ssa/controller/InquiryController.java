@@ -42,4 +42,6 @@ public class InquiryController {
         model.addAttribute("inquiry", inquiry);
         return "Inquiry/detail"; // 💡 JSP: /WEB-INF/views/Inquiry/detail.jsp
     }
+
+
 }
