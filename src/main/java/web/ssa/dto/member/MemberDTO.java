@@ -2,6 +2,8 @@ package web.ssa.dto.member;
 
 import lombok.Data;
 
+import java.time.LocalDateTime;
+
 @Data
 public class MemberDTO {
     private String email;
@@ -9,6 +11,8 @@ public class MemberDTO {
     private String name;
     private String nickname;
     private String phone;
-    private String role;
+    private String role = "USER";
 
+    private boolean emailVerified = false;
+    private LocalDateTime emailVerifiedAt;
 }
