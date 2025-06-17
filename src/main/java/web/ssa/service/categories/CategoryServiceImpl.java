@@ -20,11 +20,11 @@ public class CategoryServiceImpl implements CategoryService {
 
     @Override
     public Categories getCategoryById(int id) {
-        return this.categoryRepository.findByCategoryId(id);
+        return this.categoryRepository.findById(id);
     }
 
     @Override
     public Categories getCategoryByName(String name) {
-        return this.categoryRepository.findByCategoryName(name);
+        return this.categoryRepository.findByName(name);
     }
 }

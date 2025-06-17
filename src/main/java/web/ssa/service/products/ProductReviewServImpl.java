@@ -2,6 +2,7 @@ package web.ssa.service.products;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import web.ssa.entity.products.ProductMaster;
 import web.ssa.entity.products.ProductReview;
 import web.ssa.repository.products.ProductReviewRepository;
 
@@ -20,8 +21,8 @@ public class ProductReviewServImpl implements ProductReviewServ {
     }
 
     @Override
-    public ProductReview getProductReview(int id) {
-        return this.productReviewRepository.findByProductId(id);
+    public ProductReview getProductReview(ProductMaster productMaster) {
+        return this.productReviewRepository.findProductReviewByProductId(productMaster);
     }
 
     @Override

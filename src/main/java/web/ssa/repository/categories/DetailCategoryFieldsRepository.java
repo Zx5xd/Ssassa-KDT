@@ -8,7 +8,6 @@ import java.util.List;
 
 @Repository
 public interface DetailCategoryFieldsRepository extends JpaRepository<Categories, Integer> {
-    List<Categories> findByCategoryId(Integer categoryId);
-    List<Categories> findByCategoryName(String categoryName);
-    List<Categories> findByCategoryIdAndCategoryName(Integer categoryId, String categoryName);
+    List<Categories> findByName(String categoryName);
+    List<Categories> findById(Categories categories);
 }
