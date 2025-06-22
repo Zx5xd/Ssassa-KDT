@@ -21,13 +21,12 @@ def classify_value(value: str) -> str | None:
             # print(f"classify_str, {value}")
             return "varchar2"
 
-def classify_unit_first_process(unit_len, order_value) :
-    # print(f"order_value : {order_value} , len : {unit_len}")
+def classify_unit_first_process(unit_len, value) :
     match unit_len:
         case 0 :
             return "varchar2"
         case 1 :
-            return classify_value(order_value)
+            return classify_value(value)
         case 2 :
             return "number"
 
@@ -47,16 +46,16 @@ def unit_process(data2) :
         return json_data_unit_value(data2)
 
 def unit_len_2(data2) :
-    order_unit = {}
+    value_unit = {}
 
-    for val in data2['DISPLAY_ORDER']:
+    for val in data2['value']:
         try:
             num = int(val)
             if num >= 100:
-                order_unit[val] = "GB"
+                value_unit[val] = "GB"
             else:
-                order_unit[val] = "TB"
+                value_unit[val] = "TB"
         except ValueError:
-            order_unit[val] = "unkwon"  # 숫자 아닌 값 처리용
+            value_unit[val] = "unkwon"  # 숫자 아닌 값 처리용
 
-    return order_unit
+    return value_unit

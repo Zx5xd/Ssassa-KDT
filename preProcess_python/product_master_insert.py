@@ -13,28 +13,36 @@ for file in json_files:
         try:
             products = json.load(f)
             if isinstance(products, list):
-                master_lists = product_master_preprocessing.extract_product_detail_info(products, category_name)
+
+                # product_img 테이블에 상품 이미지 주소 삽입
+                # product_master_preprocessing.insert_img_path_to_product_img(products)
+
+                # product_master 테이블에 상품 데이터 삽입
+                # master_lists = product_master_preprocessing.extract_product_detail_info(products, category_name)
 
                 master_insert_sql = """
                                     INSERT INTO product_master (name, simple_img, detail_img, price, 
-                                                                detail, reg, cateogry_id, detail_category_id, default_variant, amount)
+                                                                detail, reg, category_id, detail_category_id, default_variant, amount)
                                     VALUES (:name, :simple_img, :detail_img, :price, 
-                                                                :detail, :reg, :cateogry_id, :detail_category_id, :default_variant, :amount)
+                                                                :detail, :reg, :category_id, :detail_category_id, :default_variant, :amount)
                                     """
 
-                for data in master_lists:
-                    mysql_crud.crud_insert(master_insert_sql, data)
+                # for data in master_lists:
+                    # print(f"dict : {data['detail_img']} \n // type : {type(data['detail_img'])} \n // len : {len(data['detail_img'])}")
+                    # mysql_crud.crud_insert(master_insert_sql, data)
 
-                    variants_lists = product_master_preprocessing.extract_product_variation_info(products)
 
+                # product_variants 테이블에 파생 데이터 삽입
+                variants_lists = product_master_preprocessing.extract_product_variation_info(products)
+                #
                 if variants_lists:
                     variants_insert_sql = """
-                                          INSERT INTO product_variant (master_id, price, detail, detail_img, 
+                                          INSERT INTO product_variant (master_id, price, detail, detail_img,
                                                                     name, simple_img, amount)
-                                          VALUES (:master_id, :price, :detail, :detail_img, 
-                                                                    :name, :simple_img, :amount)  
-                                    """
-
+                                          VALUES (:master_id, :price, :detail, :detail_img,
+                                                                    :name, :simple_img, :amount)
+                                         """
+                #
                     for data in variants_lists:
                         mysql_crud.crud_insert(variants_insert_sql, data)
 

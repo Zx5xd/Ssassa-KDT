@@ -114,8 +114,9 @@ def collect_normalized_values(base_details):
 
     final_data = {}
     for key in field_values:
+        print(f"key : {field_values[key]}")
         final_data[key] = {
-            "DISPLAY_ORDER": sorted(field_values[key]),
+            "value": sorted(field_values[key]),
             "unit": sorted(unit_map[key]) if unit_map[key] else []
         }
     return final_data
@@ -147,4 +148,4 @@ def process_all_files(folder_path: str, output_file: str):
 
     return output_file
 
-process_all_files("data", "cleaned_unique_fields(Unit Eidt)2.json")
+process_all_files("../data", "semi_final_cleaned_unique_fields(unit_value_edit).json")
