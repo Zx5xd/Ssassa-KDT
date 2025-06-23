@@ -1,6 +1,8 @@
 package web.ssa.repository.products;
 
 import jakarta.transaction.Transactional;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.*;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
@@ -18,4 +20,10 @@ public interface ProductRepository extends JpaRepository<ProductMaster, Integer>
     @Transactional
     @Query("UPDATE ProductMaster p SET p.name = :name WHERE p.id = :id")
     int updateProductNameById(@Param("id") int id, @Param("name") String name);
+
+    Page<ProductMaster> findAll(Pageable pageable);
+
+    // 상품 등록 <- 기본
+    //
+
 }

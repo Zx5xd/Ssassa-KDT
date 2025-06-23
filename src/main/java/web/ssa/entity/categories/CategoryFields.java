@@ -3,6 +3,8 @@ package web.ssa.entity.categories;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.util.List;
+
 @Entity
 @Table(name = "CATEGORY_FIELDS")
 @Getter
@@ -13,8 +15,13 @@ public class CategoryFields {
     private int id;
 
     @ManyToOne
-    @JoinColumn(name = "CATEGORY_ID")
+    @JoinColumn(name = "category_child_id")
+    private CategoriesChild categoryChildId;
+
+    @ManyToOne
+    @JoinColumn(name = "category_id", nullable = false)
     private Categories categoryFieldId;
+
 
     @Column(name = "ATTRIBUTE_KEY", nullable = false)
     private String attributeKey;

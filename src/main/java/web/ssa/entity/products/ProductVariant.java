@@ -23,10 +23,10 @@ public class ProductVariant {
     private String name;
 
     @Column(name="SIMPLE_IMG")
-    private String simpleImg;
+    private int simpleImg;
 
     @Column(name = "DETAIL_IMG")
-    private String detailImg;
+    private int detailImg;
 
     @Column(columnDefinition = "json", nullable = false)
     private String detail;

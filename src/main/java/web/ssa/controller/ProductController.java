@@ -1,24 +1,41 @@
 package web.ssa.controller;
 
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpSession;
-import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.web.bind.annotation.*;
+import web.ssa.entity.products.ProductMaster;
+import web.ssa.entity.products.ProductReview;
+import web.ssa.service.products.ProductReviewServImpl;
+import web.ssa.service.products.ProductServiceImpl;
 
-@Controller("/pd/*")
+@RestController
+@RequestMapping("/pd/*")
 public class ProductController {
 
-/*    @GetMapping("/main")
-    public String home() {
+    @Autowired
+    private ProductServiceImpl pdServImpl;
 
-        return "main"; // → /WEB-INF/views/home.jsp로 포워딩됨
+    @Autowired
+    private ProductReviewServImpl pdReviewServImpl;
+
+    @GetMapping
+    public Page<ProductMaster> listProducts(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size
+    ) {
+        return pdServImpl.getPagedProducts(page, size);
     }
 
-    @PostMapping("/main")
-    public String postHome(Model model, HttpSession session, HttpServletRequest request) {
+    @GetMapping("/{productId}/reviews")
+    public Page<ProductReview> listReviews(
+            @PathVariable int productId,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "5") int size
+    ) {
+        return pdReviewServImpl.getPagedReviews(productId, page, size);
+    }
 
-        return "main"; // → /WEB-INF/views/home.jsp로 포워딩됨
-    }*/
+
+    // ManageMent
+
 }

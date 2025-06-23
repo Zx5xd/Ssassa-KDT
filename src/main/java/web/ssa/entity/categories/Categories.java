@@ -2,6 +2,7 @@ package web.ssa.entity.categories;
 
 import jakarta.persistence.*;
 import lombok.*;
+import web.ssa.enumf.CategoryType;
 
 import java.util.List;
 
@@ -14,18 +15,16 @@ public class Categories {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
+    @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 100)
-    private String code;
+    private CategoryType code;
 
     @Column(nullable = false, length = 255)
     private String name;
 
-    @OneToMany(mappedBy = "categoryDetailId", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<DetailCategories> detailCategories;
+    @OneToMany(mappedBy = "categoryChildId", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<CategoriesChild> categoryChildren;
 
     @OneToMany(mappedBy = "categoryFieldId", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<CategoryFields> categoriesFields;
-
-    @OneToMany(mappedBy = "categoryDetailFieldId", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<DetailCategoryFields> detailCategoriesFields;
 }
