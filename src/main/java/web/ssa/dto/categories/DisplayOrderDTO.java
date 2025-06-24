@@ -17,4 +17,15 @@ public class DisplayOrderDTO {
         this.oldOrder = oldOrder;
         this.newOrder = newOrder;
     }
+
+    @Override
+    public String toString() {
+        return "[ DTO ] DisplayOrderDTO{" +
+                "categoryId=" + this.categoryId +
+                ", childId=" + this.childId +
+                ", attributeKey='" + this.attributeKey + '\'' +
+                ", oldOrder=" + this.oldOrder +
+                ", newOrder=" + this.newOrder +
+                '}';
+    }
 }

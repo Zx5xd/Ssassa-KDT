@@ -1,54 +1,54 @@
-<%@ page import="java.util.List" %>
-<%@ page import="web.ssa.dto.categories.CategoryFieldsDTO" %>
-<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%@ page contentType="text/html; charset=UTF-8" language="java" %>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <!DOCTYPE html>
-<html lang="ko">
+<html>
 <head>
-  <meta charset="UTF-8">
-  <title>Category Field 순서 조정</title>
-<%--  <script>--%>
-<%--    async function updateOrder() {--%>
-<%--      const categoryId = parseInt(document.getElementById("categoryId").value);--%>
-<%--      const childIdRaw = document.getElementById("childId").value;--%>
-<%--      const childId = childIdRaw ? parseInt(childIdRaw) : null;--%>
-<%--      const attributeKey = document.getElementById("attributeKey").value;--%>
-<%--      const oldOrder = parseInt(document.getElementById("oldOrder").value);--%>
-<%--      const newOrder = parseInt(document.getElementById("newOrder").value);--%>
-
-<%--      const response = await fetch("/cat/set/displayOrder-static", {--%>
-<%--        method: "POST",--%>
-<%--        headers: {--%>
-<%--          "Content-Type": "application/json"--%>
-<%--        },--%>
-<%--        body: JSON.stringify({--%>
-<%--          categoryId,--%>
-<%--          childId,--%>
-<%--          attributeKey,--%>
-<%--          oldOrder,--%>
-<%--          newOrder--%>
-<%--        })--%>
-<%--      });--%>
-
-<%--      if (response.ok) {--%>
-<%--        alert("순서가 성공적으로 변경되었습니다!");--%>
-<%--        location.reload();--%>
-<%--      } else {--%>
-<%--        const err = await response.text();--%>
-<%--        alert("오류 발생: " + err);--%>
-<%--      }--%>
-<%--    }--%>
-<%--  </script>--%>
-  <%
-    String dtoList = request.getParameter("dtoList")
-  %>
+  <title>카테고리 필드 목록</title>
 </head>
 <body>
-<h1>Category Field 순서 조정</h1>
-<label>Category ID: <input type="number" id="categoryId" required></label><br>
-<label>Child Category ID (nullable): <input type="number" id="childId"></label><br>
-<label>Attribute Key: <input type="text" id="attributeKey" required></label><br>
-<label>Old Order: <input type="number" id="oldOrder" required></label><br>
-<label>New Order: <input type="number" id="newOrder" required></label><br>
-<button onclick="updateOrder()">순서 변경</button>
+<h1>카테고리 필드 목록</h1>
+<%
+
+%>
+<a href="/cat/displayOrder-All?categoryId="></a>
+
+<!-- 값이 없을 때 -->
+<c:if test="${empty dtoList}">
+  <p>데이터가 없습니다.</p>
+</c:if>
+
+<!-- 값이 있을 때 -->
+<c:if test="${not empty dtoList}">
+  <table border="1">
+    <thead>
+    <tr>
+      <th>ID</th>
+      <th>Category ID</th>
+      <th>Attribute Key</th>
+      <th>Display Name</th>
+      <th>Data Type</th>
+      <th>Unit</th>
+      <th>Display Order</th>
+      <th>Tooltip</th>
+      <th>Value List</th>
+    </tr>
+    </thead>
+    <tbody>
+    <c:forEach var="item" items="${dtoList}">
+      <tr>
+        <td>${item.id}</td>
+        <td>${item.categoryId}</td>
+        <td>${item.attributeKey}</td>
+        <td>${item.displayName}</td>
+        <td>${item.dataType}</td>
+        <td>${item.unit}</td>
+        <td>${item.displayOrder}</td>
+        <td>${item.tooltip}</td>
+        <td>${item.valueList}</td>
+      </tr>
+    </c:forEach>
+    </tbody>
+  </table>
+</c:if>
 </body>
 </html>

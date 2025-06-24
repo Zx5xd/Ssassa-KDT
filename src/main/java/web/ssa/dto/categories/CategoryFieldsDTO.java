@@ -37,4 +37,20 @@ public class CategoryFieldsDTO {
                 })
                 .collect(Collectors.toList());
     }
+
+    @Override
+    public String toString() {
+        return "[ DTO ] CategoryFieldsDTO{" +
+                "id=" + this.id +
+                ", categoryId=" + this.categoryId +
+                ", attributeKey='" + this.attributeKey + '\'' +
+                ", displayName='" + this.displayName + '\'' +
+                ", dataType='" + this.dataType + '\'' +
+                ", isFilterable=" + this.isFilterable +
+                ", unit='" + this.unit + '\'' +
+                ", displayOrder=" + this.displayOrder +
+                ", tooltip='" + this.tooltip + '\'' +
+                ", valueList='" + this.valueList + '\'' +
+                '}';
+    }
 }

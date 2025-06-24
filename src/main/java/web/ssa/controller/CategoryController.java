@@ -13,9 +13,11 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import web.ssa.cache.CategoriesCache;
 import web.ssa.dto.categories.CategoryFieldsDTO;
 import web.ssa.dto.categories.DisplayOrderDTO;
 import web.ssa.entity.categories.CategoryFields;
+import web.ssa.enumf.CategoryType;
 import web.ssa.service.categories.CategoryServiceImpl;
 
 import java.util.List;
@@ -25,20 +27,16 @@ import java.util.Map;
 @Controller
 @RequestMapping("/cat/*")
 public class CategoryController {
-    /*    @GetMapping("/main")
-    public String home() {
-
-        return "main"; // → /WEB-INF/views/home.jsp로 포워딩됨
-    }
-
-    @PostMapping("/main")
-    public String postHome(Model model, HttpSession session, HttpServletRequest request) {
-
-        return "main"; // → /WEB-INF/views/home.jsp로 포워딩됨
-    }*/
 
     @Autowired
     private CategoryServiceImpl categoryService;
+
+    @Autowired
+    private final CategoriesCache categoriesCache;
+
+    public CategoryController(CategoriesCache categoriesCache) {
+        this.categoriesCache = categoriesCache;
+    }
 
     @GetMapping("fridge")
     public String fridge() {
@@ -112,14 +110,16 @@ public class CategoryController {
 
         List<CategoryFieldsDTO> dtoList = this.categoryService.getCategoryFieldsByCategoryId(categoryId);
         model.addAttribute("dtoList", dtoList);
-
+//        model.addAttribute("category", categoriesCache);
+        categoriesCache.getCachedCategories().forEach(categories -> {
+            System.out.println(categories.toString());
+        });
         return "reDisplayorderAll";
     }
 
     @PostMapping("set/displayOrder-All")
     public ResponseEntity<?> allReorder(@RequestBody Map<String, Object> payload) {
         try {
-
             DisplayOrderDTO orderDTO = new DisplayOrderDTO(
                     Integer.parseInt(payload.get("categoryId").toString()),
                     Integer.parseInt(payload.get("childId").toString()),
@@ -127,7 +127,6 @@ public class CategoryController {
                     Integer.parseInt(payload.get("oldOrder").toString()),
                     Integer.parseInt(payload.get("newOrder").toString())
             );
-
 
             return ResponseEntity.ok("순서 변경 완료");
         } catch (Exception e) {

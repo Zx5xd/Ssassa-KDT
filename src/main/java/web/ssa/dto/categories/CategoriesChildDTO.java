@@ -1,25 +1,26 @@
 package web.ssa.dto.categories;
 
 import lombok.Data;
-import web.ssa.entity.categories.Categories;
-import web.ssa.entity.categories.CategoryFields;
+import web.ssa.entity.categories.CategoriesChild;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
 @Data
-public class CategoriesDTO {
+public class CategoriesChildDTO {
     private int id;
+    private int categoryId;
     private String code;
     private String name;
 
-    public static List<CategoriesDTO> convertToDTOList(List<Categories> entities) {
+    public static List<CategoriesChildDTO> convertToDTOList(List<CategoriesChild> entities) {
         return entities.stream()
                 .map(entity -> {
-                    CategoriesDTO dto = new CategoriesDTO();
+                    CategoriesChildDTO dto = new CategoriesChildDTO();
                     dto.setId(entity.getId());
                     dto.setCode(String.valueOf(entity.getCode()));
                     dto.setName(entity.getName());
+                    dto.setCategoryId(entity.getCategoryChildId().getId());
 
                     return dto;
                 })
@@ -28,8 +29,9 @@ public class CategoriesDTO {
 
     @Override
     public String toString() {
-        return "[ DTO ] CategoriesDTO{" +
+        return "[ DTO ]CategoriesChild{" +
                 "id=" + this.id +
+                ", categoryId=" + this.categoryId +
                 ", code='" + this.code + '\'' +
                 ", name='" + this.name + '\'' +
                 '}';
