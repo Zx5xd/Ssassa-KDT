@@ -1,10 +1,12 @@
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <html>
 <head>
-  <title>마이페이지</title>
+    <title>마이페이지</title>
 </head>
 <body>
 <h2>마이페이지</h2>
+
 
 <p>이메일: ${user.email}</p>
 <p>이름: ${user.name}</p>
@@ -36,7 +38,7 @@
 <a href="/logout">로그아웃</a>
 
 <form method="post" action="/withdraw" onsubmit="return confirm('정말 탈퇴하시겠습니까?')">
-  <button type="submit">회원 탈퇴</button>
+    <button type="submit">회원 탈퇴</button>
 </form>
 </body>
 </html>

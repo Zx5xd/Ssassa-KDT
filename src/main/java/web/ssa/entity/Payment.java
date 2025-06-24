@@ -15,6 +15,7 @@ public class Payment {
     private int amount;
     private String status; // SUCCESS / REFUND_REQUEST / REFUNDED / CANCELLED
     private String tid;    // 카카오 결제 TID
+    private String userEmail;
 
     private LocalDateTime createdAt = LocalDateTime.now();
 }

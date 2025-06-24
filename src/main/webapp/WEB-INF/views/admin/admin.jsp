@@ -11,7 +11,7 @@
 <ul class="list-group">
   <li class="list-group-item"><a href="/admin/users">회원 목록 관리</a></li>
   <li class="list-group-item"><a href="/admin/products">상품 관리</a></li>
-  <li class="list-group-item"><a href="/admin/inquiries">환불 및 문의사항 관리</a></li>
+  <li class="list-group-item"><a href="/admin/refunds">환불 및 문의사항 관리</a></li>  <!-- ✅ 수정 여기! -->
   <li class="list-group-item"><a href="/logout">로그아웃</a></li>
 </ul>
 </body>

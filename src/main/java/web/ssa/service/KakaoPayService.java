@@ -1,3 +1,4 @@
+// ✅ KakaoPayService.java 전체 코드 (userEmail 저장 로직 제거 → PayController에서 처리)
 package web.ssa.service;
 
 import lombok.RequiredArgsConstructor;
@@ -19,7 +20,7 @@ import java.util.Map;
 public class KakaoPayService {
 
     private final PaymentRepository paymentRepository;
-    private static final String ADMIN_KEY = "KakaoAK 3abec9eb781aaddcb9e4d14a1b3f25d5"; // 실제 키로 교체
+    private static final String ADMIN_KEY = "KakaoAK 3abec9eb781aaddcb9e4d14a1b3f25d5";
 
     private String tid;
     private Product currentProduct;
@@ -68,6 +69,7 @@ public class KakaoPayService {
         HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<>(params, headers);
         restTemplate.postForEntity("https://kapi.kakao.com/v1/payment/approve", request, Map.class);
 
+        // ✅ 필드 채운 Payment 객체 반환 (DB 저장은 controller에서)
         Payment payment = new Payment();
         payment.setProductId(currentProduct.getId());
         payment.setItemName(currentProduct.getName());
@@ -75,7 +77,7 @@ public class KakaoPayService {
         payment.setStatus("SUCCESS");
         payment.setTid(this.tid);
 
-        return paymentRepository.save(payment);
+        return payment;
     }
 
     public void requestRefund(Long paymentId) {
@@ -126,5 +128,10 @@ public class KakaoPayService {
 
     public void savePayment(Payment payment) {
         paymentRepository.save(payment);
+    }
+
+    // ✅ 사용자 이메일로 결제 내역 조회
+    public List<Payment> getPaymentsByUser(String email) {
+        return paymentRepository.findByUserEmail(email);
     }
 }

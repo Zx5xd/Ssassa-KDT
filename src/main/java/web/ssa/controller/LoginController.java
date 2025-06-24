@@ -21,13 +21,11 @@ public class LoginController {
 
     private final MemberService memberService;
 
-    // 로그인 폼
     @GetMapping("/login")
     public String showLoginPage() {
         return "login";
     }
 
-    // 로그인 처리
     @PostMapping("/login")
     public String login(@RequestParam("email") String email,
                         @RequestParam("password") String password,
@@ -43,10 +41,9 @@ public class LoginController {
                 throw new IllegalStateException("로그인 실패 또는 탈퇴한 계정입니다.");
             }
 
-            // 세션에 로그인 정보 저장
             session.setAttribute("loginUser", user);
 
-            // 자동 로그인 토큰 생성 및 쿠키 저장
+            // 자동 로그인 쿠키 저장
             String token = UUID.randomUUID().toString();
             Cookie autoLoginCookie = new Cookie("loginToken", token);
             autoLoginCookie.setMaxAge(60 * 5); // 5분
@@ -56,18 +53,18 @@ public class LoginController {
 
             memberService.saveTokenWithTimestamp(email, token, LocalDateTime.now());
 
-            // 이메일 저장 쿠키 처리
+            // 이메일 기억 쿠키 처리
             Cookie rememberCookie = new Cookie("rememberEmail",
                     "on".equals(rememberEmail) ? email : null);
             rememberCookie.setMaxAge("on".equals(rememberEmail) ? 60 * 60 * 24 * 30 : 0);
             rememberCookie.setPath("/");
             response.addCookie(rememberCookie);
 
-            // 역할 기반 리디렉션
+            // ✅ 경로 수정: /productList → /products
             if ("ADMIN".equals(user.getRole())) {
                 return "redirect:/admin";
             } else {
-                return "redirect:/test";
+                return "redirect:/products";
             }
 
         } catch (IllegalArgumentException | IllegalStateException e) {
@@ -76,7 +73,6 @@ public class LoginController {
         }
     }
 
-    // 로그아웃 처리
     @GetMapping("/logout")
     public String logout(HttpServletRequest request,
                          HttpServletResponse response,
@@ -85,7 +81,6 @@ public class LoginController {
         User user = (User) session.getAttribute("loginUser");
         session.invalidate();
 
-        // 자동 로그인 쿠키 삭제
         Cookie autoLoginCookie = new Cookie("loginToken", null);
         autoLoginCookie.setMaxAge(0);
         autoLoginCookie.setPath("/");
@@ -98,13 +93,11 @@ public class LoginController {
         return "redirect:/login";
     }
 
-    // 아이디 찾기 폼
     @GetMapping("/find-id")
     public String showFindIdForm() {
         return "findId";
     }
 
-    // 아이디 찾기 처리
     @PostMapping("/find-id")
     public String findId(@RequestParam String name,
                          @RequestParam String phone,
@@ -120,13 +113,11 @@ public class LoginController {
         return "findId";
     }
 
-    // 비밀번호 찾기 폼
     @GetMapping("/find-password")
     public String showFindPasswordForm() {
         return "findPassword";
     }
 
-    // 비밀번호 찾기 처리
     @PostMapping("/find-password")
     public String findPassword(@RequestParam String email,
                                @RequestParam String phone,
@@ -142,7 +133,6 @@ public class LoginController {
         }
     }
 
-    // 비밀번호 재설정
     @PostMapping("/reset-password")
     public String resetPassword(@RequestParam String email,
                                 @RequestParam String newPassword,

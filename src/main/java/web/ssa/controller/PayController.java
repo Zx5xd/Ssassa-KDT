@@ -1,5 +1,6 @@
 package web.ssa.controller;
 
+import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -8,6 +9,7 @@ import web.ssa.dto.KakaoPayCancelResponse;
 import web.ssa.entity.Payment;
 import web.ssa.entity.Product;
 import web.ssa.service.KakaoPayService;
+import web.ssa.entity.member.User;
 
 import java.util.Arrays;
 import java.util.List;
@@ -42,24 +44,38 @@ public class PayController {
 
     // 결제 성공 후 승인 처리
     @GetMapping("/pay/success")
-    public String kakaoPaySuccess(@RequestParam("pg_token") String pgToken, Model model) {
+    public String kakaoPaySuccess(@RequestParam("pg_token") String pgToken,
+                                  HttpSession session,
+                                  Model model) {
+        // 1. 결제 승인 후 Payment 객체 생성 (itemName, amount, status 포함)
         Payment payment = kakaoPayService.kakaoPayApprove(pgToken);
+
+        // 2. 세션에서 로그인한 사용자 정보 가져옴
+        User user = (User) session.getAttribute("loginUser");
+        if (user != null) {
+            // 3. userEmail 설정
+            payment.setUserEmail(user.getEmail());
+
+            // 4. 모든 정보 포함된 Payment 객체를 DB에 저장
+            kakaoPayService.savePayment(payment);
+        }
+
         model.addAttribute("payment", payment);
         return "paySuccess";
     }
 
-    // 결제 실패 시
-    @GetMapping("/pay/fail")
-    public String kakaoPayFail() {
-        return "payFail";
-    }
+        // 결제 실패 시
+        @GetMapping("/pay/fail")
+        public String kakaoPayFail() {
+            return "payFail";
+        }
 
     // 사용자 마이페이지
-    @GetMapping("/mypage")
-    public String mypage(Model model) {
-        model.addAttribute("payments", kakaoPayService.getAllPayments());
-        return "mypage";
-    }
+//    @GetMapping("/mypage")
+//    public String mypage(Model model) {
+//        model.addAttribute("payments", kakaoPayService.getAllPayments());
+//        return "mypage";
+//    }
 
     // 사용자 환불 요청
     @PostMapping("/refund")

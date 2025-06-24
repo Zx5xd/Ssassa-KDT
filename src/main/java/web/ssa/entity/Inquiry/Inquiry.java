@@ -22,4 +22,7 @@ public class Inquiry {
     private Long productId;
 
     private LocalDateTime createdAt = LocalDateTime.now();
+
+    private boolean hasReply;  // true 또는 false
+
 }
