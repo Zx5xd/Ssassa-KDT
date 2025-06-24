@@ -4,7 +4,9 @@ package web.ssa.dto.products;
 
 
 import lombok.Data;
+import web.ssa.entity.products.ReviewRecommend;
 
+import java.util.List;
 import java.util.Map;
 
 @Data
@@ -22,4 +24,7 @@ public class ProductReviewDTO {
     private int productVariantId;
 
     private Integer recommendCount;
+    private int reviewType;
+
+    private List<ReviewRecommend> recommendList;
 }

@@ -6,10 +6,10 @@ import lombok.*;
 import java.util.List;
 
 @Entity
-@Table(name = "DETAIL_CATEGORIES")
+@Table(name = "CHILD_CATEGORIES")
 @Getter @Setter @NoArgsConstructor
 @AllArgsConstructor @Builder
-public class DetailCategories {
+public class CategoriesChild {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
@@ -17,7 +17,7 @@ public class DetailCategories {
 //    @Column(name = "CATEGORY_ID", nullable = false)
     @ManyToOne
     @JoinColumn(name = "category_id")
-    private Categories categoryDetailId;
+    private Categories categoryChildId;
 
     @Column(nullable = false)
     private String code;
@@ -25,7 +25,7 @@ public class DetailCategories {
     @Column(nullable = false)
     private String name;
 
-    @OneToMany(mappedBy = "detailCategoryId")
-    private List<DetailCategoryFields> detailCategoryFields;
+    @OneToMany(mappedBy = "categoryChildId")
+    private List<CategoryFields> categoryFields;
 }
 

@@ -3,19 +3,24 @@ package web.ssa.entity.products;
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.util.List;
-
 @Entity
-@Table(name = "PRODUCT_REVIEW")
+@Table(name = "REVIEW_RECOMMEND")
 @Getter
-@Setter @NoArgsConstructor @AllArgsConstructor @Builder
-public class ProductReview {
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
+public class ReviewRecommend {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
     @Column(nullable = false)
     private String writer;
+
+    @ManyToOne
+    @JoinColumn(name = "REVIEW_ID", nullable = false)
+    private ProductReview reviewId;
 
     @Column(columnDefinition = "text", nullable = false)
     private String content;
@@ -34,10 +39,4 @@ public class ProductReview {
     @Column(name = "RECOMMEND_COUNT", nullable = false)
     private Integer recommendCount;
 
-    @Column(name = "REVIEW_TYPE", nullable = false)
-    private int reviewType;
-
-    @OneToMany(mappedBy = "reviewId", cascade = CascadeType.ALL)
-    List<ReviewRecommend> recommendList;
 }
-

@@ -19,7 +19,7 @@ public class ProductMaster {
     @Column(nullable = false)
     private String name;
 
-    @Column(name = "CATEOGRY_ID", nullable = false)
+    @Column(name = "CATEGORY_ID", nullable = false)
     private int categoryId;
 
     @Column(name = "DETAIL_CATEGORY_ID", nullable = false)
@@ -51,4 +51,7 @@ public class ProductMaster {
 
     @OneToMany(mappedBy = "productId", cascade = CascadeType.ALL)
     List<ProductReview> reviews;
+
+    @OneToMany(mappedBy = "productId", cascade = CascadeType.ALL)
+    List<ReviewRecommend> commends;
 }
