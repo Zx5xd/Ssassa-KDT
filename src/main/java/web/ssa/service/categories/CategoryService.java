@@ -1,7 +1,9 @@
 package web.ssa.service.categories;
 
 import org.springframework.stereotype.Service;
+import web.ssa.dto.categories.CategoryFieldsDTO;
 import web.ssa.entity.categories.Categories;
+import web.ssa.entity.categories.CategoryFields;
 
 import java.util.List;
 
@@ -9,6 +11,6 @@ import java.util.List;
 public interface CategoryService {
     List<Categories> getCategories();
     Categories getCategoryById(int id);
-
     Categories getCategoryByName(String name);
+    List<CategoryFieldsDTO> getCategoryFieldsByCategoryId(int id);
 }

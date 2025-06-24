@@ -3,7 +3,10 @@ package web.ssa.service.categories;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import web.ssa.dto.categories.CategoryFieldsDTO;
+import web.ssa.dto.categories.DisplayOrderDTO;
 import web.ssa.entity.categories.Categories;
+import web.ssa.entity.categories.CategoryFields;
 import web.ssa.repository.categories.CategoryFieldsRepository;
 import web.ssa.repository.categories.CategoryRepository;
 
@@ -33,17 +36,34 @@ public class CategoryServiceImpl implements CategoryService {
         return this.categoryRepository.findByName(name);
     }
 
+    @Override
+    public List<CategoryFieldsDTO> getCategoryFieldsByCategoryId(int id) {
+        return CategoryFieldsDTO.convertToDTOList(this.categoryFieldsRepository.findCategoryFieldsById(id));
+    }
 
 
     // Category Fields Service
     @Transactional
-    public void reorderField(int categoryId, int childId, String attributeKey, int oldOrder, int newOrder) {
-        if (oldOrder > newOrder) {
-            categoryFieldsRepository.shiftDown(categoryId, childId, newOrder, oldOrder);
-        } else if (oldOrder < newOrder) {
-            categoryFieldsRepository.shiftUp(categoryId, childId, oldOrder, newOrder);
+    public void reorderField(DisplayOrderDTO dto) {
+        if (dto.getOldOrder() > dto.getNewOrder()) {
+            categoryFieldsRepository.shiftDown(dto.getCategoryId(), dto.getChildId(), dto.getNewOrder(), dto.getOldOrder());
+        } else if (dto.getOldOrder() < dto.getNewOrder()) {
+            categoryFieldsRepository.shiftUp(dto.getCategoryId(), dto.getChildId(), dto.getOldOrder(), dto.getNewOrder());
         }
 
-        categoryFieldsRepository.updateOrder(categoryId, attributeKey, newOrder);
+        categoryFieldsRepository.updateOrder(dto.getCategoryId(), dto.getAttributeKey(), dto.getNewOrder());
+    }
+
+
+
+    @Transactional
+    public void allReorder(List<DisplayOrderDTO> dtoList) {
+        dtoList.forEach(dto -> {
+            categoryFieldsRepository.updateOrder(
+                    dto.getCategoryId(),
+                    dto.getAttributeKey(),
+                    dto.getNewOrder()
+            );
+        });
     }
 }

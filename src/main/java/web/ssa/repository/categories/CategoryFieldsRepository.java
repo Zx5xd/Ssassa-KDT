@@ -23,7 +23,7 @@ public interface CategoryFieldsRepository extends JpaRepository<CategoryFields, 
           AND (category_child_id = :childId OR (category_child_id IS NULL AND :childId IS NULL))
           AND display_order >= :newOrder AND display_order < :oldOrder
     """, nativeQuery = true)
-    void shiftDown(int catId, int childId, int newOrder, int oldOrder);
+    void shiftDown(int catId, Integer childId, int newOrder, int oldOrder);
 
     @Modifying
     @Query(value = """
@@ -33,7 +33,7 @@ public interface CategoryFieldsRepository extends JpaRepository<CategoryFields, 
           AND (category_child_id = :childId OR (category_child_id IS NULL AND :childId IS NULL))
           AND display_order <= :newOrder AND display_order > :oldOrder
     """, nativeQuery = true)
-    void shiftUp(int catId, int childId, int oldOrder, int newOrder);
+    void shiftUp(int catId, Integer childId, int oldOrder, int newOrder);
 
     @Modifying
     @Query(value = """
