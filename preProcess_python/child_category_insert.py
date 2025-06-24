@@ -52,7 +52,7 @@ name_conv_kor = {
 }
 
 # DB 연결 (네 정보에 맞게 수정)
-engine = create_engine("mysql+pymysql://jstest3:jsp1234@hyproz.myds.me:36000/test3")
+engine = create_engine("mysql+pymysql://jshop:jsp1234@hyproz.myds.me:36000/shop")
 conn = engine.connect()
 
 # 카테고리 name - code 매핑 불러오기

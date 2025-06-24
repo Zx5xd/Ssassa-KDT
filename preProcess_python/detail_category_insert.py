@@ -53,7 +53,7 @@ name_conv_kor = {
 }
 
 # DB 연결 (네 정보에 맞게 수정)
-engine = create_engine("mysql+pymysql://jstest3:jsp1234@hyproz.myds.me:36000/test3")
+engine = create_engine("mysql+pymysql://jshop:jsp1234@hyproz.myds.me:36000/shop")
 conn = engine.connect()
 
 # 카테고리 name - code 매핑 불러오기
@@ -88,8 +88,9 @@ for name, data in all_data.items():
                                 """)
             select_result = conn.execute(select_query, {"category_id":seq, "code":name})
             ch_cat_id = 0
-            for cat_id, ch_id, code, code_name in select_result :
-               ch_cat_id = ch_id
+            for ch_id, code, code_name, cat_id in select_result :
+                print(f"code : {code} //  ch_id : {ch_id}")
+                ch_cat_id = ch_id
 
             # print(f"select Result : {select_result}")
 
@@ -107,6 +108,7 @@ for name, data in all_data.items():
                 data_type = ""
                 key_translate = ""
                 value_list = []
+                dp_order = 1
 
                 for child_value in data2['value'] :
                     data_type = category_insert_tool.classify_unit_first_process(len(data2['unit']), child_value)
@@ -128,7 +130,6 @@ for name, data in all_data.items():
 
 
                 if not data_type in "varchar2":
-                   dp_order = 1
                    conn.execute(query, {"category_id": seq, "category_child_id": ch_cat_id, "display_order": dp_order,
                                              "is_filterable": True, "attribute_key":key_translate, "data_type":data_type, "display_name":key, "tooltip":None,
                                              "unit": unit_2, "value_list":json.dumps(value_list, ensure_ascii=False)})

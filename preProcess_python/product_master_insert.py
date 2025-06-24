@@ -23,9 +23,9 @@ for file in json_files:
 
                 master_insert_sql = """
                                     INSERT INTO product_master (name, simple_img, detail_img, price,
-                                                                detail, reg, category_id, detail_category_id, default_variant, amount)
+                                                                detail, reg, category_id, category_child_id, default_variant, amount)
                                     VALUES (:name, :simple_img, :detail_img, :price,
-                                                                :detail, :reg, :category_id, :detail_category_id, :default_variant, :amount)
+                                                                :detail, :reg, :category_id, :category_child_id, :default_variant, :amount)
                                     """
 
                 for data in master_lists:
