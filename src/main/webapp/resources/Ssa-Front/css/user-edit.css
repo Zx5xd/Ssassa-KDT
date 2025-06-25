@@ -1,0 +1,73 @@
+.edit-body {
+    font-family: 'Noto Sans KR', sans-serif;
+    background-color: transparent;  /* ✅ index.css 배경색을 그대로 따름 */
+    padding: 40px;
+}
+
+.edit-container {
+    max-width: 600px;
+    margin: 0 auto;
+    background-color: #1e1e1e; /* ✅ 어두운 배경으로 통일 */
+    padding: 30px;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    text-align: center;
+    color: white; /* 텍스트도 흰색 */
+}
+
+.edit-title {
+    font-size: 24px;
+    margin-bottom: 30px;
+    color: #eeeeee;        /* ✅ 더 밝고 눈에 띄는 색상 */
+    font-weight: bold;
+    text-align: left;      /* ✅ 왼쪽 정렬 */
+}
+
+.edit-form label {
+    display: block;
+    margin-bottom: 15px;
+    font-size: 16px;
+    text-align: left;
+}
+
+.edit-form input {
+    width: 100%;
+    padding: 8px 12px;
+    margin-top: 4px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+}
+
+.submit-btn,
+.temp-btn {
+    margin-top: 20px;
+    padding: 10px 20px;
+    background-color: #4da6ff;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+}
+
+.submit-btn:hover,
+.temp-btn:hover {
+    background-color: #007bff;
+}
+
+.temp-form {
+    margin-top: 10px;
+}
+
+.link-button {
+    display: inline-block;
+    margin-top: 20px;
+    padding: 10px 16px;
+    background-color: #ddd;
+    color: #333;
+    text-decoration: none;
+    border-radius: 6px;
+}
+
+.link-button:hover {
+    background-color: #ccc;
+}

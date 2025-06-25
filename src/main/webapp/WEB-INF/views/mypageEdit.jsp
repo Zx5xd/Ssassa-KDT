@@ -1,98 +1,21 @@
-<%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
+<%@ page contentType="text/html;charset=UTF-8" pageEncoding="UTF-8" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <!DOCTYPE html>
 <html lang="ko">
 <head>
   <meta charset="UTF-8">
-  <title>마이페이지 - 싸싸</title>
-
-  <!-- ✅ 폰트 및 아이콘 -->
+  <title>회원 정보 수정 - 싸싸</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR&display=swap" rel="stylesheet">
   <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
   <link href="https://fonts.googleapis.com/icon?family=Material+Symbols+Outlined" rel="stylesheet">
-
-  <!-- ✅ 외부 CSS -->
   <link rel="stylesheet" href="${pageContext.request.contextPath}/resources/Ssa-Front/index.css">
   <link rel="stylesheet" href="${pageContext.request.contextPath}/resources/Ssa-Front/css/profile.css">
-
-  <style>
-    main {
-      max-width: 1200px;
-      margin: 140px auto 80px; /* ✅ 더 아래로 내림 */
-      padding: 0 20px;
-    }
-
-    .mypage-container {
-      display: flex;
-      justify-content: center;
-      align-items: center; /* ✅ 수직 가운데 정렬 */
-      gap: 60px; /* ✅ 여백 조금 늘림 */
-      background-color: rgba(255, 255, 255, 0.04);
-      border-radius: 12px;
-      box-shadow: 0 0 10px rgba(0,0,0,0.3);
-      padding: 50px;
-      font-size: 17px;
-    }
-
-    .profile-section {
-      flex: 0 0 250px;
-      text-align: center;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 100%;
-    }
-
-    .default-profile {
-      width: 200px;
-      height: 200px;
-      border-radius: 50%;
-      border: 2px solid #888;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      color: #ccc;
-      font-size: 18px;
-      text-align: center;
-    }
-
-
-    .info-section {
-      flex: 1;
-    }
-
-    .info-section h2 {
-      font-size: 28px;
-      margin-bottom: 20px;
-    }
-
-    .info-section p {
-      margin-bottom: 12px;
-    }
-
-    .btn {
-      padding: 12px 24px;
-      font-size: 16px;
-      margin-right: 10px;
-    }
-
-    .btn.danger {
-      background-color: #e74c3c;
-      color: white;
-    }
-
-    .btn.secondary {
-      background-color: #999;
-      color: white;
-    }
-  </style>
 </head>
-
 <body class="noto-sans-kr-regular">
 
-<!-- ✅ 메뉴바 -->
+<!-- ✅ 메뉴바 영역 -->
 <nav>
   <a href="${pageContext.request.contextPath}/index" style="text-decoration: none;">
     <div id="logo" style="background-image: url('${pageContext.request.contextPath}/resources/Ssa-Front/assets/logo_main.png');"></div>
@@ -112,7 +35,7 @@
           <c:choose>
             <c:when test="${not empty sessionScope.loginUser.profileImage}">
               <img class="navbar-profile-img"
-                   src="${pageContext.request.contextPath}${sessionScope.loginUser.profileImage}" alt="프로필">
+                   src="${pageContext.request.contextPath}${sessionScope.loginUser.profileImage}" alt="프로필" />
             </c:when>
             <c:otherwise>
               <div class="login" style="display: flex; align-items: center; cursor: pointer;">
@@ -145,47 +68,45 @@
   </div>
 </nav>
 
-<!-- ✅ 마이페이지 본문 -->
-<main>
-  <div class="mypage-container">
-    <div class="profile-section">
-      <c:choose>
-        <c:when test="${not empty sessionScope.loginUser.profileImage}">
-          <img src="${pageContext.request.contextPath}${sessionScope.loginUser.profileImage}" alt="프로필 이미지">
-        </c:when>
-        <c:otherwise>
-          <div class="default-profile">기본 프로필<br>이미지</div>
-        </c:otherwise>
-      </c:choose>
-    </div>
-
-    <div class="info-section">
-      <h2>마이페이지</h2>
-      <p><strong>이메일:</strong> ${sessionScope.loginUser.email}</p>
-      <p><strong>이름:</strong> ${sessionScope.loginUser.name}</p>
-      <p><strong>닉네임:</strong> ${sessionScope.loginUser.nickname}</p>
-      <p><strong>전화번호:</strong> ${sessionScope.loginUser.phone}</p>
-      <p><strong>가입일:</strong> ${formattedCreatedAt}</p>
-
-      <p><strong>이메일 인증 여부:</strong>
+<!-- ✅ 회원정보 수정 영역 -->
+<div class="edit-container">
+  <div class="edit-box">
+    <h2>회원 정보 수정</h2>
+    <c:if test="${not empty error}">
+      <p style="color: #ff4d4d; font-weight: bold;">${error}</p>
+    </c:if>
+    <form method="post" action="/mypage/update" enctype="multipart/form-data">
+      <input type="hidden" name="email" value="${user.email}">
+      <div class="profile-box">
         <c:choose>
-          <c:when test="${sessionScope.loginUser.emailVerified}">인증 완료</c:when>
-          <c:otherwise>미인증</c:otherwise>
+          <c:when test="${not empty user.profileImage}">
+            <img id="preview" class="preview"
+                 src="${pageContext.request.contextPath}${user.profileImage}" alt="프로필 이미지" />
+          </c:when>
+          <c:otherwise>
+            <div id="preview" class="default-profile">기본<br>프로필<br>이미지</div>
+          </c:otherwise>
         </c:choose>
-      </p>
-
-      <form method="get" action="/mypage/edit" style="display: inline;">
-        <button type="submit" class="btn">정보 수정</button>
+        <div class="profile-label">프로필 이미지</div>
+        <input type="file" name="profileImage" accept="image/*" onchange="previewImage(event)" />
+      </div>
+      <p><strong>이메일:</strong> <input type="text" value="${user.email}" readonly /></p>
+      <p><strong>이름:</strong> <input type="text" value="${user.name}" readonly /></p>
+      <p><strong>닉네임:</strong> <input type="text" name="nickname" value="${user.nickname}" required /></p>
+      <p><strong>비밀번호:</strong> <input type="password" name="password" placeholder="비밀번호 변경 시에만 입력" /></p>
+      <p><strong>전화번호:</strong> <input type="text" name="phone" value="${user.phone}" oninput="formatPhone(this)" required /></p>
+      <div style="margin-top: 20px;">
+        <button type="submit" class="btn" style="margin-right: 10px;">수정 완료</button>
+        <a href="/mypage" class="btn danger">마이페이지로</a>
+      </div>
+    </form>
+    <c:if test="${not empty user.profileImage}">
+      <form method="post" action="/mypage/profile/delete">
+        <button type="submit" class="btn secondary">이미지 삭제</button>
       </form>
-
-      <form method="post" action="/withdraw" onsubmit="return confirm('정말 탈퇴하시겠습니까?')" style="display: inline;">
-        <button type="submit" class="btn danger">회원 탈퇴</button>
-      </form>
-
-      <a href="/logout" class="btn" style="background-color: #555;">로그아웃</a>
-    </div>
+    </c:if>
   </div>
-</main>
+</div>
 
 <!-- ✅ 스크립트 -->
 <script>
@@ -197,10 +118,40 @@
   document.addEventListener("click", function (e) {
     const menu = document.getElementById("profile-menu");
     const wrapper = document.querySelector(".profile-wrapper");
-    if (wrapper && !wrapper.contains(e.target)) {
+    if (!wrapper.contains(e.target)) {
       menu.classList.add("hidden");
     }
   });
+
+  function formatPhone(input) {
+    let value = input.value.replace(/[^0-9]/g, '');
+    if (value.length < 4) {
+      input.value = value;
+    } else if (value.length < 8) {
+      input.value = value.slice(0, 3) + '-' + value.slice(3);
+    } else {
+      input.value = value.slice(0, 3) + '-' + value.slice(3, 7) + '-' + value.slice(7, 11);
+    }
+  }
+
+  function previewImage(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = function () {
+      const preview = document.getElementById('preview');
+      if (preview.tagName === 'DIV') {
+        const newImg = document.createElement('img');
+        newImg.id = 'preview';
+        newImg.className = 'preview';
+        newImg.src = reader.result;
+        preview.parentNode.replaceChild(newImg, preview);
+      } else {
+        preview.src = reader.result;
+      }
+    };
+    reader.readAsDataURL(file);
+  }
 </script>
 <script src="${pageContext.request.contextPath}/resources/Ssa-Front/js/slide.js"></script>
 <script src="${pageContext.request.contextPath}/resources/Ssa-Front/js/SsaComponent.js"></script>

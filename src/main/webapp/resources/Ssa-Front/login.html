@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>싸싸</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons"
+          rel="stylesheet">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Symbols+Outlined"
+          rel="stylesheet">
+    <link rel="stylesheet" href="index.css">
+    <link rel="stylesheet" href="./css/auth.css">
+</head>
+<body class="noto-sans-kr-regular">
+<nav>
+    <div id="logo"></div>
+    <div id="searchBox">
+        <input type="text" id="searchInput" placeholder="검색할 제품을 입력해주세요">
+        <div class="searchBtn">
+            <span class="material-symbols-outlined">search</span>
+        </div>
+    </div>
+    <div id="user-interface">
+        <div class="login">
+            <span class="material-symbols-outlined">account_box</span>
+            <span class="label">로그인</span>
+        </div>
+    </div>
+</nav>
+<main>
+    <div id="container">
+        <div id="header">
+            <h4>로그인</h4>
+        </div>
+        <form id="form-box" action="#" method="post">
+            <div class="form-item">
+                <div class="form-label">아이디</div>
+                <div class="form-input">
+                    <input type="text" name="id" id="id">
+                </div>
+            </div>
+            <div class="form-item">
+                <div class="form-label">비밀번호</div>
+                <div class="form-input">
+                    <input type="password" name="pw" id="pw">
+                </div>
+            </div>
+            <label class="form-login-status-box">
+                <input type="checkbox" name="login-status" id="login-status">
+                <span class="material-symbols-outlined">check_circle</span>
+                <span class="label">로그인 유지</span>
+            </label>
+            <div class="form-button">
+                <button class="login" type="submit">로그인</button>
+            </div>
+            <div class="form-bottom">
+                <a href="#">회원가입</a>
+                <a href="#">비밀번호 찾기</a>
+            </div>
+        </form>
+    </div>
+</main>
+</body>
+</html>

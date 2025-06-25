@@ -1,0 +1,79 @@
+main {
+    display: flex;
+    flex-direction: row;
+    align-items: flex-start;
+    gap: var(--size-4);
+    justify-content: center;
+}
+
+section {
+    display: flex;
+    flex-direction: row;
+    width: var(--size-md);
+    height: var(--size-14);
+    padding: var(--size-4) var(--size-6);
+    background-color: var(--surface-1);
+    border-radius: var(--radius-3);
+    box-shadow: var(--shadow-3);
+
+    .row {
+        display: flex;
+        flex-direction: row;
+    }
+    .col {
+        display: flex;
+        flex-direction: column;
+    }
+}
+
+.all-cat-item {
+    flex: 0;
+    justify-content: left;
+    align-items: center;
+    gap: var(--size-3);
+    & a {
+        color: var(--blue-4);
+    }
+}
+
+#content {
+    display: flex;
+    flex-direction: column;
+    gap: var(--size-4);
+    padding-left: 24px;
+    padding-bottom: var(--size-4);
+}
+
+section {
+    gap: var(--size-3);
+}
+
+section .banner-img {
+    flex: 1;
+    background-color: #fff;
+    border-radius: var(--radius-3);
+}
+
+section .col {
+    flex: 1;
+    gap: var(--size-3);
+    .col-item {
+        flex: 1;
+        background-color: var(--surface-3);
+        border-radius: var(--radius-3);
+    }
+}
+
+.category-container {
+    position: sticky;
+    top: 2em; /* 일단 작게 테스트 */
+    margin-top: var(--size-2);
+    margin-right: var(--size-2);
+    background: red; /* 테스트용 색상 */
+}
+
+#categoryBar.scrolled {
+    position: relative;
+    top: unset;
+    left: unset;
+}

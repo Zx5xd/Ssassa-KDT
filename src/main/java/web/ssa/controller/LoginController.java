@@ -23,7 +23,12 @@ public class LoginController {
 
     // 로그인 폼
     @GetMapping("/login")
-    public String showLoginPage() {
+    public String showLoginPage(HttpServletRequest request, Model model) {
+        for (Cookie cookie : Optional.ofNullable(request.getCookies()).orElse(new Cookie[0])) {
+            if ("rememberEmail".equals(cookie.getName())) {
+                model.addAttribute("rememberedEmail", cookie.getValue());
+            }
+        }
         return "login";
     }
 
@@ -46,7 +51,7 @@ public class LoginController {
             // 세션에 로그인 정보 저장
             session.setAttribute("loginUser", user);
 
-            // 자동 로그인 토큰 생성 및 쿠키 저장
+            // 자동 로그인 토큰 쿠키 생성
             String token = UUID.randomUUID().toString();
             Cookie autoLoginCookie = new Cookie("loginToken", token);
             autoLoginCookie.setMaxAge(60 * 5); // 5분
@@ -56,18 +61,18 @@ public class LoginController {
 
             memberService.saveTokenWithTimestamp(email, token, LocalDateTime.now());
 
-            // 이메일 저장 쿠키 처리
+            // 이메일 저장 쿠키
             Cookie rememberCookie = new Cookie("rememberEmail",
                     "on".equals(rememberEmail) ? email : null);
             rememberCookie.setMaxAge("on".equals(rememberEmail) ? 60 * 60 * 24 * 30 : 0);
             rememberCookie.setPath("/");
             response.addCookie(rememberCookie);
 
-            // 역할 기반 리디렉션
+            // ✅ 관리자 여부에 따라 리디렉션
             if ("ADMIN".equals(user.getRole())) {
                 return "redirect:/admin";
             } else {
-                return "redirect:/test";
+                return "redirect:/index";
             }
 
         } catch (IllegalArgumentException | IllegalStateException e) {

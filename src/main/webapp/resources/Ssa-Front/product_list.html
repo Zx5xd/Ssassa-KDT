@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>싸싸</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons"
+          rel="stylesheet">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Symbols+Outlined"
+          rel="stylesheet">
+    <link rel="stylesheet" href="index.css">
+    <link rel="stylesheet" href="./css/product_list.css">
+</head>
+<body class="noto-sans-kr-regular">
+<nav>
+    <div id="logo"></div>
+    <div id="searchBox">
+        <input type="text" id="searchInput" placeholder="검색할 제품을 입력해주세요">
+        <div class="searchBtn">
+            <span class="material-symbols-outlined">search</span>
+        </div>
+    </div>
+    <div id="user-interface">
+        <div class="login">
+            <span class="material-symbols-outlined">account_box</span>
+            <span class="label">로그인</span>
+        </div>
+    </div>
+</nav>
+<main>
+    <div class="category-container">
+        <category-elem id="categoryBar">
+            <category-item href="/laptop" value="노트북" color="white">
+                <span class="material-icons">computer</span>
+            </category-item>
+
+            <category-item href="/laptop" value="노트북" color="white">
+                <span class="material-icons">computer</span>
+            </category-item>
+
+            <category-item bgColor="red" textColor="white" href="/gpu" value="그래픽카드" color="#eef">
+                <span class="material-icons">sports_esports</span>
+            </category-item>
+        </category-elem>
+    </div>
+    <product-list id="plist"></product-list>
+    <basket-side></basket-side>
+</main>
+</body>
+<script src="./js/SsaComponent.js"></script>
+</html>
+
+<script>
+    const list = document.querySelector("product-list");
+    const basket = document.querySelector("basket-side");
+
+    list.basketSideEl = basket;
+    list.category = 'cpu';
+    list.products = [
+        {
+            id: 1,
+            name: "AMD 라이젠7-6세대 9800X3D (그래니트 릿지)",
+            src: "https://img.danawa.com/prod_img/500000/547/531/img/70531547_1.jpg?shrink=130:130&_v=20241119093012",
+            desc: "AMD(소켓AM5)/8코어/16스레드/메모리 규격: DDR5...",
+            pReg: "2025.02",
+            prices: [
+                { id: 1, name: '멀티팩(정품)', schedule: false, price: 669350 },
+                { id: 2, name: '정품', schedule: false, price: 698990 },
+                { id: 3, name: '벌크 병행', schedule: true, price: 985430 }
+            ]
+        },
+        {
+            id: 2,
+            name: "MSI 지포스 RTX 5070 Ti 게이밍 트리오 OC D7 16GB 트라이프로져4",
+            src: "https://img.danawa.com/prod_img/500000/715/160/img/90160715_1.jpg?shrink=330:*&_v=20250508184147",
+            desc: "RTX 5070 Ti/PCIe5.0x16/정격파워750W 이상...",
+            pReg: "2025.05",
+            prices: [
+                { id: 4, name: 'GPU 특가', schedule: false, price: 1436980 }
+            ]
+        }
+    ];
+</script>
