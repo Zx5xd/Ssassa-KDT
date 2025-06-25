@@ -60,11 +60,11 @@ public class LoginController {
             rememberCookie.setPath("/");
             response.addCookie(rememberCookie);
 
-            // ✅ 경로 수정: /productList → /products
+            // ✅ 로그인 성공 후 경로 설정
             if ("ADMIN".equals(user.getRole())) {
                 return "redirect:/admin";
             } else {
-                return "redirect:/products";
+                return "redirect:/shop/products";  // ✅ 쇼핑몰 상품 목록으로 이동
             }
 
         } catch (IllegalArgumentException | IllegalStateException e) {

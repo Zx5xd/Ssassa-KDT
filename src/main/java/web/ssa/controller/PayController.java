@@ -1,103 +1,183 @@
 package web.ssa.controller;
 
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import web.ssa.dto.KakaoPayCancelResponse;
+import web.ssa.dto.SelectedProduct;
 import web.ssa.entity.Payment;
 import web.ssa.entity.Product;
-import web.ssa.service.KakaoPayService;
 import web.ssa.entity.member.User;
+import web.ssa.service.KakaoPayService;
+import web.ssa.service.ProductService;
 
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 
 @Controller
 @RequiredArgsConstructor
 public class PayController {
 
     private final KakaoPayService kakaoPayService;
+    private final ProductService productService;
 
-    // 상품 리스트 화면
-    @GetMapping("/products")
-    public String products(Model model) {
-        List<Object[]> products = Arrays.asList(
-                new Object[]{"테스트 상품1", 1000},
-                new Object[]{"테스트 상품2", 2000}
-        );
-        model.addAttribute("products", products);
-        return "productList";
+    // ✅ 장바구니 복수 상품 결제
+    @PostMapping("/cart/checkout")
+    public String checkout(HttpServletRequest request, HttpSession session, Model model) {
+        Object obj = session.getAttribute("loginUser");
+        if (!(obj instanceof User loginUser)) {
+            model.addAttribute("error", "로그인이 필요합니다.");
+            return "redirect:/login";
+        }
+
+        String[] selectedProductIds = request.getParameterValues("selectedProducts");
+        if (selectedProductIds == null || selectedProductIds.length == 0) {
+            model.addAttribute("error", "선택된 상품이 없습니다.");
+            return "redirect:/products";
+        }
+
+        List<SelectedProduct> selectedItems = new ArrayList<>();
+        int totalAmount = 0;
+
+        try {
+            for (String productIdStr : selectedProductIds) {
+                Long productId = Long.parseLong(productIdStr);
+                String quantityParam = request.getParameter("quantities[" + productId + "]");
+                int quantity = quantityParam != null ? Integer.parseInt(quantityParam) : 1;
+
+                Product product = productService.getProductById(productId);
+                if (product != null) {
+                    int itemTotal = product.getPrice() * quantity;
+                    totalAmount += itemTotal;
+                    selectedItems.add(new SelectedProduct(product.getName(), quantity));
+                }
+            }
+        } catch (Exception e) {
+            model.addAttribute("error", "상품 정보를 처리하는 중 오류가 발생했습니다.");
+            return "redirect:/products";
+        }
+
+        if (selectedItems.isEmpty()) {
+            model.addAttribute("error", "유효한 상품이 없습니다.");
+            return "redirect:/products";
+        }
+
+        try {
+            String redirectUrl = kakaoPayService.readyToPay(loginUser, selectedItems, totalAmount);
+            return "redirect:" + redirectUrl;
+        } catch (Exception e) {
+            model.addAttribute("error", "결제 준비 중 오류가 발생했습니다: " + e.getMessage());
+            return "redirect:/products";
+        }
     }
 
-    // 카카오페이 결제 준비
+    // ✅ 단일 상품 결제
     @GetMapping("/pay/ready")
-    public String kakaoPay(@RequestParam("productId") int productId) {
-        Product product = (productId == 1)
-                ? new Product(1L, "테스트 상품1", 1000)
-                : new Product(2L, "테스트 상품2", 2000);
+    public String kakaoPay(@RequestParam("productId") Long productId,
+                           @RequestParam(value = "quantity", defaultValue = "1") int quantity,
+                           HttpSession session,
+                           Model model) {
 
-        String redirectUrl = kakaoPayService.kakaoPayReady(product);
-        return "redirect:" + redirectUrl;
+        Object obj = session.getAttribute("loginUser");
+        if (!(obj instanceof User loginUser)) {
+            return "redirect:/login";
+        }
+
+        Product product = productService.getProductById(productId);
+        if (product == null) {
+            model.addAttribute("error", "상품을 찾을 수 없습니다.");
+            return "redirect:/products";
+        }
+
+        if (quantity <= 0) quantity = 1;
+        if (quantity > 99) quantity = 99;
+        product.setQuantity(quantity);
+
+        try {
+            String redirectUrl = kakaoPayService.kakaoPayReady(product, loginUser);
+            return "redirect:" + redirectUrl;
+        } catch (Exception e) {
+            model.addAttribute("error", "결제 준비 중 오류가 발생했습니다: " + e.getMessage());
+            return "redirect:/products";
+        }
     }
 
-    // 결제 성공 후 승인 처리
+    // ✅ 결제 성공
     @GetMapping("/pay/success")
     public String kakaoPaySuccess(@RequestParam("pg_token") String pgToken,
                                   HttpSession session,
                                   Model model) {
-        // 1. 결제 승인 후 Payment 객체 생성 (itemName, amount, status 포함)
-        Payment payment = kakaoPayService.kakaoPayApprove(pgToken);
+        try {
+            Payment payment = kakaoPayService.kakaoPayApprove(pgToken);
+            Object obj = session.getAttribute("loginUser");
+            if (obj instanceof User user) {
+                payment.setUserEmail(user.getEmail());
+                kakaoPayService.savePayment(payment);
+            }
 
-        // 2. 세션에서 로그인한 사용자 정보 가져옴
-        User user = (User) session.getAttribute("loginUser");
-        if (user != null) {
-            // 3. userEmail 설정
-            payment.setUserEmail(user.getEmail());
-
-            // 4. 모든 정보 포함된 Payment 객체를 DB에 저장
-            kakaoPayService.savePayment(payment);
-        }
-
-        model.addAttribute("payment", payment);
-        return "paySuccess";
-    }
-
-        // 결제 실패 시
-        @GetMapping("/pay/fail")
-        public String kakaoPayFail() {
+            model.addAttribute("payment", payment);
+            return "paySuccess";
+        } catch (Exception e) {
+            model.addAttribute("error", "결제 처리 중 오류가 발생했습니다: " + e.getMessage());
             return "payFail";
         }
+    }
 
-    // 사용자 마이페이지
-//    @GetMapping("/mypage")
-//    public String mypage(Model model) {
-//        model.addAttribute("payments", kakaoPayService.getAllPayments());
-//        return "mypage";
-//    }
+    // ✅ 결제 실패
+    @GetMapping("/pay/fail")
+    public String kakaoPayFail(Model model) {
+        model.addAttribute("message", "결제가 취소되었거나 실패했습니다.");
+        return "payFail";
+    }
 
-    // 사용자 환불 요청
+    // ✅ 마이페이지에서 환불 요청
     @PostMapping("/refund")
-    public String refund(@RequestParam("paymentId") Long paymentId) {
-        kakaoPayService.requestRefund(paymentId);
+    public String requestRefund(@RequestParam("paymentId") Long paymentId,
+                                HttpSession session,
+                                Model model) {
+        Object obj = session.getAttribute("loginUser");
+        if (!(obj instanceof User user)) {
+            return "redirect:/login";
+        }
+
+        try {
+            kakaoPayService.requestRefund(paymentId);
+            model.addAttribute("message", "환불 요청이 완료되었습니다.");
+        } catch (Exception e) {
+            model.addAttribute("error", "환불 요청 중 오류가 발생했습니다.");
+        }
+
         return "redirect:/mypage";
     }
 
-    // 일반 환불 처리
-    @PostMapping("/pay/refund")
-    public String kakaoPayRefund(@RequestParam("id") Long id, Model model) {
-        Payment payment = kakaoPayService.getPaymentById(id);
-        if (payment == null || payment.getTid() == null) {
-            model.addAttribute("message", "환불 대상 결제가 존재하지 않습니다.");
-            return "error";
+    // ✅ 관리자 환불 처리
+    @PostMapping("/admin/refund")
+    public String adminRefund(@RequestParam("id") Long id,
+                              Model model,
+                              HttpSession session) {
+        Object obj = session.getAttribute("loginUser");
+        if (!(obj instanceof User admin) || !"ADMIN".equals(admin.getRole())) {
+            return "redirect:/login";
         }
 
-        KakaoPayCancelResponse response = kakaoPayService.kakaoPayCancel(payment.getTid(), payment.getAmount());
-        payment.setStatus("CANCELLED");
-        kakaoPayService.savePayment(payment);
+        try {
+            Payment payment = kakaoPayService.getPaymentById(id);
+            if (payment == null || payment.getTid() == null) {
+                model.addAttribute("message", "환불 대상 결제가 존재하지 않습니다.");
+                return "error";
+            }
 
-        model.addAttribute("cancel", response);
-        return "payCancelResult";
+            KakaoPayCancelResponse response = kakaoPayService.kakaoPayCancel(payment.getTid(), payment.getAmount());
+            payment.setStatus("CANCELLED");
+            kakaoPayService.savePayment(payment);
+
+            model.addAttribute("cancel", response);
+            return "payCancelResult";
+        } catch (Exception e) {
+            model.addAttribute("error", "환불 처리 중 오류가 발생했습니다: " + e.getMessage());
+            return "error";
+        }
     }
 }

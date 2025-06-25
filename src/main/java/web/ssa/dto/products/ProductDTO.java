@@ -18,4 +18,7 @@ public class ProductDTO {
     int defaultVariant;
     private int amount;
     private Date reg;
+
+
+    private int quantity;//수량
 }
