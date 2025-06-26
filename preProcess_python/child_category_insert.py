@@ -31,7 +31,7 @@ name_conv_eng = {
 }
 
 name_conv_kor = {
-"Keyboard" : "키보드",
+    "Keyboard" : "키보드",
     "earphone" : "이어폰",
     "headset" : "헤드셋",
     "monitor" : "모니터",
@@ -52,7 +52,7 @@ name_conv_kor = {
 }
 
 # DB 연결 (네 정보에 맞게 수정)
-engine = create_engine("mysql+pymysql://jshop:jsp1234@hyproz.myds.me:36000/shop")
+engine = create_engine("mysql+pymysql://jstest3:jsp1234@hyproz.myds.me:36000/test3")
 conn = engine.connect()
 
 # 카테고리 name - code 매핑 불러오기
@@ -60,7 +60,7 @@ df = pd.read_sql("SELECT code, name FROM categories", engine)
 name_to_code = dict(zip(df['code'], df['name']))
 
 # JSON 로딩
-with open("cleaned_unique_fields(Unit Eidt)2.json", encoding="utf-8") as f:
+with open("final_cleaned_unique_fields(unit_value_edit).json", encoding="utf-8") as f:
     all_data = json.load(f)
 
 # 분리 저장
@@ -76,7 +76,7 @@ for name, data in all_data.items():
             matches = df[df['code'] == parent_name.upper()]
             for idx in matches.index:
                 seq = df.index.get_loc(idx) + 1
-            # print(f"cat_id: {seq}, code: {name}, name: {name_conv_kor.get(name)}")
+            print(f"cat_id: {seq}, code: {name}, name: {name_conv_kor.get(name)}")
 
             query = text("""
                               INSERT INTO child_categories (category_id, code, name)

@@ -123,7 +123,12 @@ def collect_normalized_values(base_details):
 
 # 카테고리명 추출
 def extract_category_name(filename: str) -> str:
-    match = re.match(r"(pcProducts_|peripherals_)?(.+)\.json", filename)
+    # match = re.match(r"(pcProducts_|peripherals_|product_)?(.+)\.json", filename)
+    match = re.match(r"(pcProducts_|peripherals_|product_)?(.+)\.json", filename)
+    # re_name = match.group(2) if match else filename
+    # if '_' in re_name:
+    #     re_names = re_name.split('_')
+    #     re_name = re_names[0]
     return match.group(2) if match else filename
 
 # 전체 파일 처리
@@ -133,6 +138,7 @@ def process_all_files(folder_path: str, output_file: str):
     all_processed = {}
 
     for file in json_files:
+        print(f"{extract_category_name(file.name)}")
         category_name = extract_category_name(file.name)
         with open(file, "r", encoding="utf-8") as f:
             try:
@@ -148,4 +154,4 @@ def process_all_files(folder_path: str, output_file: str):
 
     return output_file
 
-process_all_files("../data", "semi_final_cleaned_unique_fields(unit_value_edit).json")
+process_all_files("../data", "final_cleaned_unique_fields(unit_value_edit).json")

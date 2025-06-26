@@ -29,6 +29,8 @@ name_conv_eng = {
     "washing dryer": "WASHING_DRYER",
     "TV": "TELEVISION",
     "kimchi": "KIMCHI_REFRIGERATOR",
+    "phone": "SMARTPHONE",
+    "tablet": "TABLET_PC",
 }
 
 name_conv_kor = {
@@ -53,7 +55,7 @@ name_conv_kor = {
 }
 
 # DB 연결 (네 정보에 맞게 수정)
-engine = create_engine("mysql+pymysql://jshop:jsp1234@hyproz.myds.me:36000/shop")
+engine = create_engine("mysql+pymysql://jstest3:jsp1234@hyproz.myds.me:36000/test3")
 conn = engine.connect()
 
 # 카테고리 name - code 매핑 불러오기
@@ -61,7 +63,7 @@ df = pd.read_sql("SELECT code, name FROM categories", engine)
 name_to_code = dict(zip(df['code'], df['name']))
 
 # JSON 로딩
-with open("semi_final_cleaned_unique_fields(unit_value_edit).json", encoding="utf-8") as f:
+with open("final_cleaned_unique_fields(unit_value_edit).json", encoding="utf-8") as f:
     all_data = json.load(f)
 
 # 분리 저장
@@ -124,9 +126,9 @@ for name, data in all_data.items():
                 ## print(f"Child_Categories DB INSERT 必, cat_id: {seq}, code: key_translate, name: {key}")
                 ## DB INSERT
 
-                    if 'value' in data2:
-                        for idx, val in enumerate(data2['value']):
-                            value_list.append({"value": val, "weight": idx + 1})
+                if 'value' in data2:
+                    for idx, val in enumerate(data2['value']):
+                        value_list.append({"value": val, "weight": idx + 1})
 
 
                 if not data_type in "varchar2":
@@ -172,11 +174,11 @@ for name, data in all_data.items():
                 data_type = category_insert_tool.classify_unit_first_process(len(data2['unit']), data_value)
                 print(f"parent_type : {data_type}")
 
-                value_list = []
+            value_list = []
 
-                if 'value' in data2:
-                    for idx, val in enumerate(data2['value']):
-                        value_list.append({"value": val, "weight": idx + 1})
+            if 'value' in data2:
+                for idx, val in enumerate(data2['value']):
+                    value_list.append({"value": val, "weight": idx + 1})
 
 
 

@@ -3,7 +3,7 @@ from sqlalchemy import create_engine
 from sqlalchemy import text
 
 # DB 연결 (네 정보에 맞게 수정)
-engine = create_engine("mysql+pymysql://jshop:jsp1234@hyproz.myds.me:36000/shop", pool_pre_ping=True)
+engine = create_engine("mysql+pymysql://jstest3:jsp1234@hyproz.myds.me:36000/test3", pool_pre_ping=True)
 # conn = engine.connect()
 
 def crud_select(db_name) :
