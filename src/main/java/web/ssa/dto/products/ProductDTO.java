@@ -1,8 +1,6 @@
 package web.ssa.dto.products;
 
 import lombok.Data;
-import web.ssa.dto.categories.CategoriesDTO;
-import web.ssa.entity.categories.Categories;
 import web.ssa.entity.products.ProductMaster;
 
 import java.util.Date;
@@ -24,6 +22,7 @@ public class ProductDTO {
     private int amount;
     private int count;
     private Date reg;
+    private int quantity;//수량
 
     @Override
     public String toString() {
@@ -57,4 +56,6 @@ public class ProductDTO {
                 })
                 .collect(Collectors.toList());
     }
+
+
 }
