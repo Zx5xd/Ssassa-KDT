@@ -11,8 +11,8 @@ public class ProductVariantDTO {
     private int masterId;
     private int price;
     private String name;
-    private String simpleImg;
-    private String detailImg;
+    private int simpleImg;
+    private int detailImg;
     private Map<String, Map<String, String>> detail;
     private int amount;
 }

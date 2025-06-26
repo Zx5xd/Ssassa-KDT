@@ -1,5 +1,8 @@
 package web.ssa.enumf;
 
+import lombok.Getter;
+
+@Getter
 public enum CategoryType {
     AIR("에어프라이어"),
     DRYER("건조기"),
@@ -20,7 +23,4 @@ public enum CategoryType {
         this.displayName = displayName;
     }
 
-    public String getDisplayName() {
-        return displayName;
-    }
 }

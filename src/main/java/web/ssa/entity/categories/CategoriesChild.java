@@ -17,7 +17,7 @@ public class CategoriesChild {
 //    @Column(name = "CATEGORY_ID", nullable = false)
     @ManyToOne
     @JoinColumn(name = "category_id")
-    private Categories categoryChildId;
+    private Categories category;
 
     @Column(nullable = false)
     private String code;

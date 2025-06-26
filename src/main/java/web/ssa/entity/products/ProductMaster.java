@@ -22,8 +22,8 @@ public class ProductMaster {
     @Column(name = "CATEGORY_ID", nullable = false)
     private int categoryId;
 
-    @Column(name = "DETAIL_CATEGORY_ID", nullable = false)
-    private int detailCategoryId;
+    @Column(name = "CATEGORY_CHILD_ID", nullable = false)
+    private int categoryChildId;
 
     @Column(name = "SIMPLE_IMG")
     private int simpleImg;

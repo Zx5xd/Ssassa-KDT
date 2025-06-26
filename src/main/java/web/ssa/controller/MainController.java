@@ -13,7 +13,4 @@ public class MainController {
 
         return "main"; // → /WEB-INF/views/home.jsp로 포워딩됨
     }
-
-
-
 }

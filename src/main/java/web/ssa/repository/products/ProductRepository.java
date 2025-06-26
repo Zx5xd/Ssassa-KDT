@@ -15,6 +15,10 @@ public interface ProductRepository extends JpaRepository<ProductMaster, Integer>
     List<ProductMaster> findByName(String name);
     List<ProductMaster> findById(int id);
 
+    @EntityGraph(attributePaths = {"variants"})
+    Page<ProductMaster> findByCategoryId(int categoryId, Pageable pageable);
+    Page<ProductMaster> findByCategoryChildId(int categoryChildId, Pageable pageable);
+
     int deleteById(int id);
     @Modifying
     @Transactional

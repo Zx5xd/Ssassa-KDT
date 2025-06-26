@@ -10,7 +10,7 @@ public class ProductDTO {
     private int id;
     private String name;
     private int categoryId;
-    private int detailCategoryId;
+    private int categoryChildId;
     private int simpleImg;
     private int detailImg;
     private int price;

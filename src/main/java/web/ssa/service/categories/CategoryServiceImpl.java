@@ -3,11 +3,16 @@ package web.ssa.service.categories;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import web.ssa.dto.categories.CategoriesDTO;
+import web.ssa.dto.categories.PLCategoryDTO;
 import web.ssa.entity.categories.Categories;
+import web.ssa.entity.categories.CategoriesChild;
 import web.ssa.repository.categories.CategoryFieldsRepository;
 import web.ssa.repository.categories.CategoryRepository;
 
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @Service
 public class CategoryServiceImpl implements CategoryService {
@@ -45,5 +50,18 @@ public class CategoryServiceImpl implements CategoryService {
         }
 
         categoryFieldsRepository.updateOrder(categoryId, attributeKey, newOrder);
+    }
+
+    @Override
+    public Map<Integer, PLCategoryDTO> getCategoryMap() {
+        // EntityGraph(fetch join)를 통해 카테고리 + 자식 카테고리 동시 로딩
+        List<Categories> categories = categoryRepository.findAllWithChildren();
+
+        // DTO 변환 및 Map 구조로 변환
+        return categories.stream()
+                .collect(Collectors.toMap(
+                        Categories::getId,     // keyMapper
+                        PLCategoryDTO::from    // valueMapper
+                ));
     }
 }
