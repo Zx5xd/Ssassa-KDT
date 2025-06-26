@@ -3,9 +3,11 @@ package web.ssa.service.categories;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.servlet.View;
 import web.ssa.dto.categories.CategoryFieldsDTO;
 import web.ssa.dto.categories.DisplayOrderDTO;
 import web.ssa.entity.categories.Categories;
+import web.ssa.entity.categories.CategoriesChild;
 import web.ssa.entity.categories.CategoryFields;
 import web.ssa.repository.categories.CategoryFieldsRepository;
 import web.ssa.repository.categories.CategoryRepository;
@@ -20,6 +22,8 @@ public class CategoryServiceImpl implements CategoryService {
 
     @Autowired
     private CategoryFieldsRepository categoryFieldsRepository;
+    @Autowired
+    private View error;
 
     @Override
     public List<Categories> getCategories() {
@@ -38,9 +42,19 @@ public class CategoryServiceImpl implements CategoryService {
 
     @Override
     public List<CategoryFieldsDTO> getCategoryFieldsByCategoryId(int id) {
-        return CategoryFieldsDTO.convertToDTOList(this.categoryFieldsRepository.findCategoryFieldsById(id));
+        return CategoryFieldsDTO.convertToDTOList(
+                this.categoryFieldsRepository.findByCategoryFieldId_Id(id)
+        );
     }
 
+    @Override
+    public List<CategoryFieldsDTO> getCategoryFieldsByChildId(int categoryId, List<CategoriesChild> childId) {
+        return CategoryFieldsDTO.convertToDTOList(
+                this.categoryFieldsRepository.findByCategoryAndChilds(
+                        categoryId, childId
+                )
+        );
+    }
 
     // Category Fields Service
     @Transactional
@@ -57,13 +71,13 @@ public class CategoryServiceImpl implements CategoryService {
 
 
     @Transactional
-    public void allReorder(List<DisplayOrderDTO> dtoList) {
-        dtoList.forEach(dto -> {
-            categoryFieldsRepository.updateOrder(
-                    dto.getCategoryId(),
-                    dto.getAttributeKey(),
-                    dto.getNewOrder()
-            );
-        });
+    public void allReorder(List<Integer> fieldIds, List<Integer> newOrders) {
+        if (fieldIds.size() != newOrders.size()) {
+            throw new IllegalArgumentException("fieldIds와 newOrders의 크기가 다릅니다.");
+        }
+
+        for (int i = 0; i < fieldIds.size(); i++) {
+            this.categoryFieldsRepository.updateOrders(fieldIds.get(i), newOrders.get(i));
+        }
     }
 }

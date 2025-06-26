@@ -10,6 +10,7 @@ import java.util.stream.Collectors;
 public class CategoryFieldsDTO {
     private int id;
     private int categoryId;
+    private int categoryChildId;
     private String attributeKey;
     private String displayName;
     private String dataType;
@@ -25,6 +26,11 @@ public class CategoryFieldsDTO {
                     CategoryFieldsDTO dto = new CategoryFieldsDTO();
                     dto.setId(entity.getId());
                     dto.setCategoryId(entity.getCategoryFieldId().getId());  // categoryFieldId는 Categories 객체
+                    if(entity.getCategoryChildId() != null) {
+                        dto.setCategoryChildId(entity.getCategoryChildId().getId());
+                    }else{
+                        dto.setCategoryChildId(0);
+                    }
                     dto.setAttributeKey(entity.getAttributeKey());
                     dto.setDisplayName(entity.getDisplayName());
                     dto.setDataType(entity.getDataType());
@@ -43,6 +49,7 @@ public class CategoryFieldsDTO {
         return "[ DTO ] CategoryFieldsDTO{" +
                 "id=" + this.id +
                 ", categoryId=" + this.categoryId +
+                ", categoryChildId=" + this.categoryChildId +
                 ", attributeKey='" + this.attributeKey + '\'' +
                 ", displayName='" + this.displayName + '\'' +
                 ", dataType='" + this.dataType + '\'' +

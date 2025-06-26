@@ -22,6 +22,7 @@ public class ProductDTO {
     private Map<String, Map<String, String>> detail;
     int defaultVariant;
     private int amount;
+    private int count;
     private Date reg;
 
     @Override

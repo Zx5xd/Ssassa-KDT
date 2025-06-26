@@ -9,17 +9,18 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
 import web.ssa.cache.CategoriesCache;
 import web.ssa.dto.categories.CategoryFieldsDTO;
 import web.ssa.dto.categories.DisplayOrderDTO;
+import web.ssa.entity.categories.Categories;
+import web.ssa.entity.categories.CategoriesChild;
 import web.ssa.entity.categories.CategoryFields;
 import web.ssa.enumf.CategoryType;
+import web.ssa.service.categories.CategoryChildServImpl;
 import web.ssa.service.categories.CategoryServiceImpl;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -30,6 +31,9 @@ public class CategoryController {
 
     @Autowired
     private CategoryServiceImpl categoryService;
+
+    @Autowired
+    private CategoryChildServImpl categoryChildServ;
 
     @Autowired
     private final CategoriesCache categoriesCache;
@@ -80,7 +84,7 @@ public class CategoryController {
     }
 
     @PostMapping("set/displayOrder-static")
-    public ResponseEntity<?> reorder(@RequestBody Map<String, Object> payload) {
+    public String reorder(@RequestBody Map<String, Object> payload, Model model) {
         try {
 
             DisplayOrderDTO orderDTO = new DisplayOrderDTO(
@@ -92,11 +96,12 @@ public class CategoryController {
             );
 
             categoryService.reorderField(orderDTO);
-
-            return ResponseEntity.ok("순서 변경 완료");
+            model.addAttribute("resultMsg","순서 변경 완료");
         } catch (Exception e) {
-            return ResponseEntity.badRequest().body("에러: " + e.getMessage());
+            String msg = "[ 순서 변경 실패 ] " + e.getMessage();
+            model.addAttribute("resultMsg",msg);
         }
+        return "reDisplayorder";
     }
 
     @GetMapping("displayOrder-All")
@@ -109,29 +114,52 @@ public class CategoryController {
         }
 
         List<CategoryFieldsDTO> dtoList = this.categoryService.getCategoryFieldsByCategoryId(categoryId);
+
         model.addAttribute("dtoList", dtoList);
-//        model.addAttribute("category", categoriesCache);
-        categoriesCache.getCachedCategories().forEach(categories -> {
-            System.out.println(categories.toString());
-        });
+        model.addAttribute("category", categoriesCache.getCachedCategories());
+
+        return "reDisplayorderAll";
+    }
+
+    @GetMapping("displayOrder-All/{id}")
+    public String displayOrderById(Model model, @PathVariable int id) {
+
+        Categories category = new Categories();
+        List<CategoriesChild> child = null;
+        if (id == 5 || id == 8 || id == 9) {
+           category  = this.categoriesCache.getCachedCategories().stream()
+                    .filter(cat -> cat.getId() == id)
+                    .findFirst()
+                    .orElseThrow(() -> new IllegalArgumentException("카테고리 없음"));
+
+           child = this.categoryChildServ.getCategoryChild(category);
+        }
+
+        List<CategoryFieldsDTO> dtoList = switch (id) {
+            case 5, 8, 9 ->
+                    this.categoryService.getCategoryFieldsByChildId(id,
+                   child);
+            default -> this.categoryService.getCategoryFieldsByCategoryId(id);
+        };
+
+        model.addAttribute("category", categoriesCache.getCachedCategories());
+        model.addAttribute("dtoList", dtoList);
+
         return "reDisplayorderAll";
     }
 
     @PostMapping("set/displayOrder-All")
-    public ResponseEntity<?> allReorder(@RequestBody Map<String, Object> payload) {
+    public String allReorder(@RequestParam List<Integer> fieldId,
+                                        @RequestParam List<Integer> orderNum,
+                             Model model) {
         try {
-            DisplayOrderDTO orderDTO = new DisplayOrderDTO(
-                    Integer.parseInt(payload.get("categoryId").toString()),
-                    Integer.parseInt(payload.get("childId").toString()),
-                    payload.get("attributeKey").toString(),
-                    Integer.parseInt(payload.get("oldOrder").toString()),
-                    Integer.parseInt(payload.get("newOrder").toString())
-            );
-
-            return ResponseEntity.ok("순서 변경 완료");
+            this.categoryService.allReorder(fieldId, orderNum);
+            model.addAttribute("resultMsg", "순서 변경 완료");
         } catch (Exception e) {
-            return ResponseEntity.badRequest().body("에러: " + e.getMessage());
+            String msg = "[ 순서 변경 실패 ] " + e.getMessage();
+            model.addAttribute("resultMsg",msg);
         }
+        return "reDisplayorderAll";
     }
 
 }

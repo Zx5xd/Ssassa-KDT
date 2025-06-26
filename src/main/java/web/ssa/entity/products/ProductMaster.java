@@ -43,6 +43,9 @@ public class ProductMaster {
     @Column
     private int amount;
 
+    @Column(name = "visit_count")
+    private int count;
+
     @Column(nullable = false)
     private Date reg;
 

@@ -1,11 +1,13 @@
 package web.ssa.service.categories;
 
+import org.springframework.stereotype.Service;
 import web.ssa.entity.categories.Categories;
 import web.ssa.entity.categories.CategoriesChild;
 import web.ssa.repository.categories.CategoryChildRepository;
 
 import java.util.List;
 
+@Service
 public class CategoryChildServImpl implements CategoryChildServ {
 
     private CategoryChildRepository categoryChildRepository;
