@@ -1,4 +1,4 @@
-package web.ssa.controller;
+package web.ssa.controller.client;
 
 import lombok.Data;
 import lombok.RequiredArgsConstructor;

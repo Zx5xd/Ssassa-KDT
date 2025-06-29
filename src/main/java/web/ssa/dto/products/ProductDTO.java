@@ -2,6 +2,7 @@ package web.ssa.dto.products;
 
 import lombok.Data;
 import web.ssa.entity.products.ProductMaster;
+import web.ssa.util.DTOUtil;
 
 import java.util.Date;
 import java.util.List;
@@ -22,7 +23,7 @@ public class ProductDTO {
     private int amount;
     private int count;
     private Date reg;
-    private int quantity;//수량
+//    private int quantity;//수량
 
     @Override
     public String toString() {
@@ -37,7 +38,7 @@ public class ProductDTO {
                 ", reg=" + reg +
                 '}';
     }
-
+    private static DTOUtil util = new DTOUtil();
     public static List<ProductDTO> convertToDTOList(List<ProductMaster> entities) {
         return entities.stream()
                 .map(entity -> {
@@ -49,12 +50,30 @@ public class ProductDTO {
                     dto.setSimpleImg(entity.getSimpleImg());
                     dto.setDetailImg(entity.getDetailImg());
                     dto.setPrice(entity.getPrice());
+                    dto.setDetail(util.stringToMapping(entity.getDetail()));
+                    dto.setDefaultVariant(entity.getDefaultVariantId());
                     dto.setAmount(entity.getAmount());
                     dto.setReg(entity.getReg());
 
                     return dto;
                 })
                 .collect(Collectors.toList());
+    }
+
+    public static ProductDTO convertToDTO(ProductMaster entity) {
+        ProductDTO dto = new ProductDTO();
+        dto.setId(entity.getId());
+        dto.setName(entity.getName());
+        dto.setCategoryId(entity.getCategoryId());
+        dto.setDetailCategoryId(entity.getCategoryId());
+        dto.setSimpleImg(entity.getSimpleImg());
+        dto.setDetailImg(entity.getDetailImg());
+        dto.setPrice(entity.getPrice());
+        dto.setDetail(util.stringToMapping(entity.getDetail()));
+        dto.setDefaultVariant(entity.getDefaultVariantId());
+        dto.setAmount(entity.getAmount());
+        dto.setReg(entity.getReg());
+        return dto;
     }
 
 

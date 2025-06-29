@@ -1,4 +1,4 @@
-package web.ssa.controller;
+package web.ssa.controller.admin;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;

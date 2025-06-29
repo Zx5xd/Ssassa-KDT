@@ -1,12 +1,9 @@
-package web.ssa.controller;
+package web.ssa.controller.admin;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
-import org.apache.coyote.Request;
-import org.apache.coyote.Response;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -15,12 +12,9 @@ import web.ssa.dto.categories.CategoryFieldsDTO;
 import web.ssa.dto.categories.DisplayOrderDTO;
 import web.ssa.entity.categories.Categories;
 import web.ssa.entity.categories.CategoriesChild;
-import web.ssa.entity.categories.CategoryFields;
-import web.ssa.enumf.CategoryType;
 import web.ssa.service.categories.CategoryChildServImpl;
 import web.ssa.service.categories.CategoryServiceImpl;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 

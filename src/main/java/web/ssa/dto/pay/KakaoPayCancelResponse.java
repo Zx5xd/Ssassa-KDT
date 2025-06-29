@@ -1,4 +1,4 @@
-package web.ssa.dto;
+package web.ssa.dto.pay;
 
 
 import lombok.Data;

@@ -6,11 +6,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
-import web.ssa.dto.KakaoPayCancelResponse;
-import web.ssa.dto.SelectedProduct;
+import web.ssa.dto.pay.KakaoPayCancelResponse;
+import web.ssa.dto.pay.SelectedProductDTO;
 import web.ssa.entity.Payment;
-import web.ssa.entity.Product;
 import web.ssa.entity.member.User;
+import web.ssa.entity.products.ProductMaster;
 import web.ssa.repository.PaymentRepository;
 
 import java.util.List;
@@ -25,13 +25,13 @@ public class KakaoPayService {
 
     private String tid;
     private String partnerOrderId;
-    private Product currentProduct;
+    private SelectedProductDTO currentProduct;
     private User currentUser;
-    private List<SelectedProduct> currentSelectedItems;
+    private List<SelectedProductDTO> currentSelectedItems;
     private int currentTotalAmount;
 
-    // ✅ 단일 상품 결제 준비 (User 포함)
-    public String kakaoPayReady(Product product, User user) {
+    // 단일 상품 결제 준비 (User 포함)
+    public String kakaoPayReady(SelectedProductDTO product, User user) {
         this.currentProduct = product;
         this.currentUser = user;
         this.partnerOrderId = "order_" + System.currentTimeMillis();
@@ -42,13 +42,13 @@ public class KakaoPayService {
         headers.set("Authorization", ADMIN_KEY);
         headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
 
-        int quantity = (product.getQuantity() != null) ? product.getQuantity() : 1;
+        int quantity = product.getQuantity();
 
         MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
         params.add("cid", "TC0ONETIME");
         params.add("partner_order_id", this.partnerOrderId);
         params.add("partner_user_id", user.getEmail());
-        params.add("item_name", product.getName());
+        params.add("item_name", product.getProductName());
         params.add("quantity", String.valueOf(quantity));
         params.add("total_amount", String.valueOf(product.getPrice() * quantity));
         params.add("tax_free_amount", "0");
@@ -64,8 +64,8 @@ public class KakaoPayService {
         return (String) response.getBody().get("next_redirect_pc_url");
     }
 
-    // ✅ 복수 상품 결제 준비
-    public String readyToPay(User user, List<SelectedProduct> selectedItems, int totalAmount) {
+    // 복수 상품 결제 준비
+    public String readyToPay(User user, List<SelectedProductDTO> selectedItems, int totalAmount) {
         this.currentUser = user;
         this.currentSelectedItems = selectedItems;
         this.currentTotalAmount = totalAmount;
@@ -82,7 +82,7 @@ public class KakaoPayService {
             itemName += " 외 " + (selectedItems.size() - 1) + "개";
         }
 
-        int totalQuantity = selectedItems.stream().mapToInt(SelectedProduct::getQuantity).sum();
+        int totalQuantity = selectedItems.stream().mapToInt(SelectedProductDTO::getQuantity).sum();
 
         MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
         params.add("cid", "TC0ONETIME");
@@ -104,7 +104,7 @@ public class KakaoPayService {
         return (String) response.getBody().get("next_redirect_pc_url");
     }
 
-    // ✅ 결제 승인 처리
+    // 결제 승인 처리
     public Payment kakaoPayApprove(String pgToken) {
         RestTemplate restTemplate = new RestTemplate();
 
@@ -134,9 +134,9 @@ public class KakaoPayService {
             payment.setAmount(currentTotalAmount);
             payment.setProductId(0L);
         } else if (currentProduct != null) {
-            int quantity = (currentProduct.getQuantity() != null) ? currentProduct.getQuantity() : 1;
-            payment.setProductId(currentProduct.getId());
-            payment.setItemName(currentProduct.getName());
+            int quantity = currentProduct.getQuantity();
+            payment.setProductId((long) currentProduct.getProductId());
+            payment.setItemName(currentProduct.getProductName());
             payment.setAmount(currentProduct.getPrice() * quantity);
         }
 
@@ -145,14 +145,14 @@ public class KakaoPayService {
         return payment;
     }
 
-    // ✅ 마이페이지 환불 요청
+    // 마이페이지 환불 요청
     public void requestRefund(Long paymentId) {
         Payment payment = paymentRepository.findById(paymentId).orElseThrow();
         payment.setStatus("REFUND_REQUEST");
         paymentRepository.save(payment);
     }
 
-    // ✅ 관리자 환불 처리
+    // 관리자 환불 처리
     public void completeRefund(Long paymentId) {
         Payment payment = paymentRepository.findById(paymentId).orElseThrow();
         KakaoPayCancelResponse res = kakaoPayCancel(payment.getTid(), payment.getAmount());
@@ -175,8 +175,7 @@ public class KakaoPayService {
 
         HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<>(params, headers);
         ResponseEntity<KakaoPayCancelResponse> response = restTemplate.postForEntity(
-                "https://kapi.kakao.com/v1/payment/cancel", request, KakaoPayCancelResponse.class
-        );
+                "https://kapi.kakao.com/v1/payment/cancel", request, KakaoPayCancelResponse.class);
 
         return response.getBody();
     }

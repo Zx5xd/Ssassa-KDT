@@ -1,4 +1,4 @@
-package web.ssa.controller;
+package web.ssa.controller.admin;
 
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
@@ -37,10 +37,11 @@ public class AdminController {
     // 환불 + 문의사항 목록 페이지
     @GetMapping("/refunds")
     public String showAdminDashboard(HttpSession session, Model model) {
-        if (!isAdmin(session)) return "redirect:/login";
+        if (!isAdmin(session))
+            return "redirect:/login";
         model.addAttribute("refunds", kakaoPayService.getPendingRefunds());
         model.addAttribute("inquiries", inquiryService.getAll());
-        return "admin/adminRefunds"; // ✅ 수정 완료
+        return "admin/adminRefunds"; // 수정 완료
     }
 
     // 환불 승인 처리
@@ -60,21 +61,24 @@ public class AdminController {
     // 상품 등록 관리 페이지
     @GetMapping("/products")
     public String manageProducts(HttpSession session, Model model) {
-        if (!isAdmin(session)) return "redirect:/login";
+        if (!isAdmin(session))
+            return "redirect:/login";
         return "admin/productList"; // /WEB-INF/views/admin/productList.jsp
     }
 
     // 회원 목록 관리 페이지
     @GetMapping("/users")
     public String manageUsers(HttpSession session, Model model) {
-        if (!isAdmin(session)) return "redirect:/login";
+        if (!isAdmin(session))
+            return "redirect:/login";
         return "admin/userList"; // /WEB-INF/views/admin/userList.jsp
     }
 
     // 문의사항 별도 목록 페이지 (옵션)
     @GetMapping("/inquiries")
     public String manageInquiries(HttpSession session, Model model) {
-        if (!isAdmin(session)) return "redirect:/login";
+        if (!isAdmin(session))
+            return "redirect:/login";
         model.addAttribute("inquiries", inquiryService.getAll());
         return "admin/inquiryList"; // /WEB-INF/views/admin/inquiryList.jsp
     }

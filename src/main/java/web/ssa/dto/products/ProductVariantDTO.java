@@ -1,10 +1,8 @@
 package web.ssa.dto.products;
 
-
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.Data;
-import web.ssa.entity.products.ProductReview;
 import web.ssa.entity.products.ProductVariant;
 
 import java.util.List;
@@ -27,8 +25,8 @@ public class ProductVariantDTO {
         try {
             this.detail = objectMapper.readValue(
                     detail,
-                    new TypeReference<Map<String, Map<String, String>>>() {}
-            );
+                    new TypeReference<Map<String, Map<String, String>>>() {
+                    });
         } catch (Exception e) {
             e.printStackTrace();
         }

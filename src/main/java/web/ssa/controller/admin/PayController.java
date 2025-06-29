@@ -1,4 +1,4 @@
-package web.ssa.controller;
+package web.ssa.controller.admin;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
@@ -6,13 +6,15 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
-import web.ssa.dto.KakaoPayCancelResponse;
-import web.ssa.dto.SelectedProduct;
+import web.ssa.dto.pay.KakaoPayCancelResponse;
+import web.ssa.dto.pay.SelectedProductDTO;
+import web.ssa.dto.products.ProductDTO;
 import web.ssa.entity.Payment;
-import web.ssa.entity.Product;
 import web.ssa.entity.member.User;
+import web.ssa.entity.products.ProductMaster;
 import web.ssa.service.KakaoPayService;
-import web.ssa.service.ProductService;
+import web.ssa.service.products.ProductService;
+import web.ssa.repository.products.ProductVariantRepository;
 
 import java.util.*;
 
@@ -22,8 +24,9 @@ public class PayController {
 
     private final KakaoPayService kakaoPayService;
     private final ProductService productService;
+    private final ProductVariantRepository productVariantRepository;
 
-    // ✅ 장바구니 복수 상품 결제
+    // 장바구니 복수 상품 결제
     @PostMapping("/cart/checkout")
     public String checkout(HttpServletRequest request, HttpSession session, Model model) {
         Object obj = session.getAttribute("loginUser");
@@ -38,7 +41,7 @@ public class PayController {
             return "redirect:/products";
         }
 
-        List<SelectedProduct> selectedItems = new ArrayList<>();
+        List<SelectedProductDTO> selectedItems = new ArrayList<>();
         int totalAmount = 0;
 
         try {
@@ -47,11 +50,14 @@ public class PayController {
                 String quantityParam = request.getParameter("quantities[" + productId + "]");
                 int quantity = quantityParam != null ? Integer.parseInt(quantityParam) : 1;
 
-                Product product = productService.getProductById(productId);
+                ProductDTO product = ProductDTO.convertToDTO(this.productService.getProductById(productId));
                 if (product != null) {
-                    int itemTotal = product.getPrice() * quantity;
+                    int productPrice = productService.getProductPrice(productId);
+                    int itemTotal = productPrice * quantity;
                     totalAmount += itemTotal;
-                    selectedItems.add(new SelectedProduct(product.getName(), quantity));
+                    selectedItems.add(
+                            new SelectedProductDTO(product.getId(), product.getDefaultVariant(), product.getName(),
+                                    quantity, productPrice));
                 }
             }
         } catch (Exception e) {
@@ -73,30 +79,40 @@ public class PayController {
         }
     }
 
-    // ✅ 단일 상품 결제
+    // 단일 상품 결제
     @GetMapping("/pay/ready")
     public String kakaoPay(@RequestParam("productId") Long productId,
-                           @RequestParam(value = "quantity", defaultValue = "1") int quantity,
-                           HttpSession session,
-                           Model model) {
+            @RequestParam(value = "quantity", defaultValue = "1") int quantity,
+            HttpSession session,
+            Model model) {
 
         Object obj = session.getAttribute("loginUser");
         if (!(obj instanceof User loginUser)) {
             return "redirect:/login";
         }
 
-        Product product = productService.getProductById(productId);
-        if (product == null) {
+        ProductMaster productMaster = productService.getProductById(productId);
+        if (productMaster == null) {
             model.addAttribute("error", "상품을 찾을 수 없습니다.");
             return "redirect:/products";
         }
 
-        if (quantity <= 0) quantity = 1;
-        if (quantity > 99) quantity = 99;
-        product.setQuantity(quantity);
+        if (quantity <= 0)
+            quantity = 1;
+        if (quantity > 99)
+            quantity = 99;
+
+        int price = productService.getProductPrice(productId);
+        int variantId = productMaster.getDefaultVariantId() != null ? productMaster.getDefaultVariantId() : 0;
+        SelectedProductDTO selectedProduct = new SelectedProductDTO(
+                productMaster.getId(),
+                variantId,
+                productMaster.getName(),
+                quantity,
+                price);
 
         try {
-            String redirectUrl = kakaoPayService.kakaoPayReady(product, loginUser);
+            String redirectUrl = kakaoPayService.kakaoPayReady(selectedProduct, loginUser);
             return "redirect:" + redirectUrl;
         } catch (Exception e) {
             model.addAttribute("error", "결제 준비 중 오류가 발생했습니다: " + e.getMessage());
@@ -104,11 +120,11 @@ public class PayController {
         }
     }
 
-    // ✅ 결제 성공
+    // 결제 성공
     @GetMapping("/pay/success")
     public String kakaoPaySuccess(@RequestParam("pg_token") String pgToken,
-                                  HttpSession session,
-                                  Model model) {
+            HttpSession session,
+            Model model) {
         try {
             Payment payment = kakaoPayService.kakaoPayApprove(pgToken);
             Object obj = session.getAttribute("loginUser");
@@ -125,18 +141,18 @@ public class PayController {
         }
     }
 
-    // ✅ 결제 실패
+    // 결제 실패
     @GetMapping("/pay/fail")
     public String kakaoPayFail(Model model) {
         model.addAttribute("message", "결제가 취소되었거나 실패했습니다.");
         return "payFail";
     }
 
-    // ✅ 마이페이지에서 환불 요청
+    // 마이페이지에서 환불 요청
     @PostMapping("/refund")
     public String requestRefund(@RequestParam("paymentId") Long paymentId,
-                                HttpSession session,
-                                Model model) {
+            HttpSession session,
+            Model model) {
         Object obj = session.getAttribute("loginUser");
         if (!(obj instanceof User user)) {
             return "redirect:/login";
@@ -152,11 +168,11 @@ public class PayController {
         return "redirect:/mypage";
     }
 
-    // ✅ 관리자 환불 처리
+    // 관리자 환불 처리
     @PostMapping("/admin/refund")
     public String adminRefund(@RequestParam("id") Long id,
-                              Model model,
-                              HttpSession session) {
+            Model model,
+            HttpSession session) {
         Object obj = session.getAttribute("loginUser");
         if (!(obj instanceof User admin) || !"ADMIN".equals(admin.getRole())) {
             return "redirect:/login";

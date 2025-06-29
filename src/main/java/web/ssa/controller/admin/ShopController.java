@@ -1,4 +1,4 @@
-package web.ssa.controller;
+package web.ssa.controller.admin;
 
 // 올바른 부분 ✅
 import org.springframework.ui.Model;
@@ -8,8 +8,8 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
-import web.ssa.entity.Product;
-import web.ssa.service.ProductService;
+import web.ssa.entity.products.ProductMaster;
+import web.ssa.service.products.ProductService;
 
 import java.util.List;
 
@@ -28,9 +28,18 @@ public class ShopController {
             return "redirect:/login";
         }
 
-        List<Product> productList = productService.getAllProducts();
+        List<ProductMaster> productList = productService.getAllProducts();
+
+        // 각 상품에 이미지 URL 추가
+        productList.forEach(product -> {
+            String imgUrl = productService.getProductSimpleImg(product);
+            // ProductMaster에 임시로 이미지 URL 설정 (실제로는 DTO 사용 권장)
+            // 여기서는 간단히 model에 별도로 추가
+        });
+
         model.addAttribute("products", productList);
         model.addAttribute("loginUser", loginUser);
+        model.addAttribute("productService", productService); // JSP에서 사용할 수 있도록
         return "productList"; // /WEB-INF/views/shop/productList.jsp
     }
 
@@ -42,7 +51,7 @@ public class ShopController {
             return "redirect:/login";
         }
 
-        Product product = productService.getProductById(id);
+        ProductMaster product = productService.getProductById(id);
         model.addAttribute("product", product);
         return "productDetail"; // /WEB-INF/views/shop/productDetail.jsp
     }

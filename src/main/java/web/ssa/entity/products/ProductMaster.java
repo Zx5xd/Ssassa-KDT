@@ -37,7 +37,7 @@ public class ProductMaster {
     @Column(columnDefinition = "json")
     private String detail;
 
-    @Column(name = "DEFAULT_VARIANT") // ✅ 컬럼 생성됨
+    @Column(name = "DEFAULT_VARIANT") // 컬럼 생성됨
     private Integer defaultVariantId;
 
     @Column

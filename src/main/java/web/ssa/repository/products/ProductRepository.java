@@ -13,17 +13,16 @@ import java.util.List;
 @Repository
 public interface ProductRepository extends JpaRepository<ProductMaster, Integer> {
     List<ProductMaster> findByName(String name);
+
     List<ProductMaster> findById(int id);
 
     int deleteById(int id);
+
     @Modifying
     @Transactional
     @Query("UPDATE ProductMaster p SET p.name = :name WHERE p.id = :id")
     int updateProductNameById(@Param("id") int id, @Param("name") String name);
 
     Page<ProductMaster> findAll(Pageable pageable);
-
-    // 상품 등록 <- 기본
-    //
 
 }

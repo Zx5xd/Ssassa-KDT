@@ -6,6 +6,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.Data;
 import web.ssa.entity.products.ProductReview;
 import web.ssa.entity.products.ReviewRecommend;
+import web.ssa.util.DTOUtil;
 
 import java.util.List;
 import java.util.Map;
@@ -23,6 +24,8 @@ public class ProductReviewDTO {
     private int reviewType;
     private List<ReviewRecommend> recommendList;
 
+    private static DTOUtil util = new DTOUtil();
+
     public static List<ProductReviewDTO> convertToDTOList(List<ProductReview> entities) {
         return entities.stream()
                 .map(entity -> {
@@ -31,7 +34,7 @@ public class ProductReviewDTO {
                     dto.setWriter(entity.getWriter());
                     dto.setContent(entity.getContent());
                     dto.setProductId(entity.getProductId().getId());
-                    dto.setUserImgs(entity.getUserImgs());
+                    dto.setUserImgs(util.stringToMapping(entity.getUserImgs()));
                     dto.setRecommendCount(entity.getRecommendCount());
                     dto.setReviewType(entity.getReviewType());
                     dto.setProductVariantId(entity.getProductVariant().getId());
@@ -42,18 +45,18 @@ public class ProductReviewDTO {
                 .collect(Collectors.toList());
     }
 
-    private void setUserImgs(String userImgs) {
-        ObjectMapper objectMapper = new ObjectMapper();
-        try {
-            this.userImgs = objectMapper.readValue(
-                    userImgs,
-                    new TypeReference<Map<String, Map<String, String>>>() {
-                    }
-            );
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
+//    private void setUserImgs(String userImgs) {
+//        ObjectMapper objectMapper = new ObjectMapper();
+//        try {
+//            this.userImgs = objectMapper.readValue(
+//                    userImgs,
+//                    new TypeReference<Map<String, Map<String, String>>>() {
+//                    }
+//            );
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//        }
+//    }
 
     @Override
     public String toString() {
