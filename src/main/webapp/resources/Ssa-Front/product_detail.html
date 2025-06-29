@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>싸싸</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons"
+          rel="stylesheet">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Symbols+Outlined"
+          rel="stylesheet">
+    <link rel="stylesheet" href="index.css">
+  <link rel="stylesheet" href="./css/product_detail.css">
+</head>
+<body class="noto-sans-kr-regular">
+<nav>
+  <div id="logo"></div>
+  <div id="searchBox">
+    <input type="text" id="searchInput" placeholder="검색할 제품을 입력해주세요">
+    <div class="searchBtn">
+      <span class="material-symbols-outlined">search</span>
+    </div>
+  </div>
+  <div id="user-interface">
+    <div class="login">
+      <span class="material-symbols-outlined">account_box</span>
+      <span class="label">로그인</span>
+    </div>
+  </div>
+</nav>
+<main>
+    <section id="header">
+      <img src="https://img.danawa.com/prod_img/500000/912/679/img/70679912_1.jpg" alt="">
+      <div id="header-content">
+          <input type="hidden" name="id" value="1">
+          <input type="hidden" name="price" value="761090">
+          <div id="header-product-name">
+              AMD 라이젠7-6세대 9800X3D (그래니트 릿지) (정품)
+          </div>
+          <div id="header-review">
+              <span id="review-star">
+                  <span class="material-icons">star</span>
+                  <span id="review-star-count">4.9</span>
+              </span>
+              <a id="review-count" href="#">리뷰 9개</a>
+          </div>
+          <div id="header-price">
+              판매가 761,090원
+          </div>
+          <div id="header-dco">
+              <div id="header-delivery-cost">
+                  배송비 2,500원
+              </div>
+              <div id="header-other">
+                  <span class="material-icons">share</span>
+                  <span class="material-icons">favorite</span>
+              </div>
+          </div>
+          <div id="header-buy-amount-container">
+              <label id="buy-amount">
+                  수량
+                  <span class="material-icons" id="remove_amount">remove_circle</span>
+                  <input type="number" value="1" min="1" id="amount_input">
+                  <span class="material-icons" id="add_amount">add_circle</span>
+              </label>
+              <span id="buy-total-price">
+                  761,090원
+              </span>
+          </div>
+          <div id="header-buttons">
+              <div id="buy-button">구매</div>
+              <div id="basket-button">장바구니</div>
+          </div>
+      </div>
+  </section>
+    <section id="spec">
+        <h5>상세정보</h5>
+    </section>
+    <section id="review">
+        <h5>리뷰</h5>
+    </section>
+</main>
+</body>
+</html>
+
+<script type="module">
+  const hiddenInput = document.querySelector('input[name="price"]');
+  const price = Number(hiddenInput.value);
+
+  let amount = 1;
+  const addAmountBtn = document.getElementById("add_amount");
+  const removeAmountBtn = document.getElementById("remove_amount");
+  const amountInput = document.getElementById("amount_input");
+  const totalPriceElem = document.getElementById("buy-total-price");
+
+  // ✅ 총 가격을 계산하고 표시하는 함수
+  const updateTotalPrice = () => {
+    const total = price * amount;
+    // 한국식 통화 형식으로 포맷
+    totalPriceElem.textContent = total.toLocaleString('ko-KR') + "원";
+  };
+
+  // 버튼: 수량 증가
+  addAmountBtn.addEventListener("click", () => {
+    amount++;
+    amountInput.value = amount;
+    updateTotalPrice();
+  });
+
+  // 버튼: 수량 감소
+  removeAmountBtn.addEventListener("click", () => {
+    if (amount > 1) amount--;
+    amountInput.value = amount;
+    updateTotalPrice();
+  });
+
+  // 직접 입력
+  amountInput.addEventListener("input", (e) => {
+    let value = Number(e.target.value);
+
+    if (value < 1 || isNaN(value)) {
+      value = 1;
+      amountInput.value = value;
+    }
+
+    amount = value;
+    updateTotalPrice();
+  });
+
+  // 초기 표시
+  updateTotalPrice();
+</script>

@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>싸싸</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons"
+          rel="stylesheet">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Symbols+Outlined"
+          rel="stylesheet">
+    <link rel="stylesheet" href="index.css">
+    <link rel="stylesheet" href="./css/slide.css">
+    <link rel="stylesheet" href="./css/index-content.css">
+</head>
+<body class="noto-sans-kr-regular">
+    <nav>
+        <div id="logo"></div>
+        <div id="searchBox">
+            <input type="text" id="searchInput" placeholder="검색할 제품을 입력해주세요">
+            <div class="searchBtn">
+                <span class="material-symbols-outlined">search</span>
+            </div>
+        </div>
+        <div id="user-interface">
+            <div class="login">
+                <span class="material-symbols-outlined">account_box</span>
+                <span class="label">로그인</span>
+            </div>
+        </div>
+    </nav>
+    <header>
+        <div class="carousel-wrapper">
+            <div class="blur-left"></div>
+            <div class="blur-right"></div>
+
+            <div class="carousel-track">
+                <div class="slide" style="background-image: url('https://coolenjoy.net/data/editor/2412/9352b0f646c40322d19302cde950c9e2a50c9309.png');"></div>
+                <div class="slide" style="background-image: url('https://img2.quasarzone.com/editor/2024/10/31/ba37e8077553fb3828bf7d96c6040ef5.png');"></div>
+                <div class="slide" style="background-image: url('https://storage.tweak.dk/processor/amd-9800X3D/AMD%209800X3D%20Specs.png');"></div>
+            </div>
+            <div class="pagination"></div>
+            <button class="prev-btn">‹</button>
+            <button class="next-btn">›</button>
+        </div>
+
+    </header>
+    <main>
+        <div class="category-container">
+            <category-elem id="categoryBar">
+                <category-item href="/laptop" value="노트북" color="white">
+                    <span class="material-icons">computer</span>
+                </category-item>
+
+                <category-item href="/laptop" value="노트북" color="white">
+                    <span class="material-icons">computer</span>
+                </category-item>
+
+                <category-item bgColor="red" textColor="white" href="/gpu" value="그래픽카드" color="#eef">
+                    <span class="material-icons">sports_esports</span>
+                </category-item>
+            </category-elem>
+        </div>
+        <div id="content">
+            <section id="laptop">
+                <div class="col">
+                    <div class="row all-cat-item">
+                        <h2>노트북</h2>
+                        <a href="">전체보기></a>
+                    </div>
+                    <div class="col-item">
+
+                    </div>
+                    <div class="col-item">
+
+                    </div>
+                </div>
+                <div class="banner-img"></div>
+            </section>
+            <section id="laptop">
+                <div class="col">
+                    <div class="row all-cat-item">
+                        <h2>노트북</h2>
+                        <a href="">전체보기></a>
+                    </div>
+                    <div class="col-item">
+
+                    </div>
+                    <div class="col-item">
+
+                    </div>
+                </div>
+                <div class="banner-img"></div>
+            </section>
+            <section id="laptop">
+                <div class="col">
+                    <div class="row all-cat-item">
+                        <h2>노트북</h2>
+                        <a href="">전체보기></a>
+                    </div>
+                    <div class="col-item">
+
+                    </div>
+                    <div class="col-item">
+
+                    </div>
+                </div>
+                <div class="banner-img"></div>
+            </section>
+            <section id="laptop">
+                <div class="col">
+                    <div class="row all-cat-item">
+                        <h2>노트북</h2>
+                        <a href="">전체보기></a>
+                    </div>
+                    <div class="col-item">
+
+                    </div>
+                    <div class="col-item">
+
+                    </div>
+                </div>
+                <div class="banner-img"></div>
+            </section>
+        </div>
+    </main>
+    <footer></footer>
+</body>
+</html>
+
+<script src="./js/slide.js"></script>
+<script crossorigin="anonymous" src="./js/SsaComponent.js"></script>
+
+<script>
+  const categoryBar = document.getElementById('categoryBar');
+  const threshold = 500; // 기준 스크롤 위치 조절
+
+  window.addEventListener('scroll', () => {
+    if (window.scrollY >= threshold) {
+      categoryBar.classList.add('scrolled');
+    } else {
+      categoryBar.classList.remove('scrolled');
+    }
+  });
+</script>

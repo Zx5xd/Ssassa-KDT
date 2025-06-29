@@ -1,0 +1,168 @@
+@import "https://unpkg.com/open-props";
+@import "https://unpkg.com/open-props/normalize.dark.min.css";
+@import "https://unpkg.com/open-props/theme.dark.switch.min.css";
+@import "https://unpkg.com/open-props/sizes.min.css";
+
+.noto-sans-kr-light {
+    font-family: "Noto Sans KR", sans-serif;
+    font-optical-sizing: auto;
+    font-weight: 300;
+    font-style: normal;
+}
+.noto-sans-kr-regular {
+    font-family: "Noto Sans KR", sans-serif;
+    font-optical-sizing: auto;
+    font-weight: 400;
+    font-style: normal;
+}
+.noto-sans-kr-bold {
+    font-family: "Noto Sans KR", sans-serif;
+    font-optical-sizing: auto;
+    font-weight: 700;
+    font-style: normal;
+}
+
+.material-symbols-outlined.md-18 { font-size: 18px; }
+.material-symbols-outlined.md-24 { font-size: 24px; }
+.material-symbols-outlined.md-24 { font-size: var(--font-size-5); }
+.material-symbols-outlined.md-36 { font-size: 36px; }
+.material-symbols-outlined.md-48 { font-size: 48px; }
+
+body, html {
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    height: 100%;
+    overflow-x: hidden;
+}
+
+html {
+    --brand-dim: var(--orange-4);
+
+    --text-1-dim: var(--gray-3);
+    --text-2-dim: var(--gray-4);
+
+    --surface-1-dim: var(--gray-8);
+    --surface-2-dim: var(--gray-7);
+    --surface-3-dim: var(--gray-6);
+    --surface-4-dim: var(--gray-5);
+}
+
+:root {
+    --brand: var(--brand-dim);
+
+    --text-1: var(--text-1-dim);
+    --text-2: var(--text-2-dim);
+
+    --surface-1: var(--surface-1-dim);
+    --surface-2: var(--surface-2-dim);
+    --surface-3: var(--surface-3-dim);
+    --surface-4: var(--surface-4-dim);
+}
+
+html {
+    background-color: var(--gray-9);
+    color: var(--text-1);
+    accent-color: var(--link);
+}
+
+.material-symbols-outlined{
+    user-select: none;
+    -webkit-user-select: none;
+}
+
+.navbar-profile-img {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    object-fit: cover;
+    margin-right: 10px;
+    border: 2px solid #ccc;
+}
+nav {
+    display: flex;
+    flex-direction: row;
+    width: 100%;
+    padding: var(--size-4) 0;
+    justify-content: center;
+    align-items: center;
+    gap: var(--size-11);
+    #logo{
+        width: 64px;
+        height: 64px;
+        background: url("./assets/logo_main.png");
+        background-size: cover;
+        cursor: pointer;
+        user-select: none;
+        -webkit-user-select: none;
+    }
+    #searchBox{
+        height: 48px;
+        display: flex;
+        flex-direction: row;
+        border: var(--border-size-2) solid var(--gray-5);
+        border-radius: var(--radius-4);
+        background: #7e8282;
+        overflow: hidden;
+        align-items: center;
+        #searchInput {
+            all: revert;
+            width: 480px;
+            height: 100%;
+            outline: none;
+            border: none;
+            font-size: var(--font-size-1);
+            background-color: transparent;
+            padding: 0 var(--size-4);
+            &::placeholder{
+                color: var(--text-2);
+            }
+        }
+        .searchBtn{
+            display: flex;
+            width: 32px;
+            height: 100%;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            user-select: none;
+            -webkit-user-select: none;
+            padding: 0 var(--size-5);
+            transition: 0.2s ease-in-out;
+            .material-symbols-outlined{
+                font-size: var(--size-6);
+            }
+            &:hover{
+                color: var(--gray-1);
+            }
+        }
+    }
+    #user-interface {
+        .login {
+            display: flex;
+            flex-direction: row;
+            justify-content: center;
+            align-items: center;
+            .material-symbols-outlined {
+                font-size: var(--font-size-6);
+            }
+            .label{
+                font-size: var(--size-3);
+            }
+            transition: 0.2s ease-in-out;
+            cursor: pointer;
+            &:hover{
+                color: var(--gray-1);
+            }
+        }
+    }
+}
+
+main {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-top: var(--size-4);
+}

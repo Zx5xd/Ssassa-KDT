@@ -1,48 +1,19 @@
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
-<html>
+<!DOCTYPE html>
+<html lang="ko">
 <head>
-  <title>비밀번호 찾기</title>
   <meta charset="UTF-8">
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-    }
+  <title>비밀번호 찾기 - 싸싸</title>
 
-    .container {
-      width: 300px;
-      margin: 50px auto;
-    }
+  <!-- ✅ 폰트 및 아이콘 -->
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/icon?family=Material+Symbols+Outlined" rel="stylesheet">
 
-    label {
-      display: block;
-      margin-top: 10px;
-    }
-
-    input[type="text"], input[type="email"] {
-      width: 100%;
-      padding: 6px;
-      margin-top: 5px;
-    }
-
-    button {
-      margin-top: 15px;
-      padding: 8px 16px;
-    }
-
-    .message {
-      margin-top: 10px;
-      font-weight: bold;
-    }
-
-    .error {
-      color: red;
-    }
-
-    .success {
-      color: green;
-    }
-  </style>
+  <!-- ✅ 공통 스타일 시트 -->
+  <link rel="stylesheet" href="${pageContext.request.contextPath}/resources/Ssa-Front/index.css">
+  <link rel="stylesheet" href="${pageContext.request.contextPath}/resources/Ssa-Front/css/auth.css">
 
   <script>
     // 전화번호 자동 하이픈 처리
@@ -66,42 +37,80 @@
     };
   </script>
 </head>
-<body>
-<div class="container">
-  <h2>비밀번호 찾기</h2>
+<body class="noto-sans-kr-regular">
+<nav>
+  <!-- 로고 클릭 시 index.jsp 이동 -->
+  <a href="${pageContext.request.contextPath}/index" style="text-decoration: none;">
+    <div id="logo" style="background-image: url('${pageContext.request.contextPath}/resources/Ssa-Front/assets/logo_main.png');"></div>
+  </a>
 
-  <form method="post" action="/find-password">
-    <label>
-      이름:
-      <input type="text" name="name" required minlength="2"
-             pattern=".{2,}" title="이름은 2자 이상 입력해주세요.">
-    </label>
+  <div id="searchBox">
+    <input type="text" id="searchInput" placeholder="검색할 제품을 입력해주세요">
+    <div class="searchBtn">
+      <span class="material-symbols-outlined">search</span>
+    </div>
+  </div>
 
-    <label>
-      이메일:
-      <input type="email" name="email" required>
-    </label>
+  <!-- 로그인 버튼 클릭 시 /login 이동 -->
+  <a href="${pageContext.request.contextPath}/login" style="text-decoration: none; color: inherit;">
+    <div id="user-interface">
+      <div class="login">
+        <span class="material-symbols-outlined">account_box</span>
+        <span class="label">로그인</span>
+      </div>
+    </div>
+  </a>
+</nav>
+<main>
+  <div id="container">
+    <div id="header">
+      <h2>비밀번호 찾기</h2>
+    </div>
 
-    <label>
-      전화번호:
-      <input type="text" name="phone" required maxlength="13"
-             oninput="formatPhone(this)"
-             pattern="010-[0-9]{4}-[0-9]{4}"
-             title="010-1234-5678 형식으로 입력해주세요.">
-    </label>
+    <form id="form-box" method="post" action="/find-password">
+      <div class="form-item">
+        <div class="form-label">이름</div>
+        <div class="form-input">
+          <input type="text" name="name" required minlength="2"
+                 pattern=".{2,}" title="이름은 2자 이상 입력해주세요.">
+        </div>
+      </div>
 
-    <button type="submit">비밀번호 찾기</button>
-  </form>
+      <div class="form-item">
+        <div class="form-label">이메일</div>
+        <div class="form-input">
+          <input type="email" name="email" required>
+        </div>
+      </div>
 
-  <c:if test="${not empty success}">
-    <p class="message success">${success}</p>
-  </c:if>
+      <div class="form-item">
+        <div class="form-label">전화번호</div>
+        <div class="form-input">
+          <input type="text" name="phone" required maxlength="13"
+                 oninput="formatPhone(this)"
+                 pattern="010-[0-9]{4}-[0-9]{4}"
+                 title="010-1234-5678 형식으로 입력해주세요.">
+        </div>
+      </div>
 
-  <c:if test="${not empty error}">
-    <p id="errorMessage" class="message error">${error}</p>
-  </c:if>
+      <div class="form-button">
+        <button class="login" type="submit">비밀번호 찾기</button>
+      </div>
 
-  <p><a href="/login">로그인으로 돌아가기</a></p>
-</div>
+      <c:if test="${not empty success}">
+        <p class="message success">${success}</p>
+      </c:if>
+
+      <c:if test="${not empty error}">
+        <p id="errorMessage" class="message error">${error}</p>
+      </c:if>
+
+      <div class="form-bottom">
+        <a href="/login">로그인으로 돌아가기</a>
+      </div>
+    </form>
+  </div>
+</main>
+
 </body>
 </html>

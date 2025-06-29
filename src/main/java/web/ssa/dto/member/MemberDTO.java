@@ -12,7 +12,7 @@ public class MemberDTO {
     private String nickname;
     private String phone;
     private String role = "USER";
-
+    private String profileImage;
     private boolean emailVerified = false;
     private LocalDateTime emailVerifiedAt;
 }

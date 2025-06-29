@@ -24,24 +24,35 @@ public class MemberController {
     @Autowired
     private JavaMailSender mailSender;
 
-    // ✅ 인증 정보 저장 (이메일 → 인증 정보 객체)
+    // 이메일 인증 정보 저장소 (인증 코드와 발급 시간)
     private final Map<String, EmailAuth> emailAuthMap = new ConcurrentHashMap<>();
 
-    // ✅ 회원가입 폼 요청
+    // 회원가입 폼 요청
     @GetMapping("/register")
     public String showRegisterForm(Model model) {
         model.addAttribute("memberDTO", new MemberDTO());
         return "register";
     }
 
-    // ✅ 회원가입 처리
+    // 회원가입 처리
     @PostMapping("/register")
-    public String register(@ModelAttribute("memberDTO") MemberDTO dto, Model model) {
-        EmailAuth auth = emailAuthMap.get(dto.getEmail());
+    public String register(
+            @RequestParam("email") String email,
+            @RequestParam("code") String code,
+            @ModelAttribute("memberDTO") MemberDTO dto,
+            Model model) {
 
-        // 인증 여부와 유효 시간 확인
+        dto.setEmail(email);
+
+        // 인증 코드 유효성 검사
+        EmailAuth auth = emailAuthMap.get(email);
         if (auth == null || auth.getCreatedAt().plusMinutes(5).isBefore(LocalDateTime.now())) {
             model.addAttribute("error", "이메일 인증을 먼저 완료해주세요. (유효시간 5분)");
+            return "register";
+        }
+
+        if (!auth.getCode().equals(code)) {
+            model.addAttribute("error", "인증 코드가 일치하지 않습니다.");
             return "register";
         }
 
@@ -50,7 +61,7 @@ public class MemberController {
 
         try {
             memberService.register(dto);
-            emailAuthMap.remove(dto.getEmail()); // 인증 정보 제거
+            emailAuthMap.remove(email); // 인증 기록 삭제
             return "redirect:/login";
         } catch (IllegalArgumentException e) {
             model.addAttribute("error", e.getMessage());
@@ -58,7 +69,7 @@ public class MemberController {
         }
     }
 
-    // ✅ 이메일 인증 코드 발송
+    // 이메일 인증 코드 발송
     @GetMapping("/send-auth-code")
     @ResponseBody
     public String sendAuthCode(@RequestParam("email") String email) {
@@ -66,16 +77,13 @@ public class MemberController {
             return "이미 가입된 이메일입니다.";
         }
 
-        // 인증 코드 생성 (6자리)
-        String code = String.valueOf((int)(Math.random() * 900000) + 100000);
+        String code = String.valueOf((int)(Math.random() * 900000) + 100000); // 6자리 코드
 
-        // 저장
         EmailAuth auth = new EmailAuth();
         auth.setCode(code);
         auth.setCreatedAt(LocalDateTime.now());
         emailAuthMap.put(email, auth);
 
-        // 이메일 발송
         SimpleMailMessage message = new SimpleMailMessage();
         message.setTo(email);
         message.setSubject("회원가입 인증 코드");
@@ -85,31 +93,30 @@ public class MemberController {
         return "인증 코드가 이메일로 전송되었습니다.";
     }
 
-    // ✅ 이메일 인증 확인
+    // 인증 코드 확인
     @GetMapping("/verify-code")
     @ResponseBody
     public boolean verifyCode(@RequestParam("email") String email,
                               @RequestParam("code") String code) {
 
         EmailAuth auth = emailAuthMap.get(email);
-
         if (auth == null) return false;
         if (auth.getCreatedAt().plusMinutes(5).isBefore(LocalDateTime.now())) return false;
-
         return code.equals(auth.getCode());
     }
 
-    // ✅ 인증 코드 + 발급시간 클래스
-    @Data
-    static class EmailAuth {
-        private String code;
-        private LocalDateTime createdAt;
-    }
-
+    // 닉네임 중복 확인
     @GetMapping("/check-nickname")
     @ResponseBody
     public String checkNickname(@RequestParam("nickname") String nickname) {
         boolean exists = memberService.existsByUsername(nickname);
         return String.valueOf(exists); // "true" or "false"
+    }
+
+    // 이메일 인증 정보 클래스
+    @Data
+    static class EmailAuth {
+        private String code;
+        private LocalDateTime createdAt;
     }
 }
