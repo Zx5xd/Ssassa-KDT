@@ -1,6 +1,6 @@
 package web.ssa.controller.admin;
 
-// 올바른 부분 ✅
+// 올바른 부분 
 import org.springframework.ui.Model;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import web.ssa.entity.products.ProductMaster;
 import web.ssa.service.products.ProductService;
+import web.ssa.cache.CategoriesCache;
 
 import java.util.List;
 
@@ -19,6 +20,7 @@ import java.util.List;
 public class ShopController {
 
     private final ProductService productService;
+    private final CategoriesCache categoriesCache;
 
     // 상품 전체 목록 (로그인 필요)
     @GetMapping("/products")
@@ -40,19 +42,33 @@ public class ShopController {
         model.addAttribute("products", productList);
         model.addAttribute("loginUser", loginUser);
         model.addAttribute("productService", productService); // JSP에서 사용할 수 있도록
-        return "productList"; // /WEB-INF/views/shop/productList.jsp
+        model.addAttribute("categoriesCache", categoriesCache); // 카테고리 캐시 추가
+        return "shop/productList"; // /WEB-INF/views/shop/productList.jsp
     }
 
     // 상품 상세 페이지 (로그인 필요)
     @GetMapping("/product/{id}")
-    public String showProductDetail(@PathVariable Long id, HttpSession session, Model model) {
+    public String showProductDetail(@PathVariable("id") int id, HttpSession session, Model model) {
         Object loginUser = session.getAttribute("loginUser");
         if (loginUser == null) {
             return "redirect:/login";
         }
 
         ProductMaster product = productService.getProductById(id);
+        if (product == null) {
+            return "redirect:/shop/products";
+        }
+
+        // 카테고리 이름 가져오기
+        String categoryName = categoriesCache.getCachedCategories().stream()
+                .filter(category -> category.getId() == product.getCategoryId())
+                .findFirst()
+                .map(category -> category.getName())
+                .orElse("카테고리 정보 없음");
+
         model.addAttribute("product", product);
-        return "productDetail"; // /WEB-INF/views/shop/productDetail.jsp
+        model.addAttribute("categoryName", categoryName);
+        model.addAttribute("categoriesCache", categoriesCache);
+        return "shop/productDetail"; // /WEB-INF/views/shop/productDetail.jsp
     }
 }

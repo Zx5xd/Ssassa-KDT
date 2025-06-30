@@ -6,12 +6,12 @@
     <meta charset="UTF-8">
     <title>로그인 - 싸싸</title>
 
-    <!-- ✅ 폰트 및 아이콘 -->
+    <!--  폰트 및 아이콘 -->
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <link href="https://fonts.googleapis.com/icon?family=Material+Symbols+Outlined" rel="stylesheet">
 
-    <!-- ✅ 스타일 시트 -->
+    <!--  스타일 시트 -->
     <link rel="stylesheet" href="${pageContext.request.contextPath}/resources/Ssa-Front/index.css">
     <link rel="stylesheet" href="${pageContext.request.contextPath}/resources/Ssa-Front/css/auth.css">
     <style>
@@ -53,7 +53,7 @@
             <h2>로그인</h2>
         </div>
 
-        <!-- ✅ 로그인 폼 -->
+        <!--  로그인 폼 -->
         <form id="form-box" method="post" action="/login">
             <div class="form-item">
                 <div class="form-label">이메일</div>
@@ -70,7 +70,7 @@
                 </div>
             </div>
 
-            <!-- ✅ 아이디 저장 체크박스 -->
+            <!--  아이디 저장 체크박스 -->
             <label class="form-login-status-box">
                 <input type="checkbox" name="rememberEmail" id="login-status"
                        <c:if test="${not empty cookie.rememberEmail}">checked</c:if> />
@@ -78,7 +78,7 @@
                 <span class="label">아이디 저장</span>
             </label>
 
-            <!-- ✅ 에러 메시지 출력 -->
+            <!--  에러 메시지 출력 -->
             <c:if test="${not empty error}">
                 <p class="error-message" id="errorMessage">${error}</p>
             </c:if>
@@ -96,7 +96,7 @@
     </div>
 </main>
 
-<!-- ✅ 에러 메시지 자동 숨김 -->
+<!--  에러 메시지 자동 숨김 -->
 <script>
     const errorEl = document.getElementById("errorMessage");
     if (errorEl) {

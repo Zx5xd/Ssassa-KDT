@@ -25,4 +25,6 @@ public interface ProductRepository extends JpaRepository<ProductMaster, Integer>
 
     Page<ProductMaster> findAll(Pageable pageable);
 
+    Page<ProductMaster> findByCategoryId(int categoryId, Pageable pageable);
+
 }

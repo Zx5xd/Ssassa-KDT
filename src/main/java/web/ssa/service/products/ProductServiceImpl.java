@@ -37,8 +37,8 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public ProductMaster getProductById(Long id) {
-        List<ProductMaster> products = this.repository.findById(id.intValue());
+    public ProductMaster getProductById(int id) {
+        List<ProductMaster> products = this.repository.findById(id);
         return products.isEmpty() ? null : products.get(0);
     }
 
@@ -62,8 +62,13 @@ public class ProductServiceImpl implements ProductService {
         return repository.findAll(pageable);
     }
 
+    public Page<ProductMaster> getPagedProductsByCategory(int categoryId, int page, int size) {
+        Pageable pageable = PageRequest.of(page, size);
+        return repository.findByCategoryId(categoryId, pageable);
+    }
+
     @Override
-    public int getProductPrice(Long productId) {
+    public int getProductPrice(int productId) {
         ProductMaster product = getProductById(productId);
         if (product == null) {
             return 0;

@@ -10,10 +10,7 @@ public class MainController {
 
     @GetMapping("/main")
     public String home() {
-
-        return "main"; // → /WEB-INF/views/home.jsp로 포워딩됨
+        return "shop/main"; // → /WEB-INF/views/shop/main.jsp로 포워딩됨
     }
-
-
 
 }

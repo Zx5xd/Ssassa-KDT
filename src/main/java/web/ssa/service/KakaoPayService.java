@@ -132,10 +132,10 @@ public class KakaoPayService {
             }
             payment.setItemName(itemName);
             payment.setAmount(currentTotalAmount);
-            payment.setProductId(0L);
+            payment.setProductId(0);
         } else if (currentProduct != null) {
             int quantity = currentProduct.getQuantity();
-            payment.setProductId((long) currentProduct.getProductId());
+            payment.setProductId((int) currentProduct.getProductId());
             payment.setItemName(currentProduct.getProductName());
             payment.setAmount(currentProduct.getPrice() * quantity);
         }

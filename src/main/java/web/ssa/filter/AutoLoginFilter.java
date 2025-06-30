@@ -31,7 +31,7 @@ public class AutoLoginFilter implements Filter {
                 for (Cookie cookie : cookies) {
                     if ("loginToken".equals(cookie.getName())) {
                         String token = cookie.getValue();
-                        Optional<User> userOpt = memberRepository.findByLoginToken(token); // ✅ 수정된 부분
+                        Optional<User> userOpt = memberRepository.findByLoginToken(token); // 수정된 부분
                         if (userOpt.isPresent()) {
                             HttpSession newSession = request.getSession();
                             newSession.setAttribute("loginUser", userOpt.get());

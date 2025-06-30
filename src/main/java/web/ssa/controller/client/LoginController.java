@@ -1,4 +1,4 @@
-package web.ssa.controller;
+package web.ssa.controller.client;
 
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
@@ -29,18 +29,18 @@ public class LoginController {
                 model.addAttribute("rememberedEmail", cookie.getValue());
             }
         }
-        return "login";
+        return "client/login";
     }
 
     // 로그인 처리
     @PostMapping("/login")
     public String login(@RequestParam("email") String email,
-                        @RequestParam("password") String password,
-                        @RequestParam(value = "rememberEmail", required = false) String rememberEmail,
-                        HttpServletResponse response,
-                        HttpServletRequest request,
-                        HttpSession session,
-                        Model model) {
+            @RequestParam("password") String password,
+            @RequestParam(value = "rememberEmail", required = false) String rememberEmail,
+            HttpServletResponse response,
+            HttpServletRequest request,
+            HttpSession session,
+            Model model) {
 
         try {
             User user = memberService.login(email, password);
@@ -68,7 +68,7 @@ public class LoginController {
             rememberCookie.setPath("/");
             response.addCookie(rememberCookie);
 
-            // ✅ 관리자 여부에 따라 리디렉션
+            // 관리자 여부에 따라 리디렉션
             if ("ADMIN".equals(user.getRole())) {
                 return "redirect:/admin";
             } else {
@@ -77,15 +77,15 @@ public class LoginController {
 
         } catch (IllegalArgumentException | IllegalStateException e) {
             model.addAttribute("error", e.getMessage());
-            return "login";
+            return "client/login";
         }
     }
 
     // 로그아웃 처리
     @GetMapping("/logout")
     public String logout(HttpServletRequest request,
-                         HttpServletResponse response,
-                         HttpSession session) {
+            HttpServletResponse response,
+            HttpSession session) {
 
         User user = (User) session.getAttribute("loginUser");
         session.invalidate();
@@ -106,14 +106,14 @@ public class LoginController {
     // 아이디 찾기 폼
     @GetMapping("/find-id")
     public String showFindIdForm() {
-        return "findId";
+        return "client/findId";
     }
 
     // 아이디 찾기 처리
     @PostMapping("/find-id")
-    public String findId(@RequestParam String name,
-                         @RequestParam String phone,
-                         Model model) {
+    public String findId(@RequestParam("name") String name,
+            @RequestParam("phone") String phone,
+            Model model) {
 
         Optional<User> userOpt = memberService.findByNameAndPhone(name, phone);
         if (userOpt.isPresent()) {
@@ -122,39 +122,39 @@ public class LoginController {
             model.addAttribute("error", "일치하는 회원 정보를 찾을 수 없습니다.");
         }
 
-        return "findId";
+        return "client/findId";
     }
 
     // 비밀번호 찾기 폼
     @GetMapping("/find-password")
     public String showFindPasswordForm() {
-        return "findPassword";
+        return "client/findPassword";
     }
 
     // 비밀번호 찾기 처리
     @PostMapping("/find-password")
-    public String findPassword(@RequestParam String email,
-                               @RequestParam String phone,
-                               Model model) {
+    public String findPassword(@RequestParam("email") String email,
+            @RequestParam("phone") String phone,
+            Model model) {
 
         Optional<User> userOpt = memberService.findByEmailAndPhone(email, phone);
         if (userOpt.isPresent()) {
             model.addAttribute("email", email);
-            return "resetPassword";
+            return "client/resetPassword";
         } else {
             model.addAttribute("error", "일치하는 회원 정보를 찾을 수 없습니다.");
-            return "findPassword";
+            return "client/findPassword";
         }
     }
 
     // 비밀번호 재설정
     @PostMapping("/reset-password")
-    public String resetPassword(@RequestParam String email,
-                                @RequestParam String newPassword,
-                                Model model) {
+    public String resetPassword(@RequestParam("email") String email,
+            @RequestParam("newPassword") String newPassword,
+            Model model) {
 
         memberService.updatePassword(email, newPassword);
         model.addAttribute("message", "비밀번호가 성공적으로 변경되었습니다. 로그인해 주세요.");
-        return "login";
+        return "client/login";
     }
 }

@@ -34,7 +34,7 @@ public interface MemberService {
     List<User> findAllUsersExcludingAdminAndDeleted();
 
     /** 관리자: 정상 회원만 조회 (삭제되지 않음 + 관리자 제외) */
-    List<User> findActiveUsers();  // deleted = "N" && role != "ADMIN"
+    List<User> findActiveUsers(); // deleted = "N" && role != "ADMIN"
 
     /** 관리자: 탈퇴 회원만 조회 (삭제됨 + 관리자 제외) */
     List<User> findDeletedUsers(); // deleted = "Y" && role != "ADMIN"
@@ -66,6 +66,6 @@ public interface MemberService {
     /** 회원 정보 수정 */
     void updateUser(User user);
 
-    /** ✅ 프로필 이미지 삭제 */
+    /** 프로필 이미지 삭제 */
     void removeProfileImage(String email);
 }

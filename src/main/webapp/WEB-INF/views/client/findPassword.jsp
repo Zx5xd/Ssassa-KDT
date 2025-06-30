@@ -4,18 +4,19 @@
 <html lang="ko">
 <head>
   <meta charset="UTF-8">
-  <title>아이디(이메일) 찾기 - 싸싸</title>
+  <title>비밀번호 찾기 - 싸싸</title>
 
-  <!-- ✅ 폰트 및 아이콘 -->
+  <!--  폰트 및 아이콘 -->
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR&display=swap" rel="stylesheet">
   <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
   <link href="https://fonts.googleapis.com/icon?family=Material+Symbols+Outlined" rel="stylesheet">
 
-  <!-- ✅ 스타일 시트 -->
+  <!--  공통 스타일 시트 -->
   <link rel="stylesheet" href="${pageContext.request.contextPath}/resources/Ssa-Front/index.css">
   <link rel="stylesheet" href="${pageContext.request.contextPath}/resources/Ssa-Front/css/auth.css">
 
   <script>
+    // 전화번호 자동 하이픈 처리
     function formatPhone(input) {
       input.value = input.value
               .replace(/[^0-9]/g, '')
@@ -25,6 +26,7 @@
               .substring(0, 13);
     }
 
+    // 에러 메시지 자동 숨김
     window.onload = function () {
       const errorEl = document.getElementById("errorMessage");
       if (errorEl) {
@@ -35,6 +37,7 @@
     };
   </script>
 </head>
+<body class="noto-sans-kr-regular">
 <nav>
   <!-- 로고 클릭 시 index.jsp 이동 -->
   <a href="${pageContext.request.contextPath}/index" style="text-decoration: none;">
@@ -58,20 +61,25 @@
     </div>
   </a>
 </nav>
-<body class="noto-sans-kr-regular">
-
 <main>
   <div id="container">
     <div id="header">
-      <h2>아이디(이메일) 찾기</h2>
+      <h2>비밀번호 찾기</h2>
     </div>
 
-    <form id="form-box" method="post" action="/find-id">
+    <form id="form-box" method="post" action="/find-password">
       <div class="form-item">
         <div class="form-label">이름</div>
         <div class="form-input">
           <input type="text" name="name" required minlength="2"
                  pattern=".{2,}" title="이름은 2자 이상 입력해주세요.">
+        </div>
+      </div>
+
+      <div class="form-item">
+        <div class="form-label">이메일</div>
+        <div class="form-input">
+          <input type="email" name="email" required>
         </div>
       </div>
 
@@ -86,11 +94,11 @@
       </div>
 
       <div class="form-button">
-        <button class="login" type="submit">아이디 찾기</button>
+        <button class="login" type="submit">비밀번호 찾기</button>
       </div>
 
-      <c:if test="${not empty foundEmail}">
-        <p class="message success">가입된 이메일: <b>${foundEmail}</b></p>
+      <c:if test="${not empty success}">
+        <p class="message success">${success}</p>
       </c:if>
 
       <c:if test="${not empty error}">

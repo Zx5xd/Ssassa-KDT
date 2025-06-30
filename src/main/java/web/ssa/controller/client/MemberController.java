@@ -31,7 +31,7 @@ public class MemberController {
     @GetMapping("/register")
     public String showRegisterForm(Model model) {
         model.addAttribute("memberDTO", new MemberDTO());
-        return "register";
+        return "client/register";
     }
 
     // 회원가입 처리
@@ -48,12 +48,12 @@ public class MemberController {
         EmailAuth auth = emailAuthMap.get(email);
         if (auth == null || auth.getCreatedAt().plusMinutes(5).isBefore(LocalDateTime.now())) {
             model.addAttribute("error", "이메일 인증을 먼저 완료해주세요. (유효시간 5분)");
-            return "register";
+            return "client/register";
         }
 
         if (!auth.getCode().equals(code)) {
             model.addAttribute("error", "인증 코드가 일치하지 않습니다.");
-            return "register";
+            return "client/register";
         }
 
         dto.setEmailVerified(true);
@@ -65,7 +65,7 @@ public class MemberController {
             return "redirect:/login";
         } catch (IllegalArgumentException e) {
             model.addAttribute("error", e.getMessage());
-            return "register";
+            return "client/register";
         }
     }
 
@@ -77,7 +77,7 @@ public class MemberController {
             return "이미 가입된 이메일입니다.";
         }
 
-        String code = String.valueOf((int)(Math.random() * 900000) + 100000); // 6자리 코드
+        String code = String.valueOf((int) (Math.random() * 900000) + 100000); // 6자리 코드
 
         EmailAuth auth = new EmailAuth();
         auth.setCode(code);
@@ -97,11 +97,13 @@ public class MemberController {
     @GetMapping("/verify-code")
     @ResponseBody
     public boolean verifyCode(@RequestParam("email") String email,
-                              @RequestParam("code") String code) {
+            @RequestParam("code") String code) {
 
         EmailAuth auth = emailAuthMap.get(email);
-        if (auth == null) return false;
-        if (auth.getCreatedAt().plusMinutes(5).isBefore(LocalDateTime.now())) return false;
+        if (auth == null)
+            return false;
+        if (auth.getCreatedAt().plusMinutes(5).isBefore(LocalDateTime.now()))
+            return false;
         return code.equals(auth.getCode());
     }
 

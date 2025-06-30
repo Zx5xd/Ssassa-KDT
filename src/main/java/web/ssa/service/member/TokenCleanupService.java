@@ -14,7 +14,7 @@ public class TokenCleanupService {
 
     private final MemberRepository memberRepository;
 
-    // ✅ 1분마다 실행 (60000ms)
+    // 1분마다 실행 (60000ms)
     @Scheduled(fixedRate = 60000)
     public void removeExpiredTokens() {
         List<User> users = memberRepository.findAll();

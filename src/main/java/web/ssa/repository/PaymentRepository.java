@@ -10,7 +10,6 @@ public interface PaymentRepository extends JpaRepository<Payment, Long> {
     // 환불 상태 조회용
     List<Payment> findByStatus(String status);
 
-    // ✅ 마이페이지 사용자 결제 내역 조회용
+    // 마이페이지 사용자 결제 내역 조회용
     List<Payment> findByUserEmail(String userEmail);
 }
-

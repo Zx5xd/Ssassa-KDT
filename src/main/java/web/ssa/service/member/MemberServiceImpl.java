@@ -175,13 +175,13 @@ public class MemberServiceImpl implements MemberService {
             existing.setPassword(user.getPassword());
         }
 
-        // ✅ null이더라도 profileImage 업데이트
+        // null이더라도 profileImage 업데이트
         existing.setProfileImage(user.getProfileImage());
 
         memberRepository.save(existing);
     }
 
-    /** ✅ 프로필 이미지 삭제 */
+    /** 프로필 이미지 삭제 */
     @Override
     public void removeProfileImage(String email) {
         User user = memberRepository.findByEmail(email)

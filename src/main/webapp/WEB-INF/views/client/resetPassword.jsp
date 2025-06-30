@@ -5,7 +5,7 @@
   <meta charset="UTF-8">
   <title>새 비밀번호 설정</title>
 
-  <!-- ✅ 외부 CSS 연결 -->
+  <!--  외부 CSS 연결 -->
   <link rel="stylesheet" href="${pageContext.request.contextPath}/resources/Ssa-Front/index.css">
   <link rel="stylesheet" href="${pageContext.request.contextPath}/resources/Ssa-Front/auth.css">
 </head>

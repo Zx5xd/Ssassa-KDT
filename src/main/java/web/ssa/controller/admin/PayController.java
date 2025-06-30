@@ -46,7 +46,7 @@ public class PayController {
 
         try {
             for (String productIdStr : selectedProductIds) {
-                Long productId = Long.parseLong(productIdStr);
+                int productId = Integer.parseInt(productIdStr);
                 String quantityParam = request.getParameter("quantities[" + productId + "]");
                 int quantity = quantityParam != null ? Integer.parseInt(quantityParam) : 1;
 
@@ -81,7 +81,7 @@ public class PayController {
 
     // 단일 상품 결제
     @GetMapping("/pay/ready")
-    public String kakaoPay(@RequestParam("productId") Long productId,
+    public String kakaoPay(@RequestParam("productId") int productId,
             @RequestParam(value = "quantity", defaultValue = "1") int quantity,
             HttpSession session,
             Model model) {
@@ -134,10 +134,10 @@ public class PayController {
             }
 
             model.addAttribute("payment", payment);
-            return "paySuccess";
+            return "pay/paySuccess";
         } catch (Exception e) {
             model.addAttribute("error", "결제 처리 중 오류가 발생했습니다: " + e.getMessage());
-            return "payFail";
+            return "pay/payFail";
         }
     }
 
@@ -145,7 +145,7 @@ public class PayController {
     @GetMapping("/pay/fail")
     public String kakaoPayFail(Model model) {
         model.addAttribute("message", "결제가 취소되었거나 실패했습니다.");
-        return "payFail";
+        return "pay/payFail";
     }
 
     // 마이페이지에서 환불 요청
@@ -190,7 +190,7 @@ public class PayController {
             kakaoPayService.savePayment(payment);
 
             model.addAttribute("cancel", response);
-            return "payCancelResult";
+            return "pay/payCancelResult";
         } catch (Exception e) {
             model.addAttribute("error", "환불 처리 중 오류가 발생했습니다: " + e.getMessage());
             return "error";

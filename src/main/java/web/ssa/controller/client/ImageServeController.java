@@ -1,4 +1,4 @@
-package web.ssa.controller;
+package web.ssa.controller.client;
 
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.stereotype.Controller;
@@ -10,13 +10,13 @@ import java.io.*;
 @Controller
 public class ImageServeController {
 
-    // ✅ 업로드된 이미지 폴더 절대 경로
+    // 업로드된 이미지 폴더 절대 경로
     private static final String UPLOAD_DIR = System.getProperty("user.dir")
             + "/src/main/webapp/resources/uploads/";
 
-    // ✅ 이미지 요청 시 반환 (예: <img src="/resources/uploads/sample.jpg">)
-    @GetMapping("/resources/uploads/{filename:.+}")
-    public void serveImage(@PathVariable String filename, HttpServletResponse response) throws IOException {
+    // 이미지 요청 시 반환 (예: <img src="/image/serve/sample.jpg">)
+    @GetMapping("/image/serve/{filename:.+}")
+    public void serveImage(@PathVariable("filename") String filename, HttpServletResponse response) throws IOException {
         File imageFile = new File(UPLOAD_DIR + filename);
 
         if (!imageFile.exists()) {
@@ -33,12 +33,15 @@ public class ImageServeController {
         }
     }
 
-    // ✅ 파일 확장자에 따라 적절한 Content-Type 반환
+    // 파일 확장자에 따라 적절한 Content-Type 반환
     private String getMimeType(String filename) {
         String lower = filename.toLowerCase();
-        if (lower.endsWith(".png")) return "image/png";
-        if (lower.endsWith(".jpg") || lower.endsWith(".jpeg")) return "image/jpeg";
-        if (lower.endsWith(".gif")) return "image/gif";
+        if (lower.endsWith(".png"))
+            return "image/png";
+        if (lower.endsWith(".jpg") || lower.endsWith(".jpeg"))
+            return "image/jpeg";
+        if (lower.endsWith(".gif"))
+            return "image/gif";
         return "application/octet-stream";
     }
 }

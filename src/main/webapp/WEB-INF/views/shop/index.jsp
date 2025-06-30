@@ -6,14 +6,14 @@
     <meta charset="UTF-8">
     <title>싸싸</title>
 
-    <!-- ✅ 폰트 및 아이콘 -->
+    <!--  폰트 및 아이콘 -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <link href="https://fonts.googleapis.com/icon?family=Material+Symbols+Outlined" rel="stylesheet">
 
-    <!-- ✅ 외부 CSS -->
+    <!--  외부 CSS -->
     <link rel="stylesheet" href="${pageContext.request.contextPath}/resources/Ssa-Front/index.css">
     <link rel="stylesheet" href="${pageContext.request.contextPath}/resources/Ssa-Front/css/slide.css">
     <link rel="stylesheet" href="${pageContext.request.contextPath}/resources/Ssa-Front/css/index-content.css">
@@ -21,7 +21,7 @@
 </head>
 <body class="noto-sans-kr-regular">
 
-<!-- ✅ 메뉴바 -->
+<!--  메뉴바 -->
 <nav>
     <a href="${pageContext.request.contextPath}/index" style="text-decoration: none;">
         <div id="logo" style="background-image: url('${pageContext.request.contextPath}/resources/Ssa-Front/assets/logo_main.png');"></div>
@@ -37,7 +37,7 @@
     <div id="user-interface">
         <c:choose>
             <c:when test="${not empty sessionScope.loginUser}">
-                <!-- ✅ 로그인 상태 -->
+                <!--  로그인 상태 -->
                 <div class="profile-wrapper" onclick="toggleProfileMenu(event)">
                     <c:choose>
                         <c:when test="${not empty sessionScope.loginUser.profileImage}">
@@ -52,7 +52,7 @@
                         </c:otherwise>
                     </c:choose>
 
-                    <!-- ✅ 드롭다운 메뉴 (초기 숨김) -->
+                    <!--  드롭다운 메뉴 (초기 숨김) -->
                     <div id="profile-menu" class="hidden">
                         <div class="menu-header">
                             <strong>${sessionScope.loginUser.nickname}님</strong>
@@ -66,7 +66,7 @@
                 </div>
             </c:when>
             <c:otherwise>
-                <!-- ✅ 비로그인 상태 -->
+                <!--  비로그인 상태 -->
                 <a href="${pageContext.request.contextPath}/login" style="text-decoration: none; color: inherit;">
                     <div class="login">
                         <span class="material-symbols-outlined">account_box</span>
@@ -78,7 +78,7 @@
     </div>
 </nav>
 
-<!-- ✅ 슬라이드 배너 -->
+<!--  슬라이드 배너 -->
 <header>
     <div class="carousel-wrapper">
         <div class="blur-left"></div>
@@ -94,7 +94,7 @@
     </div>
 </header>
 
-<!-- ✅ 본문 영역 -->
+<!--  본문 영역 -->
 <main>
     <div class="category-container">
         <category-elem id="categoryBar">
@@ -126,19 +126,19 @@
 
 <footer></footer>
 
-<!-- ✅ JS -->
+<!--  JS -->
 <script src="${pageContext.request.contextPath}/resources/Ssa-Front/js/slide.js"></script>
 <script src="${pageContext.request.contextPath}/resources/Ssa-Front/js/SsaComponent.js"></script>
 
 <script>
-    // ✅ 드롭다운 토글
+    //  드롭다운 토글
     function toggleProfileMenu(event) {
         event.stopPropagation();
         const menu = document.getElementById("profile-menu");
         menu.classList.toggle("hidden");
     }
 
-    // ✅ 다른 영역 클릭 시 메뉴 닫기
+    //  다른 영역 클릭 시 메뉴 닫기
     document.addEventListener("click", function (e) {
         const menu = document.getElementById("profile-menu");
         const wrapper = document.querySelector(".profile-wrapper");
@@ -147,7 +147,7 @@
         }
     });
 
-    // ✅ 카테고리 스크롤 시 sticky
+    //  카테고리 스크롤 시 sticky
     const categoryBar = document.getElementById('categoryBar');
     const threshold = 500;
     window.addEventListener('scroll', () => {

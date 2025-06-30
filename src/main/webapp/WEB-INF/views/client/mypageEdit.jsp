@@ -15,7 +15,7 @@
 </head>
 <body class="noto-sans-kr-regular">
 
-<!-- ✅ 메뉴바 영역 -->
+<!--  메뉴바 영역 -->
 <nav>
   <a href="${pageContext.request.contextPath}/index" style="text-decoration: none;">
     <div id="logo" style="background-image: url('${pageContext.request.contextPath}/resources/Ssa-Front/assets/logo_main.png');"></div>
@@ -68,7 +68,7 @@
   </div>
 </nav>
 
-<!-- ✅ 회원정보 수정 영역 -->
+<!--  회원정보 수정 영역 -->
 <div class="edit-container">
   <div class="edit-box">
     <h2>회원 정보 수정</h2>
@@ -108,7 +108,7 @@
   </div>
 </div>
 
-<!-- ✅ 스크립트 -->
+<!--  스크립트 -->
 <script>
   function toggleProfileMenu() {
     const menu = document.getElementById("profile-menu");

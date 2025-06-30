@@ -4,10 +4,10 @@
   <meta charset="UTF-8">
   <title>회원 정보 수정</title>
 
-  <!-- ✅ index.css : 전체 배경 및 전역 스타일 -->
+  <!--  index.css : 전체 배경 및 전역 스타일 -->
   <link rel="stylesheet" href="${pageContext.request.contextPath}/resources/Ssa-Front/index.css">
 
-  <!-- ✅ editUser.css : 폼 구성 및 버튼 스타일 -->
+  <!--  editUser.css : 폼 구성 및 버튼 스타일 -->
   <link rel="stylesheet" href="${pageContext.request.contextPath}/resources/Ssa-Front/css/user-edit.css">
 </head>
 <body class="edit-body"> <!-- index.css 배경 그대로 적용 -->

@@ -6,29 +6,30 @@
   <meta charset="UTF-8">
   <title>마이페이지 - 싸싸</title>
 
-  <!-- ✅ 폰트 및 아이콘 -->
+  <!--  폰트 및 아이콘 -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR&display=swap" rel="stylesheet">
   <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
   <link href="https://fonts.googleapis.com/icon?family=Material+Symbols+Outlined" rel="stylesheet">
 
-  <!-- ✅ 외부 CSS -->
+  <!--  외부 CSS -->
   <link rel="stylesheet" href="${pageContext.request.contextPath}/resources/Ssa-Front/index.css">
   <link rel="stylesheet" href="${pageContext.request.contextPath}/resources/Ssa-Front/css/profile.css">
+  <link rel="stylesheet" href="${pageContext.request.contextPath}/resources/Ssa-Front/css/common.css">
 
   <style>
     main {
       max-width: 1200px;
-      margin: 140px auto 80px; /* ✅ 더 아래로 내림 */
+      margin: 140px auto 80px; /*  더 아래로 내림 */
       padding: 0 20px;
     }
 
     .mypage-container {
       display: flex;
       justify-content: center;
-      align-items: center; /* ✅ 수직 가운데 정렬 */
-      gap: 60px; /* ✅ 여백 조금 늘림 */
+      align-items: center; /*  수직 가운데 정렬 */
+      gap: 60px; /*  여백 조금 늘림 */
       background-color: rgba(255, 255, 255, 0.04);
       border-radius: 12px;
       box-shadow: 0 0 10px rgba(0,0,0,0.3);
@@ -57,7 +58,6 @@
       font-size: 18px;
       text-align: center;
     }
-
 
     .info-section {
       flex: 1;
@@ -92,7 +92,7 @@
 
 <body class="noto-sans-kr-regular">
 
-<!-- ✅ 메뉴바 -->
+<!--  메뉴바 -->
 <nav>
   <a href="${pageContext.request.contextPath}/index" style="text-decoration: none;">
     <div id="logo" style="background-image: url('${pageContext.request.contextPath}/resources/Ssa-Front/assets/logo_main.png');"></div>
@@ -145,7 +145,7 @@
   </div>
 </nav>
 
-<!-- ✅ 마이페이지 본문 -->
+<!--  마이페이지 본문 -->
 <main>
   <div class="mypage-container">
     <div class="profile-section">
@@ -187,7 +187,7 @@
   </div>
 </main>
 
-<!-- ✅ 스크립트 -->
+<!--  스크립트 -->
 <script>
   function toggleProfileMenu() {
     const menu = document.getElementById("profile-menu");

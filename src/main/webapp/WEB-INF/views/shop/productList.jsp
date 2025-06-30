@@ -9,6 +9,7 @@
                 <meta name="viewport" content="width=device-width, initial-scale=1.0">
                 <title>상품 목록 - 온라인 쇼핑몰</title>
                 <link rel="stylesheet" href="/css/style.css">
+                <link rel="stylesheet" href="${pageContext.request.contextPath}/resources/Ssa-Front/css/common.css">
                 <style>
                     * {
                         margin: 0;
@@ -84,6 +85,7 @@
                         box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
                         transition: all 0.3s ease;
                         position: relative;
+                        cursor: pointer;
                     }
 
                     .product-card:hover {
@@ -118,6 +120,14 @@
                         color: #2c3e50;
                         margin-bottom: 10px;
                         line-height: 1.4;
+                    }
+
+                    .product-name a {
+                        transition: color 0.3s ease;
+                    }
+
+                    .product-name a:hover {
+                        color: #007bff;
                     }
 
                     .product-price {
@@ -317,13 +327,19 @@
                                     <c:forEach var="product" items="${products}" varStatus="status">
                                         <div class="product-card" data-product-id="${product.id}">
                                             <div class="product-image">
-                                                <img src="${productService.getProductSimpleImg(product)}" 
-                                                    alt="${product.name}"
-                                                    onerror="handleImageError(this)">
+                                                <a href="/shop/product/${product.id}" style="text-decoration: none; color: inherit;">
+                                                    <img src="${productService.getProductSimpleImg(product)}" 
+                                                        alt="${product.name}"
+                                                        onerror="handleImageError(this)">
+                                                </a>
                                             </div>
 
                                             <div class="product-info">
-                                                <div class="product-name">${product.name}</div>
+                                                <div class="product-name">
+                                                    <a href="/shop/product/${product.id}" style="text-decoration: none; color: inherit;">
+                                                        ${product.name}
+                                                    </a>
+                                                </div>
                                                 <div class="product-price">
                                                     <fmt:formatNumber value="${product.price}" type="number"
                                                         groupingUsed="true" />원

@@ -6,7 +6,7 @@
   <meta charset="UTF-8">
   <title>회원 목록</title>
 
-  <!-- ✅ 외부 CSS 파일 적용 (index.css 및 admin.css 등) -->
+  <!--  외부 CSS 파일 적용 (index.css 및 admin.css 등) -->
   <link rel="stylesheet" href="${pageContext.request.contextPath}/resources/Ssa-Front/index.css">
   <link rel="stylesheet" href="${pageContext.request.contextPath}/resources/Ssa-Front/css/admin.css">
 </head>
@@ -14,7 +14,7 @@
 
 <main class="admin-container">
   <section>
-    <h2 class="admin-title">✅ 정상 회원 목록</h2>
+    <h2 class="admin-title"> 정상 회원 목록</h2>
     <table class="admin-table">
       <thead>
       <tr>
@@ -30,7 +30,7 @@
           <td>${user.phone}</td>
           <td>${user.createdAt}</td>
           <td>
-            <form action="/admin/deleteUser" method="get" style="display:inline;">
+            <form action="/admin/deleteUser" method="post" style="display:inline;">
               <input type="hidden" name="email" value="${user.email}" />
               <button class="danger-btn" onclick="return confirm('정말 삭제하시겠습니까?')">삭제</button>
             </form>
@@ -65,7 +65,7 @@
           <td>${user.phone}</td>
           <td>${user.createdAt}</td>
           <td>
-            <form action="/admin/restoreUser" method="get">
+            <form action="/admin/restoreUser" method="post">
               <input type="hidden" name="email" value="${user.email}" />
               <button class="restore-btn" onclick="return confirm('복구하시겠습니까?')">복구</button>
             </form>

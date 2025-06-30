@@ -24,8 +24,7 @@ public class User {
     @Column(nullable = false)
     private String name;
 
-    @Column(nullable = false, unique = true,
-            columnDefinition = "VARCHAR(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci")
+    @Column(nullable = false, unique = true, columnDefinition = "VARCHAR(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci")
     private String nickname;
 
     @Column(nullable = false)
@@ -43,25 +42,25 @@ public class User {
     @Column(nullable = false)
     private String deleted = "N"; // "Y" = 탈퇴, "N" = 정상
 
-    // ✅ 자동 로그인 토큰
+    // 자동 로그인 토큰
     private String loginToken;
 
-    // ✅ 자동 로그인 토큰 생성 시각
+    // 자동 로그인 토큰 생성 시각
     private LocalDateTime loginTokenCreatedAt;
 
-    // ✅ 탈퇴 여부 확인 메서드
+    // 탈퇴 여부 확인 메서드
     public boolean isDeleted() {
         return "Y".equalsIgnoreCase(this.deleted);
     }
 
-    // ✅ 자동 로그인 토큰 유효성 검사 (5분 이내면 true)
+    // 자동 로그인 토큰 유효성 검사 (5분 이내면 true)
     public boolean isLoginTokenValid() {
         return loginToken != null &&
                 loginTokenCreatedAt != null &&
                 loginTokenCreatedAt.plusMinutes(5).isAfter(LocalDateTime.now());
     }
 
-    // ✅ 자동 로그인 토큰 삭제 메서드
+    // 자동 로그인 토큰 삭제 메서드
     public void clearLoginToken() {
         this.loginToken = null;
         this.loginTokenCreatedAt = null;

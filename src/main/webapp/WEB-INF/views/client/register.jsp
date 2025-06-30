@@ -6,14 +6,14 @@
     <meta charset="UTF-8">
     <title>회원가입 - 싸싸</title>
 
-    <!-- ✅ 구글 폰트 & 아이콘 -->
+    <!--  구글 폰트 & 아이콘 -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <link href="https://fonts.googleapis.com/icon?family=Material+Symbols+Outlined" rel="stylesheet">
 
-    <!-- ✅ 외부 스타일 -->
+    <!--  외부 스타일 -->
     <link rel="stylesheet" href="${pageContext.request.contextPath}/resources/Ssa-Front/index.css">
     <link rel="stylesheet" href="${pageContext.request.contextPath}/resources/Ssa-Front/css/auth.css">
 </head>
@@ -47,7 +47,7 @@
             <h4>회원가입</h4>
         </div>
 
-        <!-- ✅ 회원가입 폼 -->
+        <!--  회원가입 폼 -->
         <div class="grid-form-wrapper">
             <form class="grid-form" method="post" action="/register" onsubmit="return validateForm()">
                 <!-- 이메일 -->
@@ -113,7 +113,7 @@
     </div>
 </main>
 
-<!-- ✅ 스크립트 -->
+<!--  스크립트 -->
 <script>
     function validateForm() {
         const emailId = document.getElementById("email-id").value.trim();

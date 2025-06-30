@@ -13,6 +13,16 @@ java {
     }
 }
 
+// 컴파일러 옵션 추가
+compileJava {
+    options.compilerArgs += ['-parameters']
+}
+
+// Spring Boot 메인 클래스 설정
+springBoot {
+    mainClass = 'web.ssa.SsaApplication'
+}
+
 configurations {
     compileOnly {
         extendsFrom annotationProcessor

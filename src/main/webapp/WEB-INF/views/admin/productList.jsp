@@ -10,6 +10,18 @@
 <h2 class="mb-4">상품 목록</h2>
 <a href="/admin" class="btn btn-secondary mb-3">← 관리자 홈</a>
 
+<!-- 카테고리 선택 및 상품 등록 버튼 -->
+<form method="get" action="/admin/products" class="mb-3 d-flex align-items-center">
+  <c:if test="${not empty category}">
+    <div class="category-links">
+      <c:forEach items="${category}" var="cat">
+        <a href="/products/admin/list?categoryId=${cat.id}">${cat.name}</a>
+      </c:forEach>
+    </div>
+  </c:if>
+  <a href="/admin/products/new" class="btn btn-success">+ 상품 등록</a>
+</form>
+
 <table class="table table-striped table-bordered">
   <thead class="table-light">
   <tr>
@@ -21,24 +33,45 @@
   </tr>
   </thead>
   <tbody>
-  <c:forEach var="product" items="${productList}">
+  <c:forEach var="product" items="${productPage.content}">
     <tr>
       <td>${product.id}</td>
       <td>${product.name}</td>
       <td>${product.price}원</td>
-      <td>${product.createdAt}</td>
+      <td>${product.reg}</td>
       <td>
         <a href="/admin/products/edit/${product.id}" class="btn btn-sm btn-warning">수정</a>
-        <a href="/admin/products/delete/${product.id}" class="btn btn-sm btn-danger"
-           onclick="return confirm('정말 삭제하시겠습니까?');">삭제</a>
+        <form action="/admin/products/delete/${product.id}" method="post" style="display:inline;" onsubmit="return confirm('정말 삭제하시겠습니까?');">
+          <input type="hidden" name="categoryId" value="${selectedCategoryId}"/>
+          <input type="hidden" name="page" value="${productPage.number + 1}"/>
+          <button type="submit" class="btn btn-sm btn-danger">삭제</button>
+        </form>
       </td>
     </tr>
   </c:forEach>
   </tbody>
 </table>
 
-<div class="text-end">
-  <a href="/admin/products/new" class="btn btn-primary">+ 상품 등록</a>
-</div>
+<!-- 페이지네이션 -->
+<nav>
+  <ul class="pagination justify-content-center">
+    <c:if test="${productPage.hasPrevious()}">
+      <li class="page-item">
+        <a class="page-link" href="?categoryId=${selectedCategoryId}&page=${productPage.number}" aria-label="Previous">&laquo;</a>
+      </li>
+    </c:if>
+    <c:forEach begin="1" end="${productPage.totalPages}" var="i">
+      <li class="page-item <c:if test='${i == productPage.number + 1}'>active</c:if>'">
+        <a class="page-link" href="?categoryId=${selectedCategoryId}&page=${i}">${i}</a>
+      </li>
+    </c:forEach>
+    <c:if test="${productPage.hasNext()}">
+      <li class="page-item">
+        <a class="page-link" href="?categoryId=${selectedCategoryId}&page=${productPage.number + 2}" aria-label="Next">&raquo;</a>
+      </li>
+    </c:if>
+  </ul>
+</nav>
+
 </body>
 </html>

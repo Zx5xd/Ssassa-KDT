@@ -37,11 +37,10 @@ public class InquiryController {
 
     // 상세 조회
     @GetMapping("/detail/{id}")
-    public String detail(@PathVariable Long id, Model model) {
+    public String detail(@PathVariable("id") Long id, Model model) {
         Inquiry inquiry = inquiryService.getById(id);
         model.addAttribute("inquiry", inquiry);
         return "Inquiry/detail"; // 💡 JSP: /WEB-INF/views/Inquiry/detail.jsp
     }
-
 
 }
