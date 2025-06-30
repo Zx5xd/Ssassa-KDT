@@ -284,6 +284,11 @@
     <div class="header">
         <h1>상품 목록</h1>
         <p>원하는 상품을 선택하고 장바구니에 담아보세요</p>
+        <div style="background: #fff; padding: 10px 20px; border-bottom: 1px solid #ddd; text-align: right;">
+            <a href="/inquiry/list" style="text-decoration: none; font-weight: bold; color: #007bff;">
+                📮 문의사항
+            </a>
+        </div>
     </div>
 
     <c:choose>

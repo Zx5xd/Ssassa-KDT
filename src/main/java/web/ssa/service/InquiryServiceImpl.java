@@ -14,23 +14,25 @@ public class InquiryServiceImpl implements InquiryService {
     private final InquiryRepository inquiryRepository;
 
     @Override
-    public List<Inquiry> getAll() {
+    public void saveInquiry(Inquiry inquiry) {
+        inquiryRepository.save(inquiry);
+    }
+
+    @Override
+    public List<Inquiry> getAllInquiries() {
         return inquiryRepository.findAll();
     }
 
     @Override
-    public Inquiry getById(Long id) {
+    public Inquiry getInquiryById(Long id) {
         return inquiryRepository.findById(id).orElse(null);
     }
 
     @Override
-    public Inquiry save(Inquiry inquiry) {
-        return inquiryRepository.save(inquiry);
+    public void deleteInquiry(Long id) {
+        inquiryRepository.deleteById(id);
     }
 
 
-    @Override
-    public void delete(Long id) {
-        inquiryRepository.deleteById(id); // 👈 delete 구현
-    }
+
 }

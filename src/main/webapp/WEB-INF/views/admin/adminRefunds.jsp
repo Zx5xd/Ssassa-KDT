@@ -1,5 +1,6 @@
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
 <!DOCTYPE html>
 <html>
 <head>
@@ -11,8 +12,7 @@
 <body class="bg-light">
 <div class="container mt-5">
 
-
-    <!-- 환불 요청 목록 -->
+    <!-- ✅ 환불 요청 목록 -->
     <h2 class="mb-4 text-center fw-bold">📦 환불 요청 관리</h2>
     <div class="card shadow-sm mb-5">
         <div class="card-body">
@@ -49,7 +49,7 @@
         </div>
     </div>
 
-    <<!-- 문의사항 관리 -->
+    <!-- ✅ 문의사항 관리 -->
     <h2 class="mb-4 text-center fw-bold">📨 문의사항 관리</h2>
     <div class="card shadow-sm mb-5">
         <div class="card-body">
@@ -70,9 +70,7 @@
                         <td>${inq.id}</td>
                         <td class="text-start px-3">${inq.title}</td>
                         <td>${inq.username}</td>
-                        <td>
-                            <fmt:formatDate value="${inq.createdAt}" pattern="yyyy-MM-dd HH:mm" />
-                        </td>
+                        <td>${inq.createdAt.toString().substring(0, 16)}</td>
                         <td>
                             <c:choose>
                                 <c:when test="${inq.hasReply}">
@@ -99,6 +97,38 @@
             </c:if>
         </div>
     </div>
+
+    <!-- ✅ 문의 상세 및 답변 폼 (선택된 문의가 있을 경우) -->
+    <c:if test="${selectedInquiry != null}">
+        <div class="card shadow-sm">
+            <div class="card-body">
+                <h5 class="mb-3 fw-bold">📄 문의 상세 보기</h5>
+                <p><strong>제목:</strong> ${selectedInquiry.title}</p>
+                <p><strong>작성자:</strong> ${selectedInquiry.username}</p>
+                <p><strong>내용:</strong><br>${selectedInquiry.content}</p>
+
+                <c:if test="${selectedInquiry.fileName != null}">
+                    <p><strong>첨부파일:</strong>
+                        <a href="/uploads/${selectedInquiry.fileName}" download>${selectedInquiry.fileName}</a>
+                    </p>
+                </c:if>
+
+                <c:if test="${selectedInquiry.hasReply}">
+                    <p><strong>📢 기존 답변:</strong><br>${selectedInquiry.adminComment}</p>
+                </c:if>
+
+                <!-- ✅ 답변 작성 폼 -->
+                <form method="post" action="/admin/inquiry/reply">
+                    <input type="hidden" name="id" value="${selectedInquiry.id}" />
+                    <div class="mb-3">
+                        <label for="adminComment" class="form-label">답변 내용</label>
+                        <textarea name="adminComment" id="adminComment" rows="4" class="form-control" required></textarea>
+                    </div>
+                    <button type="submit" class="btn btn-success">답변 등록</button>
+                </form>
+            </div>
+        </div>
+    </c:if>
 
 </div>
 </body>
