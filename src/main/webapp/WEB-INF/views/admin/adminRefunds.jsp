@@ -31,7 +31,7 @@
 <div class="container mt-5">
 
     <!-- ✅ 확불 요청 목록 -->
-    <h2 class="mb-4 text-center fw-bold">📦 확불 요청 관리</h2>
+    <h2 class="mb-4 text-center fw-bold">📦 환불 요청 관리</h2>
     <div class="card shadow-sm mb-5">
         <div class="card-body">
             <table class="table table-bordered table-hover text-center align-middle">
@@ -54,7 +54,7 @@
                         <td>
                             <form method="post" action="/admin/refund/complete">
                                 <input type="hidden" name="paymentId" value="${payment.id}" />
-                                <button type="submit" class="btn btn-danger btn-sm">확불 승인</button>
+                                <button type="submit" class="btn btn-danger btn-sm">환불 승인</button>
                             </form>
                         </td>
                     </tr>
@@ -62,7 +62,7 @@
                 </tbody>
             </table>
             <c:if test="${empty refunds}">
-                <div class="text-center text-muted p-3">📜 현재 확불 요청이 없습니다.</div>
+                <div class="text-center text-muted p-3">📜 현재 환불 요청이 없습니다.</div>
             </c:if>
         </div>
     </div>
