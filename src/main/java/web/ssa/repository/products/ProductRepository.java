@@ -27,4 +27,12 @@ public interface ProductRepository extends JpaRepository<ProductMaster, Integer>
 
     Page<ProductMaster> findByCategoryId(int categoryId, Pageable pageable);
 
+    // amount가 -1이 아닌 상품만 조회 (삭제되지 않은 상품)
+    Page<ProductMaster> findByAmountNot(int amount, Pageable pageable);
+
+    // 카테고리별로 amount가 -1이 아닌 상품만 조회
+    Page<ProductMaster> findByCategoryIdAndAmountNot(int categoryId, int amount, Pageable pageable);
+
+    // 상품명으로 검색 (amount가 -1이 아닌 상품만)
+    Page<ProductMaster> findByNameContainingAndAmountNot(String name, int amount, Pageable pageable);
 }

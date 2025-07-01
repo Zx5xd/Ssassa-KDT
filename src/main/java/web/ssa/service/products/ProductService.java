@@ -1,7 +1,10 @@
 // ProductService.java
 package web.ssa.service.products;
 
+import web.ssa.dto.products.ProductCreateDTO;
+import web.ssa.dto.products.ProductDTO;
 import web.ssa.entity.products.ProductMaster;
+import org.springframework.data.domain.Page;
 
 import java.util.List;
 
@@ -16,6 +19,12 @@ public interface ProductService {
 
     void delete(int id);
 
+    // 논리적 삭제: amount를 -1로 설정
+    void softDeleteProduct(int productId);
+
+    // 상품 저장
+    void saveProduct(ProductCreateDTO product);
+
     // 상품 가격 조회 (variant 포함)
     int getProductPrice(int productId);
 
@@ -23,8 +32,15 @@ public interface ProductService {
     String getProductSimpleImg(ProductMaster product);
 
     // 상품 페이지네이션 (전체)
-    org.springframework.data.domain.Page<ProductMaster> getPagedProducts(int page, int size);
+    Page<ProductMaster> getPagedProducts(int page, int size);
 
     // 카테고리별 상품 페이지네이션
-    org.springframework.data.domain.Page<ProductMaster> getPagedProductsByCategory(int categoryId, int page, int size);
+    Page<ProductMaster> getPagedProductsByCategory(int categoryId, int page, int size);
+
+    // 상품명으로 검색
+    Page<ProductMaster> searchProducts(String keyword, int page, int size);
+
+    void saveProductImg(String img, int imgId);
+
+    void updateProduct(int id, ProductCreateDTO editProduct, ProductDTO originalProduct);
 }

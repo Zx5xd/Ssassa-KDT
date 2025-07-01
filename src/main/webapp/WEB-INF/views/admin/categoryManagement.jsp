@@ -112,7 +112,9 @@
                         <div class="category-code">코드: ${category.code}</div>
                         <div class="category-actions">
                             <a href="/admin/categories/${category.id}/order" class="btn btn-primary">
-                                순서 관리
+                                <span class="material-symbols-outlined">
+                                    format_line_spacing
+                                </span>
                             </a>
                         </div>
                     </div>

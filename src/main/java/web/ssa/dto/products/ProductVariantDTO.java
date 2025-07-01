@@ -31,22 +31,4 @@ public class ProductVariantDTO {
             e.printStackTrace();
         }
     }
-
-    public static List<ProductVariantDTO> convertToDTOList(List<ProductVariant> entities) {
-        return entities.stream()
-                .map(entity -> {
-                    ProductVariantDTO dto = new ProductVariantDTO();
-                    dto.setId(entity.getId());
-                    dto.setName(entity.getName());
-                    dto.setPrice(entity.getPrice());
-                    dto.setDetail(entity.getDetail());
-                    dto.setAmount(entity.getAmount());
-                    dto.setSimpleImg(entity.getSimpleImg());
-                    dto.setDetailImg(entity.getDetailImg());
-                    dto.setMasterId(entity.getMasterId().getId());
-
-                    return dto;
-                })
-                .collect(Collectors.toList());
-    }
 }

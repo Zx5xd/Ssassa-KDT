@@ -22,4 +22,9 @@ public class ProductVariantServiceImpl implements ProductVariantService {
     public ProductVariant getVariantById(int id) {
         return this.productVariantRepository.findById(id).orElse(null);
     }
+
+    @Override
+    public List<ProductVariant> getVariantsForProduct(int productId) {
+        return this.productVariantRepository.findByMasterId_Id(productId);
+    }
 }

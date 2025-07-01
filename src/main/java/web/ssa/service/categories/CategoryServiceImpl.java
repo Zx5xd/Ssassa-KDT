@@ -9,6 +9,7 @@ import web.ssa.dto.categories.DisplayOrderDTO;
 import web.ssa.entity.categories.Categories;
 import web.ssa.entity.categories.CategoriesChild;
 import web.ssa.entity.categories.CategoryFields;
+import web.ssa.mapper.ConvertToDTO;
 import web.ssa.repository.categories.CategoryFieldsRepository;
 import web.ssa.repository.categories.CategoryRepository;
 
@@ -42,14 +43,14 @@ public class CategoryServiceImpl implements CategoryService {
 
     @Override
     public List<CategoryFieldsDTO> getCategoryFieldsByCategoryId(int id) {
-        return CategoryFieldsDTO.convertToDTOList(
+        return ConvertToDTO.categoryFieldsDTOList(
                 this.categoryFieldsRepository.findByCategoryFieldId_Id(id)
         );
     }
 
     @Override
     public List<CategoryFieldsDTO> getCategoryFieldsByChildId(int categoryId, List<CategoriesChild> childId) {
-        return CategoryFieldsDTO.convertToDTOList(
+        return ConvertToDTO.categoryFieldsDTOList(
                 this.categoryFieldsRepository.findByCategoryAndChilds(
                         categoryId, childId
                 )

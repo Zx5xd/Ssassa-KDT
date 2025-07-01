@@ -13,18 +13,7 @@ public class CategoriesDTO {
     private String code;
     private String name;
 
-    public static List<CategoriesDTO> convertToDTOList(List<Categories> entities) {
-        return entities.stream()
-                .map(entity -> {
-                    CategoriesDTO dto = new CategoriesDTO();
-                    dto.setId(entity.getId());
-                    dto.setCode(String.valueOf(entity.getCode()));
-                    dto.setName(entity.getName());
 
-                    return dto;
-                })
-                .collect(Collectors.toList());
-    }
 
     @Override
     public String toString() {

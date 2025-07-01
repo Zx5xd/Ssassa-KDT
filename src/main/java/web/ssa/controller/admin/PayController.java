@@ -12,6 +12,7 @@ import web.ssa.dto.products.ProductDTO;
 import web.ssa.entity.Payment;
 import web.ssa.entity.member.User;
 import web.ssa.entity.products.ProductMaster;
+import web.ssa.mapper.ConvertToDTO;
 import web.ssa.service.KakaoPayService;
 import web.ssa.service.products.ProductService;
 import web.ssa.repository.products.ProductVariantRepository;
@@ -50,7 +51,7 @@ public class PayController {
                 String quantityParam = request.getParameter("quantities[" + productId + "]");
                 int quantity = quantityParam != null ? Integer.parseInt(quantityParam) : 1;
 
-                ProductDTO product = ProductDTO.convertToDTO(this.productService.getProductById(productId));
+                ProductDTO product = ConvertToDTO.productToDTO(this.productService.getProductById(productId));
                 if (product != null) {
                     int productPrice = productService.getProductPrice(productId);
                     int itemTotal = productPrice * quantity;

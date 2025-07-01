@@ -27,7 +27,7 @@
     <div class="admin-card">
       <ul class="admin-menu">
         <li><a href="/admin/users">👥 회원 목록 관리</a></li>
-        <li><a href="/admin/products">🛍️ 상품 관리</a></li>
+        <li><a href="/pd/get/products">🛍️ 상품 관리</a></li>
         <li><a href="/admin/categories">📂 카테고리 관리</a></li> <!--  추가됨 -->
         <li><a href="/admin/refunds">📩 환불 및 문의사항 관리</a></li>
         <li><a href="/logout">🔓 로그아웃</a></li>

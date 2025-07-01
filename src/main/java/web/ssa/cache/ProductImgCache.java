@@ -39,6 +39,22 @@ public class ProductImgCache {
         return img != null ? "https://web.hyproz.myds.me/ssa_shop/img/" + img.getImgPath() : null;
     }
 
+    public int getImageIdByUrl(String url) {
+        if (url == null || url.isEmpty()) {
+            return -1;
+        }
+
+        // 캐시에서 해당 경로를 가진 이미지 찾기
+        for (Map.Entry<Integer, ProductImg> entry : imgCache.entrySet()) {
+            ProductImg img = entry.getValue();
+            if (img.getImgPath().equals(url)) {
+                return entry.getKey();
+            }
+        }
+
+        return -1; // 찾지 못한 경우
+    }
+
     public void reload() {
         this.imgCache.clear();
         this.init();

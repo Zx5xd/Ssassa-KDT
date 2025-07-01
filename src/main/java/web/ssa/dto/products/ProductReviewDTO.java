@@ -1,6 +1,5 @@
 package web.ssa.dto.products;
 
-
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.Data;
@@ -24,39 +23,18 @@ public class ProductReviewDTO {
     private int reviewType;
     private List<ReviewRecommend> recommendList;
 
-    private static DTOUtil util = new DTOUtil();
-
-    public static List<ProductReviewDTO> convertToDTOList(List<ProductReview> entities) {
-        return entities.stream()
-                .map(entity -> {
-                    ProductReviewDTO dto = new ProductReviewDTO();
-                    dto.setId(entity.getId());
-                    dto.setWriter(entity.getWriter());
-                    dto.setContent(entity.getContent());
-                    dto.setProductId(entity.getProductId().getId());
-                    dto.setUserImgs(util.stringToMapping(entity.getUserImgs()));
-                    dto.setRecommendCount(entity.getRecommendCount());
-                    dto.setReviewType(entity.getReviewType());
-                    dto.setProductVariantId(entity.getProductVariant().getId());
-                    dto.setRecommendList(entity.getRecommendList());
-
-                    return dto;
-                })
-                .collect(Collectors.toList());
-    }
-
-//    private void setUserImgs(String userImgs) {
-//        ObjectMapper objectMapper = new ObjectMapper();
-//        try {
-//            this.userImgs = objectMapper.readValue(
-//                    userImgs,
-//                    new TypeReference<Map<String, Map<String, String>>>() {
-//                    }
-//            );
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//        }
-//    }
+    // private void setUserImgs(String userImgs) {
+    // ObjectMapper objectMapper = new ObjectMapper();
+    // try {
+    // this.userImgs = objectMapper.readValue(
+    // userImgs,
+    // new TypeReference<Map<String, Map<String, String>>>() {
+    // }
+    // );
+    // } catch (Exception e) {
+    // e.printStackTrace();
+    // }
+    // }
 
     @Override
     public String toString() {

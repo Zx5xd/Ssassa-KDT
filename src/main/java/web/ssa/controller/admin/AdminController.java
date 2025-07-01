@@ -16,10 +16,14 @@ import org.springframework.web.bind.annotation.*;
 
 import web.ssa.cache.CategoriesCache;
 import web.ssa.entity.categories.Categories;
+import web.ssa.entity.categories.CategoriesChild;
 import web.ssa.entity.member.User;
+import web.ssa.mapper.ConvertToDTO;
 import web.ssa.service.InquiryService;
 import web.ssa.service.KakaoPayService;
 import web.ssa.service.member.MemberService;
+import web.ssa.dto.categories.CategoriesChildDTO;
+import web.ssa.cache.ProductImgCache;
 
 @Controller
 @RequestMapping("/admin")
@@ -31,9 +35,10 @@ public class AdminController {
     private final MemberService memberService;
     private final JavaMailSender mailSender;
     private final CategoriesCache categoriesCache;
+    private final ProductImgCache productImgCache;
 
     // 공통: 관리자 권한 확인 메서드
-    private boolean isAdmin(HttpSession session) {
+    public boolean isAdmin(HttpSession session) {
         User loginUser = (User) session.getAttribute("loginUser");
         return loginUser != null && "ADMIN".equals(loginUser.getRole());
     }
@@ -71,14 +76,6 @@ public class AdminController {
     public String deleteInquiry(@RequestParam("id") Long id) {
         inquiryService.delete(id);
         return "redirect:/admin/refunds";
-    }
-
-    // 상품 등록 관리 페이지
-    @GetMapping("/products")
-    public String manageProducts(HttpSession session, Model model) {
-        if (!isAdmin(session))
-            return "redirect:/login";
-        return "admin/productList"; // /WEB-INF/views/admin/productList.jsp
     }
 
     // 회원 목록 관리 페이지
@@ -245,6 +242,14 @@ public class AdminController {
 
         model.addAttribute("category", category);
         return "admin/categoryOrderSelection";
+    }
+
+    // 세부 카테고리 조회 API
+    @GetMapping("/api/categories/{categoryId}/children")
+    @ResponseBody
+    public List<CategoriesChildDTO> getCategoryChildren(@PathVariable("categoryId") int categoryId) {
+        List<CategoriesChild> children = categoriesCache.getCategoryChildren(categoryId);
+        return ConvertToDTO.categoryChildDTOList(children);
     }
 
 }
