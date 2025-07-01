@@ -1,5 +1,6 @@
 <%@ page contentType="text/html;charset=UTF-8" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn" %>
 <html>
 <head>
     <title>문의 상세</title>
@@ -10,6 +11,7 @@
         .info { margin-bottom: 15px; }
         textarea, input[type="text"] { width: 100%; padding: 10px; margin-bottom: 15px; }
         button { padding: 10px 20px; }
+        img.preview { max-width: 100%; margin-top: 10px; border: 1px solid #ddd; border-radius: 5px; }
     </style>
 </head>
 <body>
@@ -19,10 +21,19 @@
     <div class="info"><strong>작성일:</strong> ${inquiry.createdAt}</div>
     <div class="info"><strong>내용:</strong><br> ${inquiry.content}</div>
 
-    <c:if test="${inquiry.fileName != null}">
+    <c:if test="${not empty inquiry.fileName}">
         <div class="info">
             <strong>첨부파일:</strong>
-            <a href="/uploads/${inquiry.fileName}" download>${inquiry.fileName}</a>
+            <a href="${inquiry.filePath}" download>${inquiry.fileName}</a>
+
+            <!-- 이미지 파일 미리보기 -->
+            <c:if test="${fn:contains(fn:toLowerCase(inquiry.fileName), '.png')
+                        or fn:contains(fn:toLowerCase(inquiry.fileName), '.jpg')
+                        or fn:contains(fn:toLowerCase(inquiry.fileName), '.jpeg')
+                        or fn:contains(fn:toLowerCase(inquiry.fileName), '.gif')
+                        or fn:contains(fn:toLowerCase(inquiry.fileName), '.webp')}">
+                <img src="${inquiry.filePath}" alt="미리보기 이미지" class="preview"/>
+            </c:if>
         </div>
     </c:if>
 
@@ -40,7 +51,6 @@
         </form>
     </c:if>
 
-    <!-- 🔧 여기만 수정 -->
     <c:if test="${sessionScope.loginUser.name eq inquiry.username}">
         <a href="/inquiry/edit/${inquiry.id}">수정</a> |
         <a href="/inquiry/delete/${inquiry.id}" onclick="return confirm('정말 삭제하시겠습니까?');">삭제</a>

@@ -13,6 +13,7 @@ import web.ssa.service.InquiryService;
 import java.io.File;
 import java.io.IOException;
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 @Controller
 @RequiredArgsConstructor
@@ -42,18 +43,25 @@ public class InquiryController {
         }
 
         if (!file.isEmpty()) {
+            // 파일 저장 디렉토리 (static 아래)
             String uploadDir = System.getProperty("user.dir") + "/src/main/resources/static/uploads";
             File dir = new File(uploadDir);
             if (!dir.exists()) dir.mkdirs(); // 폴더 없으면 생성
 
-            String fileName = file.getOriginalFilename();
+            // 파일명 중복 방지를 위한 UUID 추가
+            String uuid = UUID.randomUUID().toString();
+            String fileName = uuid + "_" + file.getOriginalFilename();
             String filePath = uploadDir + "/" + fileName;
+
+            // 파일 저장
             file.transferTo(new File(filePath));
 
+            // Inquiry 엔티티에 파일 정보 저장 (브라우저에서 접근 가능하게 경로 지정)
             inquiry.setFileName(fileName);
             inquiry.setFilePath("/uploads/" + fileName);
         }
 
+        // 사용자 및 기본 정보 설정
         inquiry.setUsername(loginUser.getName());
         inquiry.setCreatedAt(LocalDateTime.now());
         inquiry.setStatus("PENDING");
