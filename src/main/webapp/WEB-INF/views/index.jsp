@@ -123,7 +123,9 @@
         </c:forEach>
     </div>
 </main>
-
+<div style="text-align: center; margin: 10px 0; font-weight: bold;">
+    현재 세션 ID: <%= session.getId() %>
+</div>
 <footer></footer>
 
 <!-- ✅ JS -->

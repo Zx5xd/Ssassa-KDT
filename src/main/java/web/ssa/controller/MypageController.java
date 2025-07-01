@@ -25,7 +25,7 @@ public class MypageController {
     private static final String UPLOAD_DIR = System.getProperty("user.dir") +
             "/src/main/webapp/resources/uploads/";
 
-    /** ✅ 마이페이지 메인 화면 */
+    // 마이페이지 메인 화면
     @GetMapping("/mypage")
     public String showMypage(HttpSession session, Model model) {
         User user = (User) session.getAttribute("loginUser");
@@ -39,7 +39,7 @@ public class MypageController {
         return "mypage";
     }
 
-    /** ✅ 수정 폼 이동 */
+    //수정 폼 이동
     @GetMapping("/mypage/edit")
     public String editForm(HttpSession session, Model model) {
         User user = (User) session.getAttribute("loginUser");
@@ -49,7 +49,7 @@ public class MypageController {
         return "mypageEdit";
     }
 
-    /** ✅ 회원정보 및 프로필 이미지 수정 */
+    // 회원정보 및 프로필 이미지 수정
     @PostMapping("/mypage/update")
     public String updateMypage(@RequestParam String email,
                                @RequestParam(required = false) String password,
@@ -79,7 +79,7 @@ public class MypageController {
             user.setPassword(password);
         }
 
-        // ✅ 이미지가 있다면 새로 저장
+        // 이미지가 있다면 새로 저장
         if (profileImage != null && !profileImage.isEmpty()) {
             try {
                 File dir = new File(UPLOAD_DIR);
@@ -107,13 +107,13 @@ public class MypageController {
             }
         }
 
-        // ✅ DB 갱신 및 세션 갱신
+        // DB 갱신 및 세션 갱신
         memberService.updateUser(user);
         session.setAttribute("loginUser", user);
         return "redirect:/mypage";
     }
 
-    /** ✅ 프로필 이미지 삭제 */
+    //프로필 이미지 삭제
     @PostMapping("/mypage/profile/delete")
     public String deleteProfileImage(HttpSession session) {
         User user = (User) session.getAttribute("loginUser");
@@ -129,7 +129,7 @@ public class MypageController {
         return "redirect:/mypage/edit";
     }
 
-    /** ✅ 회원 탈퇴 */
+    //회원 탈퇴
     @PostMapping("/withdraw")
     public String withdraw(HttpSession session) {
         User user = (User) session.getAttribute("loginUser");

@@ -21,7 +21,7 @@ public class AdminController {
     private final MemberService memberService;
     private final JavaMailSender mailSender;
 
-    // ✅ 관리자 메인 화면
+    //  관리자 메인 화면
     @GetMapping("/admin")
     public String adminPage(HttpSession session, Model model) {
         User loginUser = (User) session.getAttribute("loginUser");
@@ -31,27 +31,27 @@ public class AdminController {
         return "admin/admin";
     }
 
-    // ✅ 관리자 권한 확인
+    // 관리자 권한 확인
     private boolean isAdmin(HttpSession session) {
         User loginUser = (User) session.getAttribute("loginUser");
         return loginUser != null && "ADMIN".equals(loginUser.getRole());
     }
 
-    // ✅ 상품 목록
+    // 상품 목록
     @GetMapping("/admin/products")
     public String manageProducts(HttpSession session) {
         if (!isAdmin(session)) return "redirect:/login";
         return "admin/productList";
     }
 
-    // ✅ 문의사항/환불
+    // 문의사항/환불
     @GetMapping("/admin/inquiries")
     public String manageInquiries(HttpSession session) {
         if (!isAdmin(session)) return "redirect:/login";
         return "admin/inquiryList";
     }
 
-    // ✅ 전체 회원 목록 - 정상 / 탈퇴 유저 나눠서 출력
+    // 전체 회원 목록 - 정상 / 탈퇴 유저 나눠서 출력
     @GetMapping("/admin/users")
     public String manageUsers(HttpSession session, Model model) {
         if (!isAdmin(session)) return "redirect:/login";
@@ -64,7 +64,7 @@ public class AdminController {
         return "admin/userList";
     }
 
-    // ✅ 회원 수정 화면
+    // 회원 수정 화면
     @GetMapping("/admin/editUser")
     public String editUserForm(@RequestParam String email, HttpSession session, Model model) {
         if (!isAdmin(session)) return "redirect:/login";
@@ -77,7 +77,7 @@ public class AdminController {
         return "redirect:/admin/users";
     }
 
-    // ✅ 회원 수정 처리 (비밀번호는 제외)
+    // 회원 수정 처리 (비밀번호는 제외)
     @PostMapping("/admin/updateUser")
     public String updateUser(@ModelAttribute User user, HttpSession session) {
         if (!isAdmin(session)) return "redirect:/login";
@@ -94,7 +94,7 @@ public class AdminController {
         return "redirect:/admin/users";
     }
 
-    // ✅ 회원 삭제 (관리자 권한)
+    // 회원 삭제 (관리자 권한)
     @GetMapping("/admin/deleteUser")
     public String deleteUser(@RequestParam String email, HttpSession session) {
         if (!isAdmin(session)) return "redirect:/login";
@@ -103,7 +103,7 @@ public class AdminController {
         return "redirect:/admin/users";
     }
 
-    // ✅ 탈퇴 회원 복구
+    // 탈퇴 회원 복구
     @GetMapping("/admin/restoreUser")
     public String restoreUser(@RequestParam String email, HttpSession session) {
         if (!isAdmin(session)) return "redirect:/login";
@@ -112,7 +112,7 @@ public class AdminController {
         return "redirect:/admin/users";
     }
 
-    // ✅ 닉네임 인라인 수정
+    // 닉네임 인라인 수정
     @PostMapping("/admin/updateUserInline")
     public String updateUserInline(@RequestParam String email,
                                    @RequestParam String nickname,
@@ -128,7 +128,7 @@ public class AdminController {
         return "redirect:/admin/users";
     }
 
-    // ✅ 임시 비밀번호 전송
+    // 임시 비밀번호 전송
     @PostMapping("/admin/sendTempPassword")
     public String sendTempPassword(@RequestParam String email, HttpSession session) {
         if (!isAdmin(session)) return "redirect:/login";

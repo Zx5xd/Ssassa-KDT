@@ -33,7 +33,7 @@ public class ImageServeController {
         }
     }
 
-    // ✅ 파일 확장자에 따라 적절한 Content-Type 반환
+    //  파일 확장자에 따라 적절한 Content-Type 반환
     private String getMimeType(String filename) {
         String lower = filename.toLowerCase();
         if (lower.endsWith(".png")) return "image/png";
