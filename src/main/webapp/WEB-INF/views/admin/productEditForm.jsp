@@ -28,6 +28,7 @@
                     <div class="form-container">
                         <form action="/pd/set/product/update/${product.id}" method="post" enctype="multipart/form-data"
                             class="product-form">
+                            
                             <div class="form-group">
                                 <label for="name">상품명 *</label>
                                 <input type="text" id="name" name="name" required class="form-input"
@@ -57,7 +58,7 @@
                                     value="<c:out value='${product.price}'/>">
                             </div>
 
-                            <div class="form-group">
+                            <div class="form-group" id="amountGroup">
                                 <label for="amount">재고 수량 *</label>
                                 <input type="number" id="amount" name="amount" required class="form-input" min="0"
                                     value="<c:out value='${product.amount}'/>">
@@ -72,9 +73,10 @@
                                 </c:if>
                             </div>
 
-                            <div class="form-group">
+                            <div class="form-group" id="detailImgGroup">
                                 <label for="detailImg">상세 이미지</label>
                                 <input type="file" id="detailImg" name="detailImg" accept="image/*" class="form-input">
+                                <input type="hidden" name="existingDetailImg" value="${product.detailImg}">
                                 <c:if test="${product.detailImg != 0}">
                                     <img src="${productImgCache.getImageUrl(product.detailImg)}"
                                         alt="${product.detailImg}" style="width: 100px; height: 100px;">
@@ -91,6 +93,58 @@
                                 <textarea id="detail" name="detail" rows="5" class="form-textarea"
                                     placeholder="상품 상세 정보를 JSON 형식으로 입력하세요"><c:out value='${product.detail}'/></textarea>
                             </div>
+
+                            <!-- 상품 변형 섹션 (price가 0이거나 detailImg가 0일 때만 표시) -->
+                            <c:if test="${product.price == 0 || product.detailImg == 0}">
+                                <!-- 변형 추가 버튼 -->
+                                <div class="form-group" id="addVariantGroup">
+                                    <button type="button" id="addVariantBtn" class="add-variant-btn">
+                                        <span class="material-symbols-outlined">add</span>
+                                        상품 변형 추가
+                                    </button>
+                                </div>
+
+                                <!-- 상품 변형 컨테이너 -->
+                                <div id="variantsContainer">
+                                    <!-- 기존 변형들 표시 -->
+                                    <c:forEach items="${existingVariants}" var="variant" varStatus="status">
+                                        <div class="variant-group">
+                                            <input type="hidden" name="variants[${status.index}].id" value="${variant.id}">
+                                            <div class="variant-header">
+                                                <span class="variant-title">상품 변형 ${status.index + 1}</span>
+                                                <button type="button" class="remove-variant-btn" onclick="removeVariant(this)">
+                                                    <span class="material-symbols-outlined">delete</span>
+                                                </button>
+                                            </div>
+                                            <div class="form-group">
+                                                <label for="variantName${status.index + 1}">상세 상품명 *</label>
+                                                <input type="text" id="variantName${status.index + 1}" name="variants[${status.index}].name" required class="form-input" value="<c:out value='${variant.name}'/>">
+                                            </div>
+                                            <div class="form-group">
+                                                <label for="variantPrice${status.index + 1}">가격 *</label>
+                                                <input type="number" id="variantPrice${status.index + 1}" name="variants[${status.index}].price" required class="form-input" min="0" value="<c:out value='${variant.price}'/>">
+                                            </div>
+                                            <div class="form-group">
+                                                <label for="variantAmount${status.index + 1}">재고 수량 *</label>
+                                                <input type="number" id="variantAmount${status.index + 1}" name="variants[${status.index}].amount" required class="form-input" min="0" value="<c:out value='${variant.amount}'/>">
+                                            </div>
+                                            <div class="form-group">
+                                                <label for="variantDetailImg${status.index + 1}">상세 이미지</label>
+                                                <input type="file" id="variantDetailImg${status.index + 1}" name="variants[${status.index}].detailImgFile" accept="image/*" class="form-input">
+                                                <c:if test="${variant.detailImg != 0}">
+                                                    <input type="hidden" name="variants[${status.index}].existingDetailImg" value="${variant.detailImg}">
+                                                    <img src="${productImgCache.getImageUrl(variant.detailImg)}"
+                                                        alt="${variant.detailImg}" style="width: 100px; height: 100px;">
+                                                </c:if>
+                                            </div>
+                                            <div class="form-group">
+                                                <label for="variantDetail${status.index + 1}">상품 상세 정보</label>
+                                                <textarea id="variantDetail${status.index + 1}" name="variants[${status.index}].detailString" rows="3" class="form-textarea" placeholder="상품 상세 정보를 JSON 형식으로 입력하세요"><c:out value='${variant.detail}'/></textarea>
+                                            </div>
+                                        </div>
+                                    </c:forEach>
+                                </div>
+                            </c:if>
 
                             <div class="form-actions">
                                 <button type="submit" class="submit-btn">
@@ -197,9 +251,148 @@
                 .form-input[type="file"] {
                     padding: 8px;
                 }
+
+                .add-variant-btn {
+                    display: flex;
+                    align-items: center;
+                    gap: 8px;
+                    padding: 12px 20px;
+                    background-color: #007bff;
+                    color: white;
+                    border: none;
+                    border-radius: 6px;
+                    cursor: pointer;
+                    font-size: 14px;
+                    transition: background-color 0.3s;
+                }
+
+                .add-variant-btn:hover {
+                    background-color: #0056b3;
+                }
+
+                .variant-group {
+                    background-color: #333;
+                    border: 1px solid #555;
+                    border-radius: 6px;
+                    padding: 20px;
+                    margin-bottom: 20px;
+                    position: relative;
+                }
+
+                .variant-header {
+                    display: flex;
+                    justify-content: space-between;
+                    align-items: center;
+                    margin-bottom: 15px;
+                    padding-bottom: 10px;
+                    border-bottom: 1px solid #555;
+                }
+
+                .variant-title {
+                    color: #fff;
+                    font-weight: bold;
+                    font-size: 16px;
+                }
+
+                .remove-variant-btn {
+                    background-color: #dc3545;
+                    color: white;
+                    border: none;
+                    border-radius: 4px;
+                    padding: 6px 12px;
+                    cursor: pointer;
+                    font-size: 12px;
+                    transition: background-color 0.3s;
+                }
+
+                .remove-variant-btn:hover {
+                    background-color: #c82333;
+                }
             </style>
 
             <script>
+                let variantCount = 0;
+                
+                // JSP에서 전달된 기존 변형 개수 설정
+                <c:if test="${existingVariants != null}">
+                    variantCount = ${existingVariants.size()};
+                </c:if>
+                
+                // 페이지 로드 시 초기화
+                document.addEventListener('DOMContentLoaded', function() {
+                    // 변형 추가 버튼 이벤트 리스너 추가
+                    const addVariantBtn = document.getElementById('addVariantBtn');
+                    if (addVariantBtn) {
+                        addVariantBtn.addEventListener('click', function() {
+                            addVariantGroup();
+                        });
+                    }
+                });
+
+                // 상품 변형 추가 함수
+                function addVariantGroup() {
+                    variantCount++;
+                    console.log("variantCount : " + variantCount);
+                    console.log("variants[" + (variantCount-1) + "] : variants[" + (variantCount-1) + "]");
+                    const container = document.getElementById('variantsContainer');
+                    
+                    const variantGroup = document.createElement('div');
+                    variantGroup.className = 'variant-group';
+                    variantGroup.innerHTML = 
+                        '<input type="hidden" name="variants[' + (variantCount-1) + '].id" value="0">' +
+                        '<div class="variant-header">' +
+                            '<span class="variant-title">상품 변형 ' + variantCount + '</span>' +
+                            '<button type="button" class="remove-variant-btn" onclick="removeVariant(this)">' +
+                                '<span class="material-symbols-outlined">delete</span>' +
+                            '</button>' +
+                        '</div>' +
+                        '<div class="form-group">' +
+                            '<label for="variantName' + variantCount + '">상세 상품명 *</label>' +
+                            '<input type="text" id="variantName' + variantCount + '" name="variants[' + (variantCount-1) + '].name" required class="form-input">' +
+                        '</div>' +
+                        '<div class="form-group">' +
+                            '<label for="variantPrice' + variantCount + '">가격 *</label>' +
+                            '<input type="number" id="variantPrice' + variantCount + '" name="variants[' + (variantCount-1) + '].price" required class="form-input" min="0">' +
+                        '</div>' +
+                        '<div class="form-group">' +
+                            '<label for="variantAmount' + variantCount + '">재고 수량 *</label>' +
+                            '<input type="number" id="variantAmount' + variantCount + '" name="variants[' + (variantCount-1) + '].amount" required class="form-input" min="0">' +
+                        '</div>' +
+                        '<div class="form-group">' +
+                            '<label for="variantDetailImg' + variantCount + '">상세 이미지</label>' +
+                            '<input type="file" id="variantDetailImg' + variantCount + '" name="variants[' + (variantCount-1) + '].detailImgFile" accept="image/*" class="form-input">' +
+                        '</div>' +
+                        '<div class="form-group">' +
+                            '<label for="variantDetail' + variantCount + '">상품 상세 정보</label>' +
+                            '<textarea id="variantDetail' + variantCount + '" name="variants[' + (variantCount-1) + '].detailString" rows="3" class="form-textarea" placeholder="상품 상세 정보를 JSON 형식으로 입력하세요"></textarea>' +
+                        '</div>';
+                    
+                    container.appendChild(variantGroup);
+                }
+
+                // 상품 변형 삭제 함수
+                function removeVariant(button) {
+                    const variantGroup = button.closest('.variant-group');
+                    variantGroup.remove();
+                    
+                    // 번호 재정렬 및 배열 인덱스 업데이트
+                    const variantGroups = document.querySelectorAll('.variant-group');
+                    variantGroups.forEach((group, index) => {
+                        const title = group.querySelector('.variant-title');
+                        title.textContent = `상품 변형 ${index + 1}`;
+                        
+                        // 배열 인덱스 업데이트
+                        const inputs = group.querySelectorAll('input, textarea');
+                        inputs.forEach(input => {
+                            const name = input.name;
+                            if (name && name.includes('variants[')) {
+                                input.name = name.replace(/variants\[\d+\]/, `variants[${index}]`);
+                            }
+                        });
+                    });
+                    variantCount = variantGroups.length;
+                }
+
                 // 카테고리 선택 시 세부 카테고리 로드
                 document.getElementById('categoryId').addEventListener('change', function () {
                     const categoryId = parseInt(this.value);

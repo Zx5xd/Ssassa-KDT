@@ -14,7 +14,7 @@
     <style>
         .category-grid {
             display: grid;
-            grid-template-columns: repeat(5, 1fr);
+            grid-template-columns: repeat(5, 2fr);
             gap: 20px;
             margin-top: 30px;
         }
@@ -23,6 +23,7 @@
             background: white;
             border-radius: 10px;
             padding: 20px;
+            width: auto;
             box-shadow: 0 2px 10px rgba(0,0,0,0.1);
             transition: transform 0.3s ease;
         }
@@ -42,6 +43,9 @@
             color: #6c757d;
             font-size: 0.9rem;
             margin-bottom: 15px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
         
         .category-actions {
@@ -109,7 +113,7 @@
                 <c:forEach var="category" items="${categories}">
                     <div class="category-card">
                         <div class="category-name">${category.name}</div>
-                        <div class="category-code">코드: ${category.code}</div>
+                        <div class="category-code">${category.code}</div>
                         <div class="category-actions">
                             <a href="/admin/categories/${category.id}/order" class="btn btn-primary">
                                 <span class="material-symbols-outlined">

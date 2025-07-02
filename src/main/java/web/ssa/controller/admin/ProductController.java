@@ -13,9 +13,11 @@ import web.ssa.cache.CategoriesCache;
 import web.ssa.cache.ProductImgCache;
 import web.ssa.dto.products.ProductCreateDTO;
 import web.ssa.dto.products.ProductDTO;
+import web.ssa.dto.products.ProductVariantDTO;
 import web.ssa.entity.categories.CategoriesChild;
 import web.ssa.entity.products.ProductMaster;
 import web.ssa.entity.products.ProductReview;
+import web.ssa.entity.products.ProductVariant;
 import web.ssa.mapper.ConvertToDTO;
 import web.ssa.service.categories.CategoryService;
 import web.ssa.service.products.ProductReviewServImpl;
@@ -133,27 +135,72 @@ public class ProductController {
             cp.setCategoryChildId(Integer.parseInt(cp.getStrCategoryChildId()));
         }
 
-        // WebDAV를 통한 파일 업로드
-        try {
-            if (simpleImg != null && !simpleImg.isEmpty()) {
-                String simpleImgUrl = webDAVService.uploadFile(simpleImg);
-                // URL에서 파일명만 추출하여 저장
-                String simpleImgFileName = simpleImgUrl.substring(simpleImgUrl.lastIndexOf("/") + 1);
-                cp.setSimpleImgFileName(simpleImgFileName);
+        System.out.println("cp.getRegistrationType() : " + cp.getRegistrationType());
+
+        // 등록 방식에 따른 처리
+        if ("multiple".equals(cp.getRegistrationType())) {
+
+            cp.getVariants().forEach(variant -> {
+                System.out.println("variant.toString() : " + variant.toString());
+            });
+
+            // 여러개 등록 모드
+            // amount, detailImg, detail 필드는 무시하고 variants에서 처리
+            cp.setAmount(0); // 기본값 설정
+            cp.setDetail("{}"); // 기본값 설정 (빈 JSON 객체)
+
+            // variants가 null이면 빈 리스트로 초기화
+            if (cp.getVariants() == null) {
+                cp.setVariants(new java.util.ArrayList<>());
             }
 
-            if (detailImg != null && !detailImg.isEmpty()) {
-                String detailImgUrl = webDAVService.uploadFile(detailImg);
-                // URL에서 파일명만 추출하여 저장
-                String detailImgFileName = detailImgUrl.substring(detailImgUrl.lastIndexOf("/") + 1);
-                cp.setDetailImgFileName(detailImgFileName);
+            // WebDAV를 통한 메인 상품 이미지 업로드
+            try {
+                if (simpleImg != null && !simpleImg.isEmpty()) {
+                    String simpleImgUrl = webDAVService.uploadFile(simpleImg);
+                    String simpleImgFileName = simpleImgUrl.substring(simpleImgUrl.lastIndexOf("/") + 1);
+                    cp.setSimpleImgFileName(simpleImgFileName);
+                }
+
+                // 상품 변형들의 상세 이미지 업로드
+                if (cp.getVariants() != null && !cp.getVariants().isEmpty()) {
+                    for (ProductVariantDTO variant : cp.getVariants()) {
+                        if (variant != null && variant.getDetailImgFile() != null
+                                && !variant.getDetailImgFile().isEmpty()) {
+                            String detailImgUrl = webDAVService.uploadFile(variant.getDetailImgFile());
+                            String detailImgFileName = detailImgUrl.substring(detailImgUrl.lastIndexOf("/") + 1);
+                            variant.setDetailImgFileName(detailImgFileName);
+                        }
+                    }
+                }
+
+                // 상품 저장 (변형 포함)
+                productService.saveProductWithVariants(cp);
+
+            } catch (IOException e) {
+                e.printStackTrace();
             }
+        } else {
+            // 단개 등록 모드 (기존 로직)
+            try {
+                if (simpleImg != null && !simpleImg.isEmpty()) {
+                    String simpleImgUrl = webDAVService.uploadFile(simpleImg);
+                    String simpleImgFileName = simpleImgUrl.substring(simpleImgUrl.lastIndexOf("/") + 1);
+                    cp.setSimpleImgFileName(simpleImgFileName);
+                }
 
-            // 상품 저장
-            productService.saveProduct(cp);
+                if (detailImg != null && !detailImg.isEmpty()) {
+                    String detailImgUrl = webDAVService.uploadFile(detailImg);
+                    String detailImgFileName = detailImgUrl.substring(detailImgUrl.lastIndexOf("/") + 1);
+                    cp.setDetailImgFileName(detailImgFileName);
+                }
 
-        } catch (IOException e) {
-            e.printStackTrace();
+                // 상품 저장
+                productService.saveProduct(cp);
+
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
 
         return "redirect:/pd/get/products";
@@ -168,16 +215,27 @@ public class ProductController {
 
         ProductDTO product = ConvertToDTO.productToDTO(this.productService.getProductById(id));
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+
+        // price가 0이거나 detailImg가 0일 때만 변형들 가져오기
+        List<ProductVariant> existingVariants = null;
+        if (product.getPrice() == 0 || product.getDetailImg() == 0) {
+            existingVariants = productVariantService.getVariantByMasterId(id);
+        }
+
         model.addAttribute("regStr", product.getReg() != null ? sdf.format(product.getReg()) : "");
         model.addAttribute("product", product);
         model.addAttribute("category", categoriesCache.getCachedCategories());
         model.addAttribute("productImgCache", this.productImgCache);
+        model.addAttribute("existingVariants", existingVariants);
 
         return "admin/productEditForm";
     }
 
     @PostMapping("/set/product/update/{id}")
-    public String updateProduct(@PathVariable("id") int id, @ModelAttribute ProductCreateDTO cp, HttpSession session) {
+    public String updateProduct(@PathVariable("id") int id, @ModelAttribute ProductCreateDTO cp,
+            @RequestParam(value = "simpleImg", required = false) MultipartFile simpleImg,
+            @RequestParam(value = "detailImg", required = false) MultipartFile detailImg,
+            HttpSession session) {
         if (!adminController.isAdmin(session)) {
             return "redirect:/login";
         }
@@ -192,7 +250,49 @@ public class ProductController {
             cp.setCategoryChildId(Integer.parseInt(cp.getStrCategoryChildId()));
         }
 
-        this.productService.updateProduct(id, cp, originalProduct);
+        // price가 0이거나 detailImg가 0일 때만 변형 처리
+        if (cp.getPrice() == 0 || originalProduct.getDetailImg() == 0) {
+            // variants가 null이면 빈 리스트로 초기화
+            if (cp.getVariants() == null) {
+                cp.setVariants(new java.util.ArrayList<>());
+            }
+
+            try {
+                // WebDAV를 통한 메인 상품 이미지 업로드
+                if (simpleImg != null && !simpleImg.isEmpty()) {
+                    String simpleImgUrl = webDAVService.uploadFile(simpleImg);
+                    String simpleImgFileName = simpleImgUrl.substring(simpleImgUrl.lastIndexOf("/") + 1);
+                    cp.setSimpleImgFileName(simpleImgFileName);
+                }
+
+                // 상품 변형들의 상세 이미지 업로드
+                if (cp.getVariants() != null && !cp.getVariants().isEmpty()) {
+                    for (ProductVariantDTO variant : cp.getVariants()) {
+                        if (variant != null) {
+                            if (variant.getExistingDetailImg() != null && variant.getExistingDetailImg() != 0) {
+                                variant.setDetailImg(variant.getExistingDetailImg());
+                            } else if (variant.getDetailImgFile() != null
+                                    && !variant.getDetailImgFile().isEmpty()) {
+                                String detailImgUrl = webDAVService.uploadFile(variant.getDetailImgFile());
+                                String detailImgFileName = detailImgUrl.substring(detailImgUrl.lastIndexOf("/") + 1);
+                                variant.setDetailImgFileName(detailImgFileName);
+                            }
+                        }
+
+                    }
+                }
+
+                // 상품 수정 (변형 포함)
+                productService.updateProductWithVariants(id, cp, originalProduct);
+
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        } else {
+            // 일반 상품 수정 (기존 로직)
+            this.productService.updateProduct(id, cp, originalProduct);
+        }
+
         return "redirect:/pd/get/products";
     }
 

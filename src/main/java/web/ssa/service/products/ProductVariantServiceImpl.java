@@ -27,4 +27,14 @@ public class ProductVariantServiceImpl implements ProductVariantService {
     public List<ProductVariant> getVariantsForProduct(int productId) {
         return this.productVariantRepository.findByMasterId_Id(productId);
     }
+
+    @Override
+    public void saveVariant(ProductVariant variant) {
+        this.productVariantRepository.save(variant);
+    }
+
+    @Override
+    public void deleteVariant(int variantId) {
+        this.productVariantRepository.deleteById(variantId);
+    }
 }

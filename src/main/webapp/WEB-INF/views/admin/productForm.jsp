@@ -26,8 +26,26 @@
                     </h2>
 
                     <div class="form-container">
+                        <!-- 등록 방식 선택 -->
+                        <div class="registration-type-selector">
+                            <label class="registration-type-label">등록 방식 선택:</label>
+                            <div class="radio-group">
+                                <label class="radio-label">
+                                    <input type="radio" name="registrationType" value="single" checked>
+                                    <span class="radio-text">단개 등록</span>
+                                </label>
+                                <label class="radio-label">
+                                    <input type="radio" name="registrationType" value="multiple">
+                                    <span class="radio-text">여러개 등록</span>
+                                </label>
+                            </div>
+                        </div>
+
                         <form action="/pd/set/product/create" method="post" enctype="multipart/form-data"
                             class="product-form">
+                            <!-- 등록 방식 히든 필드 -->
+                            <input type="hidden" id="registrationTypeField" name="registrationType" value="single">
+                            
                             <div class="form-group">
                                 <label for="name">상품명 *</label>
                                 <input type="text" id="name" name="name" required class="form-input">
@@ -57,7 +75,7 @@
                                 <input type="number" id="price" name="price" required class="form-input" min="0">
                             </div>
 
-                            <div class="form-group">
+                            <div class="form-group" id="amountGroup">
                                 <label for="amount">재고 수량 *</label>
                                 <input type="number" id="amount" name="amount" required class="form-input" min="0">
                             </div>
@@ -67,7 +85,7 @@
                                 <input type="file" id="simpleImg" name="simpleImg" accept="image/*" class="form-input">
                             </div>
 
-                            <div class="form-group">
+                            <div class="form-group" id="detailImgGroup">
                                 <label for="detailImg">상세 이미지</label>
                                 <input type="file" id="detailImg" name="detailImg" accept="image/*" class="form-input">
                             </div>
@@ -77,11 +95,22 @@
                                 <input type="date" id="reg" name="reg" required class="form-input">
                             </div>
 
-                            <div class="form-group">
+                            <div class="form-group" id="detailGroup">
                                 <label for="detail">상품 상세 정보</label>
                                 <textarea id="detail" name="detail" rows="5" class="form-textarea"
                                     placeholder="상품 상세 정보를 JSON 형식으로 입력하세요"></textarea>
                             </div>
+
+                            <!-- 여러개 등록 시 추가 버튼 -->
+                            <div class="form-group" id="addVariantGroup" style="display: none;">
+                                <button type="button" id="addVariantBtn" class="add-variant-btn">
+                                    <span class="material-symbols-outlined">add</span>
+                                    상품 변형 추가
+                                </button>
+                            </div>
+
+                            <!-- 상품 변형 컨테이너 -->
+                            <div id="variantsContainer"></div>
 
                             <div class="form-actions">
                                 <button type="submit" class="submit-btn">
@@ -101,6 +130,45 @@
                     border-radius: 8px;
                     padding: 30px;
                     margin-top: 20px;
+                }
+
+                .registration-type-selector {
+                    margin-bottom: 30px;
+                    padding: 20px;
+                    background-color: #333;
+                    border-radius: 6px;
+                    border: 1px solid #444;
+                }
+
+                .registration-type-label {
+                    display: block;
+                    margin-bottom: 15px;
+                    font-weight: bold;
+                    color: #fff;
+                    font-size: 16px;
+                }
+
+                .radio-group {
+                    display: flex;
+                    gap: 30px;
+                }
+
+                .radio-label {
+                    display: flex;
+                    align-items: center;
+                    gap: 8px;
+                    cursor: pointer;
+                }
+
+                .radio-label input[type="radio"] {
+                    width: 18px;
+                    height: 18px;
+                    accent-color: #007bff;
+                }
+
+                .radio-text {
+                    color: #fff;
+                    font-size: 14px;
                 }
 
                 .product-form {
@@ -138,9 +206,72 @@
                     box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
                 }
 
+                .form-input:read-only {
+                    background-color: #555;
+                    color: #ccc;
+                    cursor: not-allowed;
+                }
+
                 .form-textarea {
                     resize: vertical;
                     min-height: 100px;
+                }
+
+                .add-variant-btn {
+                    display: flex;
+                    align-items: center;
+                    gap: 8px;
+                    padding: 12px 20px;
+                    background-color: #007bff;
+                    color: white;
+                    border: none;
+                    border-radius: 6px;
+                    cursor: pointer;
+                    font-size: 14px;
+                    transition: background-color 0.3s;
+                }
+
+                .add-variant-btn:hover {
+                    background-color: #0056b3;
+                }
+
+                .variant-group {
+                    background-color: #333;
+                    border: 1px solid #555;
+                    border-radius: 6px;
+                    padding: 20px;
+                    margin-bottom: 20px;
+                    position: relative;
+                }
+
+                .variant-header {
+                    display: flex;
+                    justify-content: space-between;
+                    align-items: center;
+                    margin-bottom: 15px;
+                    padding-bottom: 10px;
+                    border-bottom: 1px solid #555;
+                }
+
+                .variant-title {
+                    color: #fff;
+                    font-weight: bold;
+                    font-size: 16px;
+                }
+
+                .remove-variant-btn {
+                    background-color: #dc3545;
+                    color: white;
+                    border: none;
+                    border-radius: 4px;
+                    padding: 6px 12px;
+                    cursor: pointer;
+                    font-size: 12px;
+                    transition: background-color 0.3s;
+                }
+
+                .remove-variant-btn:hover {
+                    background-color: #c82333;
                 }
 
                 .form-actions {
@@ -188,9 +319,231 @@
                 .form-input[type="file"] {
                     padding: 8px;
                 }
+
+                .hidden {
+                    display: none !important;
+                }
             </style>
 
             <script>
+                let variantCount = 0;
+                
+                // 페이지 로드 시 초기화
+                document.addEventListener('DOMContentLoaded', function() {
+                    // 기본 등록 방식 설정
+                    const defaultType = document.querySelector('input[name="registrationType"]:checked').value;
+                    const hiddenField = document.getElementById('registrationTypeField');
+                    if (hiddenField) {
+                        hiddenField.value = defaultType;
+                    }
+                });
+
+                // 등록 방식 변경 이벤트
+                document.querySelectorAll('input[name="registrationType"]').forEach(radio => {
+                    radio.addEventListener('change', function() {
+                        const isMultiple = this.value === 'multiple';
+                        toggleRegistrationMode(isMultiple);
+                        
+                        // 히든 필드 업데이트
+                        const hiddenField = document.getElementById('registrationTypeField');
+                        if (hiddenField) {
+                            hiddenField.value = this.value;
+                        }
+                    });
+                });
+
+                // 폼 제출 시 처리
+                document.querySelector('.product-form').addEventListener('submit', function(e) {
+                    const registrationType = document.querySelector('input[name="registrationType"]:checked').value;
+                    
+                    if (registrationType === 'multiple') {
+                        // 여러개 등록 시 숨겨진 필드들 비활성화
+                        const amountInput = document.getElementById('amount');
+                        const detailImgInput = document.getElementById('detailImg');
+                        const detailTextarea = document.getElementById('detail');
+                        
+                        if (amountInput) amountInput.disabled = true;
+                        if (detailImgInput) detailImgInput.disabled = true;
+                        if (detailTextarea) detailTextarea.disabled = true;
+                        
+                        // 여러개 등록 시 최소 하나의 변형이 필요
+                        const variants = document.querySelectorAll('.variant-group');
+                        if (variants.length === 0) {
+                            e.preventDefault();
+                            alert('여러개 등록 시에는 최소 하나의 상품 변형을 추가해야 합니다.');
+                            return;
+                        }
+                        
+                        // 변형들의 필수 필드 검증
+                        let isValid = true;
+                        variants.forEach((variant, index) => {
+                            const nameInput = variant.querySelector('input[name^="variants"][name$=".name"]');
+                            const priceInput = variant.querySelector('input[name^="variants"][name$=".price"]');
+                            const amountInput = variant.querySelector('input[name^="variants"][name$=".amount"]');
+                            
+                            if (!nameInput.value.trim()) {
+                                alert(`상품 변형 ${index + 1}의 상세 상품명을 입력해주세요.`);
+                                isValid = false;
+                                return;
+                            }
+                            
+                            if (!priceInput.value || parseInt(priceInput.value) <= 0) {
+                                alert(`상품 변형 ${index + 1}의 가격을 입력해주세요.`);
+                                isValid = false;
+                                return;
+                            }
+                            
+                            if (!amountInput.value || parseInt(amountInput.value) < 0) {
+                                alert(`상품 변형 ${index + 1}의 재고 수량을 입력해주세요.`);
+                                isValid = false;
+                                return;
+                            }
+                        });
+                        
+                        if (!isValid) {
+                            e.preventDefault();
+                            return;
+                        }
+                    } else {
+                        // 단개 등록 시 variants 필드들 제거 (Spring 바인딩 오류 방지)
+                        const variantInputs = document.querySelectorAll('input[name^="variants"], textarea[name^="variants"]');
+                        variantInputs.forEach(input => {
+                            input.disabled = true;
+                        });
+                    }
+                });
+
+                function toggleRegistrationMode(isMultiple) {
+                    const amountGroup = document.getElementById('amountGroup');
+                    const detailImgGroup = document.getElementById('detailImgGroup');
+                    const detailGroup = document.getElementById('detailGroup');
+                    const addVariantGroup = document.getElementById('addVariantGroup');
+                    const priceInput = document.getElementById('price');
+                    const variantsContainer = document.getElementById('variantsContainer');
+                    
+                    // 필드들 가져오기
+                    const amountInput = document.getElementById('amount');
+                    const detailImgInput = document.getElementById('detailImg');
+                    const detailTextarea = document.getElementById('detail');
+
+                    if (isMultiple) {
+                        // 여러개 등록 모드
+                        amountGroup.classList.add('hidden');
+                        detailImgGroup.classList.add('hidden');
+                        detailGroup.classList.add('hidden');
+                        addVariantGroup.style.display = 'block';
+                        
+                        // 가격을 0으로 고정
+                        priceInput.value = '0';
+                        priceInput.readOnly = true;
+                        
+                        // 숨겨진 필드들의 required 속성 제거
+                        if (amountInput) amountInput.required = false;
+                        if (detailImgInput) detailImgInput.required = false;
+                        if (detailTextarea) detailTextarea.required = false;
+                        
+                        // 기존 변형들 제거
+                        variantsContainer.innerHTML = '';
+                        variantCount = 0;
+                        
+                        // 기존 variants 필드들 비활성화
+                        const existingVariantInputs = document.querySelectorAll('input[name^="variants"], textarea[name^="variants"]');
+                        existingVariantInputs.forEach(input => {
+                            input.disabled = true;
+                        });
+                    } else {
+                        // 단개 등록 모드
+                        amountGroup.classList.remove('hidden');
+                        detailImgGroup.classList.remove('hidden');
+                        detailGroup.classList.remove('hidden');
+                        addVariantGroup.style.display = 'none';
+                        
+                        // 가격 입력 가능하게
+                        priceInput.readOnly = false;
+                        
+                        // 숨겨진 필드들의 required 속성 복원
+                        if (amountInput) amountInput.required = true;
+                        if (detailImgInput) detailImgInput.required = false; // 상세 이미지는 선택사항
+                        if (detailTextarea) detailTextarea.required = false; // 상세 정보는 선택사항
+                        
+                        // 변형들 제거
+                        variantsContainer.innerHTML = '';
+                        variantCount = 0;
+                        
+                        // 기존 variants 필드들 비활성화
+                        const existingVariantInputs = document.querySelectorAll('input[name^="variants"], textarea[name^="variants"]');
+                        existingVariantInputs.forEach(input => {
+                            input.disabled = true;
+                        });
+                    }
+                }
+
+                // 상품 변형 추가 버튼
+                document.getElementById('addVariantBtn').addEventListener('click', function() {
+                    addVariantGroup();
+                });
+
+                function addVariantGroup() {
+                    variantCount++;
+                    console.log("variantCount : " + variantCount);
+                    console.log("variants[" + (variantCount-1) + "] : variants[" + (variantCount-1) + "]");
+                    const container = document.getElementById('variantsContainer');
+                    
+                    const variantGroup = document.createElement('div');
+                    variantGroup.className = 'variant-group';
+                    variantGroup.innerHTML = 
+                        '<div class="variant-header">' +
+                            '<span class="variant-title">상품 변형 ' + variantCount + '</span>' +
+                            '<button type="button" class="remove-variant-btn" onclick="removeVariant(this)">' +
+                                '<span class="material-symbols-outlined">delete</span>' +
+                            '</button>' +
+                        '</div>' +
+                        '<div class="form-group">' +
+                            '<label for="variantName' + variantCount + '">상세 상품명 *</label>' +
+                            '<input type="text" id="variantName' + variantCount + '" name="variants[' + (variantCount-1) + '].name" required class="form-input">' +
+                        '</div>' +
+                        '<div class="form-group">' +
+                            '<label for="variantPrice' + variantCount + '">가격 *</label>' +
+                            '<input type="number" id="variantPrice' + variantCount + '" name="variants[' + (variantCount-1) + '].price" required class="form-input" min="0">' +
+                        '</div>' +
+                        '<div class="form-group">' +
+                            '<label for="variantAmount' + variantCount + '">재고 수량 *</label>' +
+                            '<input type="number" id="variantAmount' + variantCount + '" name="variants[' + (variantCount-1) + '].amount" required class="form-input" min="0">' +
+                        '</div>' +
+                        '<div class="form-group">' +
+                            '<label for="variantDetailImg' + variantCount + '">상세 이미지</label>' +
+                            '<input type="file" id="variantDetailImg' + variantCount + '" name="variants[' + (variantCount-1) + '].detailImgFile" accept="image/*" class="form-input">' +
+                        '</div>' +
+                        '<div class="form-group">' +
+                            '<label for="variantDetail' + variantCount + '">상품 상세 정보</label>' +
+                            '<textarea id="variantDetail' + variantCount + '" name="variants[' + (variantCount-1) + '].detailString" rows="3" class="form-textarea" placeholder="상품 상세 정보를 JSON 형식으로 입력하세요"></textarea>' +
+                        '</div>';
+                    
+                    container.appendChild(variantGroup);
+                }
+
+                function removeVariant(button) {
+                    const variantGroup = button.closest('.variant-group');
+                    variantGroup.remove();
+                    
+                    // 번호 재정렬 및 배열 인덱스 업데이트
+                    const variantGroups = document.querySelectorAll('.variant-group');
+                    variantGroups.forEach((group, index) => {
+                        const title = group.querySelector('.variant-title');
+                        title.textContent = `상품 변형 ${index + 1}`;
+                        
+                        // 배열 인덱스 업데이트
+                        const inputs = group.querySelectorAll('input, textarea');
+                        inputs.forEach(input => {
+                            const name = input.name;
+                            if (name && name.includes('variants[')) {
+                                input.name = name.replace(/variants\[\d+\]/, `variants[${index}]`);
+                            }
+                        });
+                    });
+                    variantCount = variantGroups.length;
+                }
+
                 // 카테고리 선택 시 세부 카테고리 로드
                 document.getElementById('categoryId').addEventListener('change', function () {
                     const categoryId = parseInt(this.value);

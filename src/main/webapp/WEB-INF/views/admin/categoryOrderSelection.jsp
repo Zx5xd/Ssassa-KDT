@@ -107,7 +107,7 @@
                 
                 <div class="category-info">
                     <div class="category-name">${category.name}</div>
-                    <div class="category-code">코드: ${category.code}</div>
+                    <div class="category-code">${category.code}</div>
                 </div>
                 
                 <h2 class="admin-title">

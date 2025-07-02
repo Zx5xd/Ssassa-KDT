@@ -129,7 +129,32 @@
                             <span class="deleted-status">삭제됨</span>
                           </c:when>
                           <c:otherwise>
-                            ${product.amount}개
+                            <!-- ${product.amount}개 -->
+
+                            <c:choose>
+                              <c:when test="${product.price == 0}">
+                                <c:set var="variants"
+                                  value="${productVariantService.getVariantsForProduct(product.id)}" />
+                                <c:choose>
+                                  <c:when test="${not empty variants}">
+                                    <div class="variant-prices">
+                                      <c:forEach var="variant" items="${variants}" varStatus="status">
+                                        <div class="variant-price-item">
+                                          ${variant.amount}개
+                                        </div>
+                                      </c:forEach>
+                                    </div>
+                                  </c:when>
+                                  <c:otherwise>
+                                    <span class="no-price">[Error] 갯수 확인 불가가</span>
+                                  </c:otherwise>
+                                </c:choose>
+                              </c:when>
+                              <c:otherwise>
+                                0개
+                              </c:otherwise>
+                            </c:choose>
+
                           </c:otherwise>
                         </c:choose>
                       </td>
@@ -242,6 +267,10 @@
         </main>
 
         <style>
+          .admin-title {
+            margin-top: 15px;
+          }
+
           .product-controls {
             display: flex;
             justify-content: space-between;
@@ -253,9 +282,17 @@
           }
 
           .category-filter {
-            display: flex;
-            gap: 10px;
+            /* display: flex;
+            row-gap: 10px;
+            column-gap: 20px;
             flex-wrap: wrap;
+            width: 100%; */
+            display: grid;
+            grid-template-columns: repeat(5, 2fr);
+            /* gap: 20px; */
+            row-gap: 10px;
+            column-gap: 20px;
+            /* margin-top: 30px; */
           }
 
           .category-link {
@@ -285,6 +322,8 @@
             text-decoration: none;
             border-radius: 6px;
             transition: background-color 0.3s;
+            margin-left: auto;
+            margin-right: 50px;
           }
 
           .add-product-btn:hover {

@@ -25,6 +25,9 @@ public interface ProductService {
     // 상품 저장
     void saveProduct(ProductCreateDTO product);
 
+    // 상품 저장 (변형 포함)
+    void saveProductWithVariants(ProductCreateDTO product);
+
     // 상품 가격 조회 (variant 포함)
     int getProductPrice(int productId);
 
@@ -43,4 +46,7 @@ public interface ProductService {
     void saveProductImg(String img, int imgId);
 
     void updateProduct(int id, ProductCreateDTO editProduct, ProductDTO originalProduct);
+
+    // 상품 수정 (변형 포함)
+    void updateProductWithVariants(int id, ProductCreateDTO editProduct, ProductDTO originalProduct);
 }

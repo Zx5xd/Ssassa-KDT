@@ -13,4 +13,10 @@ public interface ProductVariantService {
 
     // 상품 ID로 Variant 목록 조회 (가격 표시용)
     List<ProductVariant> getVariantsForProduct(int productId);
+
+    // Variant 저장
+    void saveVariant(ProductVariant variant);
+
+    // Variant 삭제
+    void deleteVariant(int variantId);
 }

@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 import web.ssa.cache.ProductImgCache;
 import web.ssa.dto.products.ProductCreateDTO;
 import web.ssa.dto.products.ProductDTO;
+import web.ssa.dto.products.ProductVariantDTO;
 import web.ssa.entity.products.ProductImg;
 import web.ssa.entity.products.ProductMaster;
 import web.ssa.entity.products.ProductVariant;
@@ -207,5 +208,172 @@ public class ProductServiceImpl implements ProductService {
 
         this.repository.save(product);
 
+    }
+
+    @Override
+    public void saveProductWithVariants(ProductCreateDTO createDto) {
+        System.out.println("saveProductWithVariants : " + createDto.toString());
+
+        String simpleImg = "";
+
+        // 메인 상품 이미지 처리
+        if (createDto.getSimpleImgFileName() != null) {
+            simpleImg = createDto.getSimpleImgFileName();
+            this.saveProductImg(simpleImg, 0);
+        }
+
+        // JSON 유효성 검사
+        if (!FormatUtil.isValidJson(createDto.getDetail())) {
+            createDto.setDetail("{}");
+        }
+
+        this.productImgCache.reload();
+
+        // 메인 상품 저장
+        ProductMaster product = ConvertToEntity.toProductCreateEntity(
+                createDto,
+                this.productImgCache.getImageIdByUrl(simpleImg),
+                0); // detailImg는 0으로 설정
+
+        ProductMaster savedProduct = repository.save(product);
+
+        // 상품 변형들 저장
+        if (createDto.getVariants() != null && !createDto.getVariants().isEmpty()) {
+            for (ProductVariantDTO variantDto : createDto.getVariants()) {
+                // 변형 상세 이미지 처리
+                String detailImg = "";
+                if (variantDto.getDetailImgFileName() != null) {
+                    detailImg = variantDto.getDetailImgFileName();
+                    this.saveProductImg(detailImg, 0);
+                }
+
+                // 변형 엔티티 생성 및 저장
+                ProductVariant variant = new ProductVariant();
+                variant.setMasterId(savedProduct);
+                variant.setName(variantDto.getName());
+                variant.setPrice(variantDto.getPrice());
+                variant.setAmount(variantDto.getAmount());
+                variant.setSimpleImg(savedProduct.getSimpleImg()); // 메인 상품의 simpleImg ID 사용
+                variant.setDetailImg(this.productImgCache.getImageIdByUrl(detailImg));
+
+                // 상세 정보 JSON 처리
+                if (variantDto.getDetail() != null && !variantDto.getDetail().isEmpty()) {
+                    try {
+                        com.fasterxml.jackson.databind.ObjectMapper mapper = new com.fasterxml.jackson.databind.ObjectMapper();
+                        String detailJson = mapper.writeValueAsString(variantDto.getDetail());
+                        variant.setDetail(detailJson);
+                    } catch (Exception e) {
+                        variant.setDetail("{}");
+                        e.printStackTrace();
+                    }
+                } else {
+                    variant.setDetail("{}");
+                }
+
+                productVariantService.saveVariant(variant);
+            }
+        }
+    }
+
+    @Override
+    public void updateProductWithVariants(int id, ProductCreateDTO editProduct, ProductDTO originalProduct) {
+        System.out.println("updateProductWithVariants : " + editProduct.toString());
+
+        try {
+            // 메인 상품 이미지 처리
+            if (editProduct.getSimpleImg() != null && !editProduct.getSimpleImg().isEmpty()) {
+                String simpleImgUrl = webDAVService.uploadFile(editProduct.getSimpleImg());
+                String simpleImgFileName = simpleImgUrl.substring(simpleImgUrl.lastIndexOf("/") + 1);
+                this.saveProductImg(simpleImgFileName, originalProduct.getSimpleImg());
+            }
+
+            // JSON 유효성 검사
+            if (!FormatUtil.isValidJson(editProduct.getDetail())) {
+                editProduct.setDetail("{}");
+            }
+
+            this.productImgCache.reload();
+
+            // 메인 상품 수정
+            ProductMaster product = ConvertToEntity.toProductCreateEntity(editProduct,
+                    originalProduct.getSimpleImg(),
+                    0); // detailImg는 0으로 설정
+
+            product.setId(id);
+            ProductMaster savedProduct = this.repository.save(product);
+
+            // 기존 변형들 수정
+            if (editProduct.getVariants() != null && !editProduct.getVariants().isEmpty()) {
+                for (ProductVariantDTO variantDto : editProduct.getVariants()) {
+                    if (variantDto.getId() > 0) {
+                        // 기존 변형 수정
+                        ProductVariant existingVariant = productVariantService.getVariantById(variantDto.getId());
+                        if (existingVariant != null) {
+                            // 변형 상세 이미지 처리
+                            if (variantDto.getDetailImgFile() != null && !variantDto.getDetailImgFile().isEmpty()) {
+                                String detailImgUrl = webDAVService.uploadFile(variantDto.getDetailImgFile());
+                                String detailImgFileName = detailImgUrl.substring(detailImgUrl.lastIndexOf("/") + 1);
+                                this.saveProductImg(detailImgFileName, existingVariant.getDetailImg());
+                            }
+
+                            // 기존 변형 정보 업데이트
+                            existingVariant.setName(variantDto.getName());
+                            existingVariant.setPrice(variantDto.getPrice());
+                            existingVariant.setAmount(variantDto.getAmount());
+                            existingVariant.setSimpleImg(savedProduct.getSimpleImg());
+
+                            // 상세 정보 JSON 처리
+                            if (variantDto.getDetail() != null && !variantDto.getDetail().isEmpty()) {
+                                try {
+                                    com.fasterxml.jackson.databind.ObjectMapper mapper = new com.fasterxml.jackson.databind.ObjectMapper();
+                                    String detailJson = mapper.writeValueAsString(variantDto.getDetail());
+                                    existingVariant.setDetail(detailJson);
+                                } catch (Exception e) {
+                                    existingVariant.setDetail("{}");
+                                    e.printStackTrace();
+                                }
+                            } else {
+                                existingVariant.setDetail("{}");
+                            }
+
+                            productVariantService.saveVariant(existingVariant);
+                        }
+                    } else {
+                        // 새로운 변형 추가
+                        String detailImg = "";
+                        if (variantDto.getDetailImgFileName() != null) {
+                            detailImg = variantDto.getDetailImgFileName();
+                            this.saveProductImg(detailImg, 0);
+                        }
+
+                        ProductVariant newVariant = new ProductVariant();
+                        newVariant.setMasterId(savedProduct);
+                        newVariant.setName(variantDto.getName());
+                        newVariant.setPrice(variantDto.getPrice());
+                        newVariant.setAmount(variantDto.getAmount());
+                        newVariant.setSimpleImg(savedProduct.getSimpleImg());
+                        newVariant.setDetailImg(this.productImgCache.getImageIdByUrl(detailImg));
+
+                        if (variantDto.getDetail() != null && !variantDto.getDetail().isEmpty()) {
+                            try {
+                                com.fasterxml.jackson.databind.ObjectMapper mapper = new com.fasterxml.jackson.databind.ObjectMapper();
+                                String detailJson = mapper.writeValueAsString(variantDto.getDetail());
+                                newVariant.setDetail(detailJson);
+                            } catch (Exception e) {
+                                newVariant.setDetail("{}");
+                                e.printStackTrace();
+                            }
+                        } else {
+                            newVariant.setDetail("{}");
+                        }
+
+                        productVariantService.saveVariant(newVariant);
+                    }
+                }
+            }
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 }
