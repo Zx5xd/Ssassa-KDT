@@ -37,11 +37,14 @@ public class ProductMaster {
     @Column(columnDefinition = "json")
     private String detail;
 
-    @Column(name = "DEFAULT_VARIANT") // ✅ 컬럼 생성됨
+    @Column(name = "DEFAULT_VARIANT") // 컬럼 생성됨
     private Integer defaultVariantId;
 
     @Column
     private int amount;
+
+    @Column(name = "visit_count")
+    private int count;
 
     @Column(nullable = false)
     private Date reg;

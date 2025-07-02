@@ -1,0 +1,139 @@
+/* 전체 컨테이너 */
+.admin-container {
+    max-width: 1100px;
+    margin: 60px auto;
+    padding: 40px;
+    background-color: #1e1e1e;
+    color: white;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+}
+
+/* 제목 스타일 */
+.admin-title {
+    font-size: 24px;
+    margin-bottom: 30px;
+    border-left: 6px solid #4da6ff;
+    padding-left: 12px;
+}
+
+/* 관리자 이름 강조 */
+.admin-name {
+    font-weight: bold;
+    color: #4da6ff;
+}
+
+/* 관리자 대시보드 카드 */
+.admin-card {
+    background-color: #2a2a2a;
+    border-radius: 10px;
+    padding: 30px;
+}
+
+/* 메뉴 리스트 */
+.admin-menu {
+    list-style: none;
+    padding: 0;
+}
+
+.admin-menu li {
+    margin: 16px 0;
+}
+
+.admin-menu li a {
+    display: block;
+    padding: 14px 20px;
+    background-color: #444;
+    color: white;
+    text-decoration: none;
+    border-radius: 6px;
+    font-size: 16px;
+    transition: background-color 0.3s;
+}
+
+.admin-menu li a:hover {
+    background-color: #007bff;
+    color: #fff;
+}
+
+/* 테이블 스타일 */
+.admin-table {
+    width: 100%;
+    border-collapse: collapse;
+    background-color: #2a2a2a;
+    color: white;
+    margin-top: 30px;
+}
+
+.admin-table th,
+.admin-table td {
+    border: 1px solid #444;
+    padding: 12px;
+    text-align: center;
+}
+
+.admin-table th {
+    background-color: #333;
+    font-weight: bold;
+}
+
+.admin-table tr:nth-child(even) {
+    background-color: #3a3a3a;
+}
+
+.admin-table tr:hover {
+    background-color: #555;
+}
+
+/* 버튼 스타일 */
+.danger-btn,
+.edit-btn,
+.restore-btn {
+    padding: 6px 12px;
+    border: none;
+    border-radius: 4px;
+    color: white;
+    font-size: 13px;
+    cursor: pointer;
+}
+
+.danger-btn {
+    background-color: #e74c3c;
+}
+
+.danger-btn:hover {
+    background-color: #c0392b;
+}
+
+.edit-btn {
+    background-color: #3498db;
+    margin-left: 5px;
+}
+
+.edit-btn:hover {
+    background-color: #2980b9;
+}
+
+.restore-btn {
+    background-color: #27ae60;
+}
+
+.restore-btn:hover {
+    background-color: #1e8449;
+}
+
+/* 관리자 돌아가기 버튼 */
+.link-button {
+    display: inline-block;
+    padding: 10px 18px;
+    background-color: #4da6ff;
+    color: white;
+    text-decoration: none;
+    border-radius: 6px;
+    font-weight: bold;
+    margin-top: 40px;
+}
+
+.link-button:hover {
+    background-color: #007bff;
+}

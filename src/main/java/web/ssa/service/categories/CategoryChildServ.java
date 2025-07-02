@@ -11,4 +11,5 @@ public interface CategoryChildServ {
     List<CategoriesChild> getCategoryChild();
     List<CategoriesChild> getCategoryChild(Categories categoriesId);
     List<CategoriesChild> getCategoryChild(Categories categoriesId, String name);
+
 }
