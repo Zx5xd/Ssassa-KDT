@@ -84,159 +84,70 @@
         }
       </style>
       <script>
-        let currentCategoryId = ${ categoryId };
-        let selectedChildId = null;
-        let selectedAttributeKey = null;
-        let selectedField = null;
+        const currentCategoryId = Number('${categoryId}');
+        const isSpecialCategory = (currentCategoryId === 5 || currentCategoryId === 8 || currentCategoryId === 9);
+        let fieldsCache = [];
 
-        // 페이지 로드 시 하위 카테고리 목록 로드
         window.onload = function () {
-          loadCategoryChildren();
+          if (isSpecialCategory) {
+            document.getElementById('childId').addEventListener('change', onChildCategoryChange);
+          } else {
+            loadFields();
+          }
         };
 
-        // 하위 카테고리 목록 로드
-        async function loadCategoryChildren() {
-          try {
-            const response = await fetch(`/cat/api/categories/${currentCategoryId}/children`);
-            const children = await response.json();
+        function onChildCategoryChange() {
+          const childId = document.getElementById('childId').value;
+          if (childId) {
+            loadFields(childId);
+            updateStepIndicator(2);
+          }
+        }
 
-            const childSelect = document.getElementById('childId');
-            childSelect.innerHTML = '<option value="">하위 카테고리 선택 (선택사항)</option>';
-
-            children.forEach(child => {
-              const option = document.createElement('option');
-              option.value = child.id;
-              option.textContent = child.name;
-              childSelect.appendChild(option);
+        function loadFields(childId) {
+          let url = "/cat/fields/" + currentCategoryId;
+          if (childId) url += "?childId=" + childId;
+          fetch(url)
+            .then(res => res.json())
+            .then(fields => {
+              fieldsCache = fields;
+              const fieldSelect = document.getElementById('fieldSelect');
+              fieldSelect.innerHTML = '<option value="">필드를 선택하세요</option>';
+              fields.forEach(field => {
+                const option = document.createElement('option');
+                option.value = field.id;
+                option.textContent = field.displayName;
+                fieldSelect.appendChild(option);
+              });
+              updateStepIndicator(isSpecialCategory ? 2 : 1);
             });
+        }
 
-            updateStepIndicator(1);
-          } catch (error) {
-            console.error('하위 카테고리 로드 실패:', error);
+        function onFieldChange() {
+          const fieldId = document.getElementById('fieldSelect').value;
+          if (!fieldId) return;
+          const field = fieldsCache.find(f => String(f.id) === String(fieldId));
+          if (field) {
+            document.getElementById('displayOrder').value = field.displayOrder;
+            document.getElementById('oldOrder').value = field.displayOrder;
+
+            updateStepIndicator(isSpecialCategory ? 3 : 2);
+            document.getElementById('submitBtn').disabled = true;
+            document.getElementById('fieldId').value = fieldId;
           }
         }
 
-        // 하위 카테고리 선택 시 속성 키 목록 로드
-        async function onChildCategoryChange() {
-          const childSelect = document.getElementById('childId');
-          selectedChildId = childSelect.value || null;
-
-          // 속성 키 목록 초기화
-          const attributeSelect = document.getElementById('attributeKey');
-          attributeSelect.innerHTML = '<option value="">속성 키를 선택하세요</option>';
-
-          // 필드 테이블 초기화
-          document.getElementById('fieldsTable').style.display = 'none';
-
-          if (selectedChildId) {
-            await loadAttributeKeys();
-          }
-
-          updateStepIndicator(2);
-        }
-
-        // 속성 키 목록 로드
-        async function loadAttributeKeys() {
-          try {
-            let url = `/cat/api/categories/${currentCategoryId}/attributes`;
-            if (selectedChildId) {
-              url += `?childId=${selectedChildId}`;
+        document.addEventListener('DOMContentLoaded', function() {
+          document.getElementById('displayOrder').addEventListener('input', function() {
+            const fieldId = document.getElementById('fieldSelect').value;
+            if (fieldId && this.value) {
+              document.getElementById('submitBtn').disabled = false;
+            } else {
+              document.getElementById('submitBtn').disabled = true;
             }
-
-            const response = await fetch(url);
-            const attributes = await response.json();
-
-            const attributeSelect = document.getElementById('attributeKey');
-            attributeSelect.innerHTML = '<option value="">속성 키를 선택하세요</option>';
-
-            attributes.forEach(attr => {
-              const option = document.createElement('option');
-              option.value = attr.attributeKey;
-              option.textContent = attr.attributeKey;
-              attributeSelect.appendChild(option);
-            });
-          } catch (error) {
-            console.error('속성 키 로드 실패:', error);
-          }
-        }
-
-        // 속성 키 선택 시 필드 목록 로드
-        async function onAttributeKeyChange() {
-          const attributeSelect = document.getElementById('attributeKey');
-          selectedAttributeKey = attributeSelect.value || null;
-
-          if (selectedAttributeKey) {
-            await loadFields();
-          }
-
-          updateStepIndicator(3);
-        }
-
-        // 필드 목록 로드
-        async function loadFields() {
-          try {
-            let url = `/cat/api/categories/${currentCategoryId}/fields`;
-            const params = new URLSearchParams();
-
-            if (selectedChildId) {
-              params.append('childId', selectedChildId);
-            }
-            if (selectedAttributeKey) {
-              params.append('attributeKey', selectedAttributeKey);
-            }
-
-            if (params.toString()) {
-              url += `?${params.toString()}`;
-            }
-
-            const response = await fetch(url);
-            const fields = await response.json();
-
-            const tbody = document.getElementById('fieldsTableBody');
-            tbody.innerHTML = '';
-
-            fields.forEach(field => {
-              const row = document.createElement('tr');
-              row.className = 'field-row';
-              row.onclick = () => selectField(field);
-
-              row.innerHTML = `
-            <td>${field.id}</td>
-            <td>${field.displayName}</td>
-            <td>${field.dataType}</td>
-            <td>${field.displayOrder}</td>
-            <td>${field.tooltip || '-'}</td>
-          `;
-
-              tbody.appendChild(row);
-            });
-
-            document.getElementById('fieldsTable').style.display = 'table';
-          } catch (error) {
-            console.error('필드 로드 실패:', error);
-          }
-        }
-
-        // 필드 선택
-        function selectField(field) {
-          // 이전 선택 해제
-          document.querySelectorAll('.field-row').forEach(row => {
-            row.classList.remove('selected');
           });
+        });
 
-          // 현재 선택 표시
-          event.target.closest('.field-row').classList.add('selected');
-
-          selectedField = field;
-          document.getElementById('fieldId').value = field.id;
-          document.getElementById('displayOrder').value = field.displayOrder;
-          document.getElementById('displayOrder').disabled = false;
-          document.getElementById('submitBtn').disabled = false;
-
-          updateStepIndicator(4);
-        }
-
-        // 단계 표시 업데이트
         function updateStepIndicator(step) {
           document.querySelectorAll('.step').forEach((el, index) => {
             el.classList.remove('active', 'completed');
@@ -248,19 +159,23 @@
           });
         }
 
-        // 폼 제출
         function submitForm() {
-          if (!selectedField) {
+          const fieldId = document.getElementById('fieldSelect').value;
+          if (!fieldId) {
             alert('필드를 선택해주세요.');
             return false;
           }
-
+          const field = fieldsCache.find(f => String(f.id) === String(fieldId));
           const displayOrder = document.getElementById('displayOrder').value;
           if (!displayOrder || isNaN(displayOrder)) {
             alert('올바른 순서 번호를 입력해주세요.');
             return false;
           }
-
+          document.getElementById('categoryChildId').value = parseInt(field.categoryChildId) == 0 ? -1 : parseInt(field.categoryChildId);
+          document.getElementById('fieldId').value = parseInt(fieldId) == 0 ? -1 : parseInt(fieldId);
+          document.getElementById('categoryId').value = parseInt(currentCategoryId);
+          document.getElementById('oldOrder').value = parseInt(field.displayOrder);
+          document.getElementById('newOrder').value = parseInt(displayOrder);
           return true;
         }
       </script>
@@ -278,38 +193,51 @@
             </h2>
 
             <div class="step-indicator">
-              <div class="step active">1. 하위 카테고리 선택</div>
-              <div class="step">2. 속성 키 선택</div>
-              <div class="step">3. 필드 선택</div>
-              <div class="step">4. 순서 변경</div>
+              <c:choose>
+                <c:when test="${categoryId == 5 || categoryId == 8 || categoryId == 9}">
+                  <div class="step active">1. 하위 카테고리 선택</div>
+                  <div class="step">2. 필드 선택</div>
+                  <div class="step">3. 순서 변경</div>
+                </c:when>
+                <c:otherwise>
+                  <div class="step active">1. 필드 선택</div>
+                  <div class="step">2. 순서 변경</div>
+                </c:otherwise>
+              </c:choose>
             </div>
 
             <div class="form-card">
-              <form onsubmit="return submitForm()" action="/cat/set/displayOrder" method="post">
+              <form onsubmit="return submitForm()" action="/cat/set/displayOrder-static" method="post">
                 <input type="hidden" id="fieldId" name="fieldId" value="">
+                <input type="hidden" id="categoryId" name="categoryId" value="${categoryId}">
+                <input type="hidden" id="categoryChildId" name="categoryChildId">
+
+                <c:if test="${categoryId == 5 || categoryId == 8 || categoryId == 9}">
+                  <div class="form-group">
+                    <label for="childId">하위 카테고리</label>
+                    <select id="childId" name="childId" onchange="onChildCategoryChange()">
+                      <option value="">하위 카테고리 선택</option>
+                      <c:forEach var="child" items="${categoryChildren}">
+                        <option value="${child.id}">${child.name}</option>
+                      </c:forEach>
+                    </select>
+                  </div>
+                </c:if>
 
                 <div class="form-group">
-                  <label for="childId">하위 카테고리 (선택사항)</label>
-                  <select id="childId" name="childId" onchange="onChildCategoryChange()">
-                    <option value="">하위 카테고리 선택 (선택사항)</option>
-                  </select>
-                </div>
-
-                <div class="form-group">
-                  <label for="attributeKey">속성 키</label>
-                  <select id="attributeKey" name="attributeKey" onchange="onAttributeKeyChange()">
-                    <option value="">속성 키를 선택하세요</option>
+                  <label for="fieldSelect">필드</label>
+                  <select id="fieldSelect" name="fieldSelect" onchange="onFieldChange()">
+                    <option value="">필드를 선택하세요</option>
                   </select>
                 </div>
 
                 <div class="form-group">
                   <label for="displayOrder">표시 순서</label>
-                  <input type="number" id="displayOrder" name="displayOrder" min="1" disabled>
+                  <input type="number" id="displayOrder" name="newOrder" min="1">
+                  <input type="hidden" name="oldOrder" id="oldOrder">
                 </div>
 
-                <button type="submit" class="btn" disabled id="submitBtn">
-                  변경하기기
-                </button>
+                <button type="submit" class="btn" disabled id="submitBtn">변경하기</button>
               </form>
 
               <table id="fieldsTable" class="fields-table" style="display: none;">
@@ -322,8 +250,7 @@
                     <th>툴팁</th>
                   </tr>
                 </thead>
-                <tbody id="fieldsTableBody">
-                </tbody>
+                <tbody id="fieldsTableBody"></tbody>
               </table>
             </div>
           </div>
@@ -331,4 +258,5 @@
       </main>
     </body>
 
+    </html>
     </html>

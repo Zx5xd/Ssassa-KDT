@@ -44,32 +44,35 @@ public class CategoryServiceImpl implements CategoryService {
     @Override
     public List<CategoryFieldsDTO> getCategoryFieldsByCategoryId(int id) {
         return ConvertToDTO.categoryFieldsDTOList(
-                this.categoryFieldsRepository.findByCategoryFieldId_Id(id)
-        );
+                this.categoryFieldsRepository.findByCategoryFieldId_Id(id));
     }
 
     @Override
     public List<CategoryFieldsDTO> getCategoryFieldsByChildId(int categoryId, List<CategoriesChild> childId) {
         return ConvertToDTO.categoryFieldsDTOList(
                 this.categoryFieldsRepository.findByCategoryAndChilds(
-                        categoryId, childId
-                )
-        );
+                        categoryId, childId));
     }
 
     // Category Fields Service
     @Transactional
     public void reorderField(DisplayOrderDTO dto) {
         if (dto.getOldOrder() > dto.getNewOrder()) {
-            categoryFieldsRepository.shiftDown(dto.getCategoryId(), dto.getChildId(), dto.getNewOrder(), dto.getOldOrder());
+            categoryFieldsRepository.shiftDown(dto.getCategoryId(), dto.getChildId(), dto.getNewOrder(),
+                    dto.getOldOrder());
+            // categoryFieldsRepository.shiftDown(dto.getFieldId(), dto.getNewOrder(),
+            // dto.getOldOrder());
         } else if (dto.getOldOrder() < dto.getNewOrder()) {
-            categoryFieldsRepository.shiftUp(dto.getCategoryId(), dto.getChildId(), dto.getOldOrder(), dto.getNewOrder());
+            categoryFieldsRepository.shiftUp(dto.getCategoryId(), dto.getChildId(), dto.getOldOrder(),
+                    dto.getNewOrder());
+            // categoryFieldsRepository.shiftUp(dto.getFieldId(), dto.getNewOrder(),
+            // dto.getOldOrder());
         }
 
-        categoryFieldsRepository.updateOrder(dto.getCategoryId(), dto.getAttributeKey(), dto.getNewOrder());
+        // categoryFieldsRepository.updateOrder(dto.getCategoryId(),
+        // dto.getAttributeKey(), dto.getNewOrder());
+        categoryFieldsRepository.updateOrder(dto.getFieldId(), dto.getNewOrder());
     }
-
-
 
     @Transactional
     public void allReorder(List<Integer> fieldIds, List<Integer> newOrders) {

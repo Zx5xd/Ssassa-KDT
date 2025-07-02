@@ -1,6 +1,9 @@
 package web.ssa.service.categories;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import web.ssa.cache.CategoriesCache;
 import web.ssa.entity.categories.Categories;
 import web.ssa.entity.categories.CategoriesChild;
 import web.ssa.repository.categories.CategoryChildRepository;
@@ -12,6 +15,9 @@ public class CategoryChildServImpl implements CategoryChildServ {
 
     private CategoryChildRepository categoryChildRepository;
 
+    @Autowired
+    private CategoriesCache categoriesCache;
+
     @Override
     public List<CategoriesChild> getCategoryChild() {
         return this.categoryChildRepository.findAll();
@@ -19,7 +25,7 @@ public class CategoryChildServImpl implements CategoryChildServ {
 
     @Override
     public List<CategoriesChild> getCategoryChild(Categories id) {
-        return this.categoryChildRepository.findByCategoryChildId(id);
+        return this.categoriesCache.getCategoryChildren(id.getId());
     }
 
     @Override

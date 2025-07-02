@@ -48,32 +48,19 @@ public class CategoryController {
         return "admin/reDisplayorder";
     }
 
-    @GetMapping("displayOrder/{id}")
-    public String displayOrderById(@PathVariable("id") int id, Model model) {
-        // 카테고리 정보를 모델에 추가
-        Categories category = categoriesCache.getCachedCategories().stream()
-                .filter(cat -> cat.getId() == id)
-                .findFirst()
-                .orElse(null);
-
-        if (category != null) {
-            model.addAttribute("category", category);
-            model.addAttribute("categoryId", id);
-        }
-
+    @GetMapping("/displayOrder/{categoryId}")
+    public String displayOrder(@PathVariable("categoryId") int categoryId, Model model) {
+        List<CategoriesChild> categoryChildren = categoriesCache.getCategoryChildren(categoryId);
+        model.addAttribute("categoryId", categoryId);
+        model.addAttribute("categoryChildren", categoryChildren);
+        // 필요시 필드/attributeKey 등도 추가
         return "admin/reDisplayorder";
     }
 
     @PostMapping("set/displayOrder-static")
-    public String reorder(@RequestBody Map<String, Object> payload, Model model) {
+    public String reorder(@ModelAttribute DisplayOrderDTO orderDTO, Model model) {
         try {
-
-            DisplayOrderDTO orderDTO = new DisplayOrderDTO(
-                    Integer.parseInt(payload.get("categoryId").toString()),
-                    Integer.parseInt(payload.get("childId").toString()),
-                    payload.get("attributeKey").toString(),
-                    Integer.parseInt(payload.get("oldOrder").toString()),
-                    Integer.parseInt(payload.get("newOrder").toString()));
+            System.out.println("orderDTO : " + orderDTO);
 
             categoryService.reorderField(orderDTO);
             model.addAttribute("resultMsg", "순서 변경 완료");
@@ -114,13 +101,16 @@ public class CategoryController {
 
             child = this.categoryChildServ.getCategoryChild(category);
         }
-
+        System.out.println("id : " + id);
         List<CategoryFieldsDTO> dtoList = switch (id) {
             case 5, 8, 9 ->
                 this.categoryService.getCategoryFieldsByChildId(id,
                         child);
             default -> this.categoryService.getCategoryFieldsByCategoryId(id);
         };
+        dtoList.forEach(dto -> {
+            System.out.println("dto.getAttributeKey() : " + dto.getAttributeKey());
+        });
 
         model.addAttribute("category", categoriesCache.getCachedCategories());
         model.addAttribute("dtoList", dtoList);
@@ -161,7 +151,8 @@ public class CategoryController {
     @GetMapping("api/categories/{categoryId}/attributes")
     @ResponseBody
     public List<String> getAttributeKeys(@PathVariable("categoryId") int categoryId,
-            @RequestParam(required = false) Integer childId) {
+            @RequestParam(value = "childId", required = false) Integer childId,
+            @RequestParam(value = "fieldId", required = false) Integer fieldId) {
         List<CategoryFieldsDTO> fields;
         if (childId != null) {
             Categories category = categoriesCache.getCachedCategories().stream()
@@ -188,8 +179,7 @@ public class CategoryController {
     @GetMapping("/fields/{categoryId}")
     @ResponseBody
     public List<CategoryFieldsDTO> getCategoryFields(@PathVariable("categoryId") int categoryId,
-            @RequestParam(value = "childId", required = false) Integer childId,
-            @RequestParam("attributeKey") String attributeKey) {
+            @RequestParam(value = "childId", required = false) Integer childId) {
         List<CategoryFieldsDTO> fields;
         if (childId != null) {
             Categories category = categoriesCache.getCachedCategories().stream()
@@ -206,8 +196,6 @@ public class CategoryController {
             fields = categoryService.getCategoryFieldsByCategoryId(categoryId);
         }
 
-        return fields.stream()
-                .filter(field -> attributeKey.equals(field.getAttributeKey()))
-                .toList();
+        return fields;
     }
 }

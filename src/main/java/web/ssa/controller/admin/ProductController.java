@@ -7,19 +7,16 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import web.ssa.util.*;
 import jakarta.servlet.http.HttpSession;
 import web.ssa.cache.CategoriesCache;
 import web.ssa.cache.ProductImgCache;
 import web.ssa.dto.products.ProductCreateDTO;
 import web.ssa.dto.products.ProductDTO;
 import web.ssa.dto.products.ProductVariantDTO;
-import web.ssa.entity.categories.CategoriesChild;
 import web.ssa.entity.products.ProductMaster;
 import web.ssa.entity.products.ProductReview;
 import web.ssa.entity.products.ProductVariant;
 import web.ssa.mapper.ConvertToDTO;
-import web.ssa.service.categories.CategoryService;
 import web.ssa.service.products.ProductReviewServImpl;
 import web.ssa.service.products.ProductService;
 import web.ssa.service.products.ProductServiceImpl;
@@ -30,6 +27,7 @@ import web.ssa.service.WebDAVService;
 import java.text.SimpleDateFormat;
 import java.util.List;
 import java.io.IOException;
+import java.util.ArrayList;
 
 @Controller
 @RequestMapping("/pd")
@@ -164,14 +162,22 @@ public class ProductController {
 
                 // 상품 변형들의 상세 이미지 업로드
                 if (cp.getVariants() != null && !cp.getVariants().isEmpty()) {
+                    List<ProductVariantDTO> variants = new ArrayList<>();
                     for (ProductVariantDTO variant : cp.getVariants()) {
+                        System.out.println("[ 상품 변형들의 상세 이미지 업로드 ] variant : " + variant.toString());
                         if (variant != null && variant.getDetailImgFile() != null
                                 && !variant.getDetailImgFile().isEmpty()) {
+                            System.out.println("[ 상품 변형들의 상세 이미지 업로드 ] detailImgFile : "
+                                    + variant.getDetailImgFile().getOriginalFilename());
                             String detailImgUrl = webDAVService.uploadFile(variant.getDetailImgFile());
+                            System.out.println("[ 상품 변형들의 상세 이미지 업로드 ] detailImgUrl : " + detailImgUrl);
                             String detailImgFileName = detailImgUrl.substring(detailImgUrl.lastIndexOf("/") + 1);
+                            System.out.println("[ 상품 변형들의 상세 이미지 업로드 ] detailImgFileName : " + detailImgFileName);
                             variant.setDetailImgFileName(detailImgFileName);
                         }
+                        variants.add(variant);
                     }
+                    cp.setVariants(variants);
                 }
 
                 // 상품 저장 (변형 포함)
@@ -267,6 +273,7 @@ public class ProductController {
 
                 // 상품 변형들의 상세 이미지 업로드
                 if (cp.getVariants() != null && !cp.getVariants().isEmpty()) {
+                    List<ProductVariantDTO> variants = new ArrayList<>();
                     for (ProductVariantDTO variant : cp.getVariants()) {
                         if (variant != null) {
                             if (variant.getExistingDetailImg() != null && variant.getExistingDetailImg() != 0) {
@@ -278,8 +285,9 @@ public class ProductController {
                                 variant.setDetailImgFileName(detailImgFileName);
                             }
                         }
-
+                        variants.add(variant);
                     }
+                    cp.setVariants(variants);
                 }
 
                 // 상품 수정 (변형 포함)

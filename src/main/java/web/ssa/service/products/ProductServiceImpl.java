@@ -213,6 +213,9 @@ public class ProductServiceImpl implements ProductService {
     @Override
     public void saveProductWithVariants(ProductCreateDTO createDto) {
         System.out.println("saveProductWithVariants : " + createDto.toString());
+        createDto.getVariants().forEach(variant -> {
+            System.out.println("variant : " + variant.toString());
+        });
 
         String simpleImg = "";
 
@@ -244,8 +247,11 @@ public class ProductServiceImpl implements ProductService {
                 String detailImg = "";
                 if (variantDto.getDetailImgFileName() != null) {
                     detailImg = variantDto.getDetailImgFileName();
+                    System.out.println("detailImg : " + detailImg);
                     this.saveProductImg(detailImg, 0);
                 }
+
+                this.productImgCache.reload();
 
                 // 변형 엔티티 생성 및 저장
                 ProductVariant variant = new ProductVariant();

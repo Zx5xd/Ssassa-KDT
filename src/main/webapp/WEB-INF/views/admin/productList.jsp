@@ -282,17 +282,10 @@
           }
 
           .category-filter {
-            /* display: flex;
-            row-gap: 10px;
-            column-gap: 20px;
-            flex-wrap: wrap;
-            width: 100%; */
             display: grid;
             grid-template-columns: repeat(5, 2fr);
-            /* gap: 20px; */
             row-gap: 10px;
             column-gap: 20px;
-            /* margin-top: 30px; */
           }
 
           .category-link {
