@@ -7,6 +7,7 @@ import web.ssa.entity.products.ProductMaster;
 import org.springframework.data.domain.Page;
 
 import java.util.List;
+import java.util.Map;
 
 public interface ProductService {
     List<ProductMaster> getAllProducts(); // 엔티티 기준 통일
@@ -49,4 +50,7 @@ public interface ProductService {
 
     // 상품 수정 (변형 포함)
     void updateProductWithVariants(int id, ProductCreateDTO editProduct, ProductDTO originalProduct);
+
+    // 동적 필터 검색
+    List<ProductMaster> searchByDynamicFilter(Map<String, List<String>> filterMap);
 }

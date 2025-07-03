@@ -89,7 +89,7 @@ public class AdminController {
 
         model.addAttribute("activeUsers", activeUsers);
         model.addAttribute("deletedUsers", deletedUsers);
-        return "admin/userList"; // /WEB-INF/views/admin/userList.jsp
+        return "admin/user/userList"; // /WEB-INF/views/admin/userList.jsp
     }
 
     // 회원 수정 화면
@@ -106,7 +106,7 @@ public class AdminController {
         }
 
         model.addAttribute("user", userOpt.get());
-        return "admin/editUser";
+        return "admin/user/editUser";
     }
 
     // 회원 수정 처리 (비밀번호는 제외)
@@ -207,7 +207,7 @@ public class AdminController {
         if (!isAdmin(session))
             return "redirect:/login";
         model.addAttribute("inquiries", inquiryService.getAll());
-        return "admin/inquiryList"; // /WEB-INF/views/admin/inquiryList.jsp
+        return "admin/user/inquiryList"; // /WEB-INF/views/admin/inquiryList.jsp
     }
 
     // 카테고리 관리 메인 페이지
@@ -218,7 +218,7 @@ public class AdminController {
 
         // 카테고리 목록을 모델에 추가
         model.addAttribute("categories", categoriesCache.getCachedCategories());
-        return "admin/categoryManagement";
+        return "admin/category/categoryManagement";
     }
 
     // 카테고리별 순서 변경 페이지 선택
@@ -241,7 +241,7 @@ public class AdminController {
         }
 
         model.addAttribute("category", category);
-        return "admin/categoryOrderSelection";
+        return "admin/category/categoryOrderSelection";
     }
 
     // 세부 카테고리 조회 API

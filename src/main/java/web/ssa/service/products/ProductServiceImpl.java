@@ -20,9 +20,11 @@ import web.ssa.repository.products.ProductVariantRepository;
 import web.ssa.service.WebDAVService;
 import web.ssa.util.FileUtil;
 import web.ssa.util.FormatUtil;
+import web.ssa.repository.products.ProductRepositoryCustom;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @Service
@@ -40,6 +42,9 @@ public class ProductServiceImpl implements ProductService {
 
     @Autowired
     private WebDAVService webDAVService;
+
+    @Autowired
+    private ProductRepositoryCustom productRepositoryCustom;
 
     public ProductServiceImpl(ProductRepository repository, ProductImgRepository imgRepository) {
         this.repository = repository;
@@ -381,5 +386,10 @@ public class ProductServiceImpl implements ProductService {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    @Override
+    public List<ProductMaster> searchByDynamicFilter(Map<String, List<String>> filterMap) {
+        return productRepositoryCustom.searchByDynamicFilter(filterMap);
     }
 }

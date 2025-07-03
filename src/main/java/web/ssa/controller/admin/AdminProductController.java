@@ -32,7 +32,7 @@ import java.util.ArrayList;
 @Controller
 @RequestMapping("/pd")
 @RequiredArgsConstructor
-public class ProductController {
+public class AdminProductController {
     private final ProductService productService;
     private final ProductServiceImpl pdServImpl;
     private final ProductReviewServImpl pdReviewServImpl;
@@ -81,7 +81,7 @@ public class ProductController {
         model.addAttribute("productService", productService); // JSP에서 사용할 수 있도록 추가
 
         if (adminController.isAdmin(session)) {
-            return "admin/productList";
+            return "admin/product/productList";
         } else {
             return "shop/productList";
         }
@@ -270,7 +270,7 @@ public class ProductController {
         model.addAttribute("productImgCache", this.productImgCache);
         model.addAttribute("existingVariants", existingVariants);
 
-        return "admin/productEditForm";
+        return "admin/product/productEditForm";
     }
 
     @PostMapping("/set/product/update/{id}")

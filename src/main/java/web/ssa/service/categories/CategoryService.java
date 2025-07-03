@@ -16,11 +16,5 @@ public interface CategoryService {
 
     Categories getCategoryByName(String name);
 
-    List<CategoryFieldsDTO> getCategoryFieldsByCategoryId(int id);
 
-    List<CategoryFieldsDTO> getCategoryFieldsByChildId(int categoryId, List<CategoriesChild> childId);
-
-    CategoryFieldsDTO getCategoryFieldById(int fieldId);
-
-    void updateValueList(int fieldId, String newValueList);
 }

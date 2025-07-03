@@ -6,6 +6,7 @@ import lombok.Data;
 import web.ssa.entity.categories.CategoryFields;
 
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
@@ -23,13 +24,7 @@ public class CategoryFieldsDTO {
     private String tooltip;
     private String valueList;
     private String formattedValue; // 가공된 value / weight 형태
-
-
-
-
-
-
-
+    private Map<String, List<String>> valueListMap;
 
     @Override
     public String toString() {
@@ -46,6 +41,7 @@ public class CategoryFieldsDTO {
                 ", tooltip='" + this.tooltip + '\'' +
                 ", valueList='" + this.valueList + '\'' +
                 ", formattedValue='" + this.formattedValue + '\'' +
+                ", valueListMap=" + this.valueListMap +
                 '}';
     }
 }
