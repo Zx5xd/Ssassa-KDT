@@ -60,17 +60,10 @@ public class CategoryServiceImpl implements CategoryService {
         if (dto.getOldOrder() > dto.getNewOrder()) {
             categoryFieldsRepository.shiftDown(dto.getCategoryId(), dto.getChildId(), dto.getNewOrder(),
                     dto.getOldOrder());
-            // categoryFieldsRepository.shiftDown(dto.getFieldId(), dto.getNewOrder(),
-            // dto.getOldOrder());
         } else if (dto.getOldOrder() < dto.getNewOrder()) {
             categoryFieldsRepository.shiftUp(dto.getCategoryId(), dto.getChildId(), dto.getOldOrder(),
                     dto.getNewOrder());
-            // categoryFieldsRepository.shiftUp(dto.getFieldId(), dto.getNewOrder(),
-            // dto.getOldOrder());
         }
-
-        // categoryFieldsRepository.updateOrder(dto.getCategoryId(),
-        // dto.getAttributeKey(), dto.getNewOrder());
         categoryFieldsRepository.updateOrder(dto.getFieldId(), dto.getNewOrder());
     }
 
@@ -83,5 +76,27 @@ public class CategoryServiceImpl implements CategoryService {
         for (int i = 0; i < fieldIds.size(); i++) {
             this.categoryFieldsRepository.updateOrders(fieldIds.get(i), newOrders.get(i));
         }
+    }
+
+    @Transactional
+    public void reValueList(CategoryFieldsDTO fDto) {
+        if (fDto.getValueList().equals("{}")) {
+
+        }
+    }
+
+    @Override
+    public CategoryFieldsDTO getCategoryFieldById(int fieldId) {
+        CategoryFields field = categoryFieldsRepository.findById(fieldId).orElse(null);
+        return field != null ? ConvertToDTO.categoryFieldsDTO(field) : null;
+    }
+
+    @Override
+    @Transactional
+    public void updateValueList(int fieldId, String newValueList) {
+        CategoryFields field = categoryFieldsRepository.findById(fieldId)
+                .orElseThrow(() -> new IllegalArgumentException("필드를 찾을 수 없습니다: " + fieldId));
+        field.setValueList(newValueList);
+        categoryFieldsRepository.save(field);
     }
 }

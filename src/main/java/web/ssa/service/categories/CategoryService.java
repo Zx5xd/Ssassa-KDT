@@ -11,8 +11,16 @@ import java.util.List;
 @Service
 public interface CategoryService {
     List<Categories> getCategories();
+
     Categories getCategoryById(int id);
+
     Categories getCategoryByName(String name);
+
     List<CategoryFieldsDTO> getCategoryFieldsByCategoryId(int id);
+
     List<CategoryFieldsDTO> getCategoryFieldsByChildId(int categoryId, List<CategoriesChild> childId);
+
+    CategoryFieldsDTO getCategoryFieldById(int fieldId);
+
+    void updateValueList(int fieldId, String newValueList);
 }

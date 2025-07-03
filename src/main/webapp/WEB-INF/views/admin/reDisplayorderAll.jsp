@@ -234,7 +234,7 @@
                           </td>
                           <td>${item.tooltip}</td>
                           <td>
-                            <a href="#" class="material-symbols-outlined">edit</a>
+                            <a href="/cat/edit/valueList/${item.id}" class="material-symbols-outlined">edit</a>
                           </td>
                           <!-- <td style="padding: 8px;">
                         <c:out value="${item.formattedValue}" escapeXml="false"/>

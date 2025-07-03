@@ -24,6 +24,19 @@ public class DTOUtil {
         }
     }
 
+    public Map<String, String> stringToMap(String str) {
+        ObjectMapper objectMapper = new ObjectMapper();
+        try {
+            return objectMapper.readValue(
+                    str,
+                    new TypeReference<Map<String, String>>() {
+                    });
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
     public String mappingToString(Map<String, Map<String, String>> map) {
         ObjectMapper objectMapper = new ObjectMapper();
         try {
@@ -89,5 +102,60 @@ public class DTOUtil {
 
         tableHtml.append("</tbody></table>");
         return tableHtml.toString();
+    }
+
+    /**
+     * valueList JSON 배열을 Map으로 변환 (value를 key로, weight를 value로)
+     * 예시: [{"value": "422", "weight": 1}, {"value": "N/A", "weight": 2}]
+     * → {"422": "1", "N/A": "2"}
+     */
+    public Map<String, String> valueListToMap(String valueListJson) {
+        if (valueListJson == null || valueListJson.trim().isEmpty()) {
+            return Map.of();
+        }
+
+        try {
+            JsonNode node = objectMapper.readTree(valueListJson);
+            Map<String, String> resultMap = new java.util.HashMap<>();
+
+            if (node.isArray()) {
+                StreamSupport.stream(node.spliterator(), false)
+                        .forEach(item -> {
+                            if (item.has("value") && item.has("weight")) {
+                                String value = item.get("value").asText();
+                                String weight = item.get("weight").asText();
+                                resultMap.put(value, weight);
+                            }
+                        });
+            }
+
+            return resultMap;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return Map.of();
+        }
+    }
+
+    /**
+     * valueList JSON 배열을 weight 기준으로 정렬된 Map으로 변환
+     * 예시: [{"value": "422", "weight": 1}, {"value": "N/A", "weight": 2}]
+     * → {"422": "1", "N/A": "2"} (weight 순으로 정렬)
+     */
+    public Map<String, String> valueListToSortedMap(String valueListJson) {
+        Map<String, String> map = valueListToMap(valueListJson);
+
+        return map.entrySet().stream()
+                .sorted(Map.Entry.comparingByValue((v1, v2) -> {
+                    try {
+                        return Integer.compare(Integer.parseInt(v1), Integer.parseInt(v2));
+                    } catch (NumberFormatException e) {
+                        return v1.compareTo(v2);
+                    }
+                }))
+                .collect(java.util.stream.Collectors.toMap(
+                        Map.Entry::getKey,
+                        Map.Entry::getValue,
+                        (e1, e2) -> e1,
+                        java.util.LinkedHashMap::new));
     }
 }

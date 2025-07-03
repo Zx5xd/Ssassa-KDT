@@ -15,6 +15,7 @@ import web.ssa.entity.categories.CategoriesChild;
 import web.ssa.service.categories.CategoryChildServImpl;
 import web.ssa.service.categories.CategoryServiceImpl;
 import web.ssa.entity.member.User;
+import web.ssa.util.DTOUtil;
 
 import java.util.List;
 import java.util.Map;
@@ -31,6 +32,8 @@ public class CategoryController {
 
     @Autowired
     private final CategoriesCache categoriesCache;
+
+    private final DTOUtil dtoUtil = new DTOUtil();
 
     public CategoryController(CategoriesCache categoriesCache) {
         this.categoriesCache = categoriesCache;
@@ -197,5 +200,109 @@ public class CategoryController {
         }
 
         return fields;
+    }
+
+    @GetMapping("/test/vl")
+    public void testVl() {
+        System.out.println("---------------- testVL ----------------");
+
+        // 테스트용 valueList 데이터
+        String testValueList = "[{\"value\": \"422\", \"weight\": 1}, {\"value\": \"N/A\", \"weight\": 2}, {\"value\": \"am\", \"weight\": 3}, {\"value\": \"남양키친플라워\", \"weight\": 4}, {\"value\": \"대웅모닝컴\", \"weight\": 5}, {\"value\": \"디디오랩\", \"weight\": 6}, {\"value\": \"디바인바이오\", \"weight\": 7}, {\"value\": \"디온리\", \"weight\": 8}, {\"value\": \"레이나\", \"weight\": 9}, {\"value\": \"롯데하이마트\", \"weight\": 10}, {\"value\": \"리비에라앤바\", \"weight\": 11}, {\"value\": \"리빙코리아\", \"weight\": 12}, {\"value\": \"리하스\", \"weight\": 13}, {\"value\": \"마이디어\", \"weight\": 14}, {\"value\": \"보랄\", \"weight\": 15}, {\"value\": \"보만\", \"weight\": 16}, {\"value\": \"보토코리아\", \"weight\": 17}, {\"value\": \"샤크닌자\", \"weight\": 18}, {\"value\": \"씨엔컴퍼니\", \"weight\": 19}, {\"value\": \"아이닉\", \"weight\": 20}, {\"value\": \"오아\", \"weight\": 21}, {\"value\": \"오쿠\", \"weight\": 22}, {\"value\": \"자일렉\", \"weight\": 23}, {\"value\": \"재원전자\", \"weight\": 24}, {\"value\": \"중산물산\", \"weight\": 25}, {\"value\": \"코렐브랜드\", \"weight\": 26}, {\"value\": \"쿠첸\", \"weight\": 27}, {\"value\": \"쿠쿠전자\", \"weight\": 28}, {\"value\": \"키친아트\", \"weight\": 29}, {\"value\": \"테팔\", \"weight\": 30}, {\"value\": \"풀무원건강생활\", \"weight\": 31}, {\"value\": \"필립스\", \"weight\": 32}, {\"value\": \"한경희생활과학\", \"weight\": 33}]";
+
+        System.out.println("=== 테스트용 valueList 데이터 ===");
+        System.out.println(testValueList);
+        System.out.println();
+
+        System.out.println("=== valueListToMap 결과 ===");
+        Map<String, String> valueListMap = dtoUtil.valueListToMap(testValueList);
+        valueListMap.forEach((key, value) -> {
+            System.out.println("key: " + key + " → value: " + value);
+        });
+        System.out.println();
+
+        System.out.println("=== valueListToSortedMap 결과 (weight 순 정렬) ===");
+        Map<String, String> sortedValueListMap = dtoUtil.valueListToSortedMap(testValueList);
+        sortedValueListMap.forEach((key, value) -> {
+            System.out.println("key: " + key + " → value: " + value);
+        });
+        System.out.println();
+
+        // 기존 데이터베이스 데이터도 테스트
+        System.out.println("=== 데이터베이스 데이터 테스트 ===");
+        List<CategoryFieldsDTO> fields = this.categoryService.getCategoryFieldsByCategoryId(1);
+        for (CategoryFieldsDTO field : fields) {
+            if (field.getValueList() != null && !field.getValueList().trim().isEmpty()) {
+                System.out.println("--- " + field.getAttributeKey() + " ---");
+                Map<String, String> valueLists = dtoUtil.valueListToMap(field.getValueList());
+                valueLists.forEach((key, value) -> {
+                    System.out.println("key: " + key + " → value: " + value);
+                });
+                System.out.println();
+            }
+        }
+    }
+
+    // valueList 편집 페이지
+    @GetMapping("/edit/valueList/{fieldId}")
+    public String editValueList(@PathVariable("fieldId") int fieldId, Model model) {
+        try {
+            // 필드 정보 조회
+            CategoryFieldsDTO field = categoryService.getCategoryFieldById(fieldId);
+            if (field == null) {
+                model.addAttribute("errorMsg", "필드를 찾을 수 없습니다.");
+                return "admin/reDisplayorderAll";
+            }
+
+            // valueList를 Map으로 변환
+            Map<String, String> valueListMap = dtoUtil.valueListToMap(field.getValueList());
+
+            model.addAttribute("field", field);
+            model.addAttribute("valueListMap", valueListMap);
+
+            return "admin/valueListEdit";
+        } catch (Exception e) {
+            model.addAttribute("errorMsg", "오류가 발생했습니다: " + e.getMessage());
+            return "admin/reDisplayorderAll";
+        }
+    }
+
+    // valueList 업데이트
+    @PostMapping("/update/valueList")
+    public String updateValueList(@RequestParam("fieldId") int fieldId,
+            @RequestParam("values") List<String> values,
+            @RequestParam("weights") List<String> weights,
+            Model model) {
+        try {
+            // 입력값 검증
+            if (values.size() != weights.size()) {
+                model.addAttribute("errorMsg", "값과 가중치의 개수가 일치하지 않습니다.");
+                return "redirect:/cat/edit/valueList/" + fieldId;
+            }
+
+            // JSON 배열 생성
+            StringBuilder jsonBuilder = new StringBuilder("[");
+            for (int i = 0; i < values.size(); i++) {
+                if (i > 0)
+                    jsonBuilder.append(",");
+                jsonBuilder.append("{\"value\":\"").append(values.get(i)).append("\",\"weight\":")
+                        .append(weights.get(i)).append("}");
+            }
+            jsonBuilder.append("]");
+
+            String newValueList = jsonBuilder.toString();
+
+            // 데이터베이스 업데이트
+            categoryService.updateValueList(fieldId, newValueList);
+
+            // 필드 정보 조회하여 categoryId 가져오기
+            CategoryFieldsDTO field = categoryService.getCategoryFieldById(fieldId);
+            int categoryId = field != null ? field.getCategoryId() : 1;
+
+            model.addAttribute("resultMsg", "값 목록이 성공적으로 업데이트되었습니다.");
+            return "redirect:/cat/displayOrder-All/" + categoryId;
+        } catch (Exception e) {
+            model.addAttribute("errorMsg", "업데이트 중 오류가 발생했습니다: " + e.getMessage());
+            return "redirect:/cat/edit/valueList/" + fieldId;
+        }
     }
 }

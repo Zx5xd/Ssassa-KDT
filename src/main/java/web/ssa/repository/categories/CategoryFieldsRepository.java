@@ -12,45 +12,54 @@ import java.util.List;
 
 @Repository
 public interface CategoryFieldsRepository extends JpaRepository<CategoryFields, Integer> {
-        List<CategoryFields> findByCategoryFieldId_Id(Integer categoryId);
+    List<CategoryFields> findByCategoryFieldId_Id(Integer categoryId);
 
-        List<CategoryFields> findCategoryFieldsByDisplayName(String categoryName);
+    List<CategoryFields> findCategoryFieldsByDisplayName(String categoryName);
 
-        List<CategoryFields> findByCategoryFieldId_IdAndCategoryChildId_Id(int categoryId, int categoryChildId);
+    List<CategoryFields> findByCategoryFieldId_IdAndCategoryChildId_Id(int categoryId, int categoryChildId);
 
-        @Query("SELECT cf FROM CategoryFields cf WHERE cf.categoryFieldId.id = :categoryId AND cf.categoryChildId IN :childs")
-        List<CategoryFields> findByCategoryAndChilds(@Param("categoryId") int categoryId,
-                        @Param("childs") List<CategoriesChild> childs);
+    @Query("SELECT cf FROM CategoryFields cf WHERE cf.categoryFieldId.id = :categoryId AND cf.categoryChildId IN :childs")
+    List<CategoryFields> findByCategoryAndChilds(@Param("categoryId") int categoryId,
+                                                 @Param("childs") List<CategoriesChild> childs);
 
-        @Modifying
-        @Query(value = """
-                            UPDATE category_fields
-                            SET display_order = display_order + 1
-                            WHERE category_id = :categoryId
-                              AND (category_child_id = :childId OR (category_child_id IS NULL AND :childId IS NULL))
-                              AND display_order >= :newOrder AND display_order < :oldOrder
-                        """, nativeQuery = true)
-        void shiftDown(int categoryId, Integer childId, int newOrder, int oldOrder);
+    @Modifying
+    @Query(value = """
+                UPDATE category_fields
+                SET display_order = display_order + 1
+                WHERE category_id = :categoryId
+                  AND (category_child_id = :childId OR (category_child_id IS NULL AND :childId IS NULL))
+                  AND display_order >= :newOrder AND display_order < :oldOrder
+            """, nativeQuery = true)
+    void shiftDown(int categoryId, Integer childId, int newOrder, int oldOrder);
 
-        @Modifying
-        @Query(value = """
-                            UPDATE category_fields
-                            SET display_order = display_order - 1
-                            WHERE category_id = :categoryId
-                              AND (category_child_id = :childId OR (category_child_id IS NULL AND :childId IS NULL))
-                              AND display_order <= :newOrder AND display_order > :oldOrder
-                        """, nativeQuery = true)
-        void shiftUp(int categoryId, Integer childId, int oldOrder, int newOrder);
+    @Modifying
+    @Query(value = """
+                UPDATE category_fields
+                SET display_order = display_order - 1
+                WHERE category_id = :categoryId
+                  AND (category_child_id = :childId OR (category_child_id IS NULL AND :childId IS NULL))
+                  AND display_order <= :newOrder AND display_order > :oldOrder
+            """, nativeQuery = true)
+    void shiftUp(int categoryId, Integer childId, int oldOrder, int newOrder);
 
-        @Modifying
-        @Query(value = "UPDATE category_fields SET display_order = ?2 WHERE id = ?1", nativeQuery = true)
-        void updateOrder(Integer fieldId, int newOrder);
+    @Modifying
+    @Query(value = "UPDATE category_fields SET display_order = ?2 WHERE id = ?1", nativeQuery = true)
+    void updateOrder(Integer fieldId, int newOrder);
 
-        @Modifying
-        @Query(value = """
-                            UPDATE category_fields
-                            SET display_order = :newOrder
-                            WHERE id = :fieldId
-                        """, nativeQuery = true)
-        void updateOrders(@Param("fieldId") int fieldId, @Param("newOrder") int newOrder);
+    @Modifying
+    @Query(value = """
+                UPDATE category_fields
+                SET display_order = :newOrder
+                WHERE id = :fieldId
+            """, nativeQuery = true)
+    void updateOrders(@Param("fieldId") int fieldId, @Param("newOrder") int newOrder);
+
+
+    @Modifying
+    @Query(value = """
+            UPDATE category_fields
+            set value_list = :new_vl
+            where id = :id
+            """, nativeQuery = true)
+    void updateValueList(@Param("id") int id, @Param("new_vl") int new_vl);
 }

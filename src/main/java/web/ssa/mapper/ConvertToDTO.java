@@ -76,6 +76,27 @@ public class ConvertToDTO {
                 .collect(Collectors.toList());
     }
 
+    public static CategoryFieldsDTO categoryFieldsDTO(CategoryFields entity) {
+        CategoryFieldsDTO dto = new CategoryFieldsDTO();
+        dto.setId(entity.getId());
+        dto.setCategoryId(entity.getCategoryFieldId().getId()); // categoryFieldId는 Categories 객체
+        if (entity.getCategoryChildId() != null) {
+            dto.setCategoryChildId(entity.getCategoryChildId().getId());
+        } else {
+            dto.setCategoryChildId(0);
+        }
+        dto.setAttributeKey(entity.getAttributeKey());
+        dto.setDisplayName(entity.getDisplayName());
+        dto.setDataType(entity.getDataType());
+        dto.setIsFilterable(entity.getIsFilterable());
+        dto.setUnit(entity.getUnit());
+        dto.setDisplayOrder(entity.getDisplayOrder());
+        dto.setTooltip(entity.getTooltip());
+        dto.setValueList(entity.getValueList());
+        dto.setFormattedValue(dtoUtil.formatValueList(entity.getValueList()));
+        return dto;
+    }
+
     public static List<ProductDTO> productDTOList(List<ProductMaster> entities) {
         return entities.stream()
                 .map(entity -> {
