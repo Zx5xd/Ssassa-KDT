@@ -1,35 +1,29 @@
 <%@ page contentType="text/html;charset=UTF-8" %>
-<%@ taglib uri="jakarta.tags.core" prefix="c" %>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <html>
 <head>
-    <title>문의사항 목록</title>
-    <link rel="stylesheet" href="<c:url value='/css/style.css' />">
+    <title>문의 목록</title>
 </head>
 <body>
-
-<h2>문의사항 목록</h2>
-<a href="/inquiry/write" class="write-button">+ 문의 작성</a>
-
-<table>
-    <thead>
+<h2>문의 목록</h2>
+<a href="/inquiry/write">문의 작성</a>
+<table border="1">
     <tr>
-        <th>ID</th>
+        <th>번호</th>
         <th>제목</th>
         <th>작성자</th>
-        <th>상세보기</th>
+        <th>상태</th>
+        <th>작성일</th>
     </tr>
-    </thead>
-    <tbody>
-    <c:forEach var="inq" items="${inquiryList}">
+    <c:forEach var="inq" items="${inquiries}">
         <tr>
             <td>${inq.id}</td>
-            <td>${inq.title}</td>
+            <td><a href="/inquiry/detail/${inq.id}">${inq.title}</a></td>
             <td>${inq.username}</td>
-            <td><a class="detail-link" href="/inquiry/detail/${inq.id}">보기</a></td>
+            <td>${inq.status}</td>
+            <td>${inq.createdAt}</td>
         </tr>
     </c:forEach>
-    </tbody>
 </table>
-
 </body>
 </html>
