@@ -74,7 +74,7 @@
     <!-- 상품 상세 내용 -->
     <main>
         <div class="product-detail-container">
-            <a href="/shop/products" class="back-link">← 상품 목록으로 돌아가기</a>
+                            <a href="/pd/get/products" class="back-link">← 상품 목록으로 돌아가기</a>
             
             <div class="product-detail-card">
                 <div class="product-header">

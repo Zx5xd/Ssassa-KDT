@@ -50,6 +50,13 @@ public class ProductController {
             @RequestParam(value = "page", defaultValue = "1") int page,
             Model model,
             HttpSession session) {
+
+        // 로그인 체크
+        Object loginUser = session.getAttribute("loginUser");
+        if (loginUser == null) {
+            return "redirect:/login";
+        }
+
         int pageSize = 20;
 
         Page<ProductMaster> productPage;
@@ -71,6 +78,7 @@ public class ProductController {
         model.addAttribute("searchKeyword", search);
         model.addAttribute("formatUtil", new FormatUtil());
         model.addAttribute("productVariantService", productVariantService);
+        model.addAttribute("productService", productService); // JSP에서 사용할 수 있도록 추가
 
         if (adminController.isAdmin(session)) {
             return "admin/productList";
@@ -210,6 +218,34 @@ public class ProductController {
         }
 
         return "redirect:/pd/get/products";
+    }
+
+    // 상품 상세 페이지 (고객용)
+    @GetMapping("/get/product/{id}")
+    public String showProductDetail(@PathVariable("id") int id, Model model, HttpSession session) {
+        // 로그인 체크
+        Object loginUser = session.getAttribute("loginUser");
+        if (loginUser == null) {
+            return "redirect:/login";
+        }
+
+        ProductMaster product = productService.getProductById(id);
+        if (product == null) {
+            return "redirect:/pd/get/products";
+        }
+
+        // 카테고리 이름 가져오기
+        String categoryName = categoriesCache.getCachedCategories().stream()
+                .filter(category -> category.getId() == product.getCategoryId())
+                .findFirst()
+                .map(category -> category.getName())
+                .orElse("카테고리 정보 없음");
+
+        model.addAttribute("product", product);
+        model.addAttribute("categoryName", categoryName);
+        model.addAttribute("categoriesCache", categoriesCache);
+        model.addAttribute("productService", productService);
+        return "shop/productDetail";
     }
 
     // 상품 수정 페이지

@@ -268,6 +268,50 @@
                         margin-bottom: 20px;
                     }
 
+                    /* 페이지네이션 스타일 */
+                    .pagination-container {
+                        margin-top: 40px;
+                        text-align: center;
+                    }
+
+                    .pagination {
+                        display: inline-flex;
+                        list-style: none;
+                        padding: 0;
+                        margin: 0;
+                    }
+
+                    .page-item {
+                        margin: 0 5px;
+                    }
+
+                    .page-link {
+                        padding: 10px 15px;
+                        text-decoration: none;
+                        color: #007bff;
+                        border: 1px solid #dee2e6;
+                        border-radius: 5px;
+                        transition: all 0.3s ease;
+                    }
+
+                    .page-link:hover {
+                        background-color: #007bff;
+                        color: white;
+                        border-color: #007bff;
+                    }
+
+                    .page-item.active .page-link {
+                        background-color: #007bff;
+                        color: white;
+                        border-color: #007bff;
+                    }
+
+                    .page-item.disabled {
+                        margin: 0 5px;
+                        padding: 10px 15px;
+                        color: #6c757d;
+                    }
+
                     @media (max-width: 768px) {
                         .container {
                             padding: 15px;
@@ -304,7 +348,7 @@
                     </div>
 
                     <c:choose>
-                        <c:when test="${empty products}">
+                        <c:when test="${empty productPage.content}">
                             <div class="empty-state">
                                 <div style="font-size: 4rem; margin-bottom: 20px;">📦</div>
                                 <h3>등록된 상품이 없습니다</h3>
@@ -324,10 +368,10 @@
                                 </div>
 
                                 <div class="product-grid">
-                                    <c:forEach var="product" items="${products}" varStatus="status">
+                                    <c:forEach var="product" items="${productPage.content}" varStatus="status">
                                         <div class="product-card" data-product-id="${product.id}">
                                             <div class="product-image">
-                                                <a href="/shop/product/${product.id}" style="text-decoration: none; color: inherit;">
+                                                <a href="/pd/get/product/${product.id}" style="text-decoration: none; color: inherit;">
                                                     <img src="${productService.getProductSimpleImg(product)}" 
                                                         alt="${product.name}"
                                                         onerror="handleImageError(this)">
@@ -336,7 +380,7 @@
 
                                             <div class="product-info">
                                                 <div class="product-name">
-                                                    <a href="/shop/product/${product.id}" style="text-decoration: none; color: inherit;">
+                                                    <a href="/pd/get/product/${product.id}" style="text-decoration: none; color: inherit;">
                                                         ${product.name}
                                                     </a>
                                                 </div>
@@ -382,6 +426,88 @@
                                     </div>
                                 </div>
                             </form>
+
+                            <!-- 페이지네이션 -->
+                            <c:if test="${productPage.totalPages > 1}">
+                                <nav class="pagination-container">
+                                    <ul class="pagination">
+                                        <!-- 이전 페이지 -->
+                                        <c:if test="${productPage.hasPrevious()}">
+                                            <li class="page-item">
+                                                <a class="page-link" 
+                                                   href="?categoryId=${selectedCategoryId}&search=${searchKeyword}&page=${productPage.number}">
+                                                    &laquo; 이전
+                                                </a>
+                                            </li>
+                                        </c:if>
+
+                                        <!-- 페이지 번호 계산 -->
+                                        <c:set var="currentPage" value="${productPage.number + 1}" />
+                                        <c:set var="totalPages" value="${productPage.totalPages}" />
+
+                                        <!-- 시작 페이지 계산 -->
+                                        <c:set var="startPage" value="1" />
+                                        <c:if test="${currentPage - 4 > 1}">
+                                            <c:set var="startPage" value="${currentPage - 4}" />
+                                        </c:if>
+
+                                        <!-- 끝 페이지 계산 -->
+                                        <c:set var="endPage" value="${totalPages}" />
+                                        <c:if test="${currentPage + 5 < totalPages}">
+                                            <c:set var="endPage" value="${currentPage + 5}" />
+                                        </c:if>
+
+                                        <!-- 시작 페이지가 1보다 크면 첫 페이지 링크 추가 -->
+                                        <c:if test="${startPage > 1}">
+                                            <li class="page-item">
+                                                <a class="page-link" href="?categoryId=${selectedCategoryId}&search=${searchKeyword}&page=1">
+                                                    1
+                                                </a>
+                                            </li>
+                                            <c:if test="${startPage > 2}">
+                                                <li class="page-item disabled">
+                                                    ...
+                                                </li>
+                                            </c:if>
+                                        </c:if>
+
+                                        <!-- 페이지 번호들 -->
+                                        <c:forEach begin="${startPage}" end="${endPage}" var="i">
+                                            <li class="page-item ${i == currentPage ? 'active' : ''}">
+                                                <a class="page-link" 
+                                                   href="?categoryId=${selectedCategoryId}&search=${searchKeyword}&page=${i}">
+                                                    ${i}
+                                                </a>
+                                            </li>
+                                        </c:forEach>
+
+                                        <!-- 끝 페이지가 전체 페이지보다 작으면 마지막 페이지 링크 추가 -->
+                                        <c:if test="${endPage < totalPages}">
+                                            <c:if test="${endPage < totalPages - 1}">
+                                                <li class="page-item disabled">
+                                                    ...
+                                                </li>
+                                            </c:if>
+                                            <li class="page-item">
+                                                <a class="page-link" 
+                                                   href="?categoryId=${selectedCategoryId}&search=${searchKeyword}&page=${totalPages}">
+                                                    ${totalPages}
+                                                </a>
+                                            </li>
+                                        </c:if>
+
+                                        <!-- 다음 페이지 -->
+                                        <c:if test="${productPage.hasNext()}">
+                                            <li class="page-item">
+                                                <a class="page-link" 
+                                                   href="?categoryId=${selectedCategoryId}&search=${searchKeyword}&page=${currentPage + 1}">
+                                                    다음 &raquo;
+                                                </a>
+                                            </li>
+                                        </c:if>
+                                    </ul>
+                                </nav>
+                            </c:if>
                         </c:otherwise>
                     </c:choose>
                 </div>
