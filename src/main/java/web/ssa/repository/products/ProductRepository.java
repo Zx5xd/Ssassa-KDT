@@ -14,7 +14,12 @@ import java.util.List;
 public interface ProductRepository extends JpaRepository<ProductMaster, Integer> {
     List<ProductMaster> findByName(String name);
 
-    List<ProductMaster> findById(int id);
+//    List<ProductMaster> findById(int id);
+
+    ProductMaster findById(int id);
+
+    @Query("SELECT p.name FROM ProductMaster p WHERE p.id = :id")
+    String findNameById(@Param("id") int id);
 
     @EntityGraph(attributePaths = {"variants"})
     Page<ProductMaster> findByCategoryId(int categoryId, Pageable pageable);
@@ -28,8 +33,6 @@ public interface ProductRepository extends JpaRepository<ProductMaster, Integer>
     int updateProductNameById(@Param("id") int id, @Param("name") String name);
 
     Page<ProductMaster> findAll(Pageable pageable);
-
-    Page<ProductMaster> findByCategoryId(int categoryId, Pageable pageable);
 
     // amount가 -1이 아닌 상품만 조회 (삭제되지 않은 상품)
     Page<ProductMaster> findByAmountNot(int amount, Pageable pageable);

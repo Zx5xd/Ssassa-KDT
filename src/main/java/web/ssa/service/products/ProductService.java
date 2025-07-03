@@ -20,7 +20,8 @@ public interface ProductService {
 
     List<ProductMaster> findByName(String name);
 
-    List<ProductMaster> findById(int id);
+    ProductMaster findById(int id);
+    String findNameById(int id);
     int delete(int id);
 
     Page<ProductMaster> findByCategoryId(int categoryId, Pageable pageable);
@@ -29,9 +30,6 @@ public interface ProductService {
     Page<SimpleProductDTO> findBySimpleCategoryId(int categoryId, Pageable pageable);
 
     ProductImg findByImgId(int productImgId);
-}
-
-    void delete(int id);
 
     // 논리적 삭제: amount를 -1로 설정
     void softDeleteProduct(int productId);
@@ -57,4 +55,6 @@ public interface ProductService {
     void saveProductImg(String img, int imgId);
 
     void updateProduct(int id, ProductCreateDTO editProduct, ProductDTO originalProduct);
+
+    int uploadImg(String img);
 }

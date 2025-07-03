@@ -57,8 +57,7 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     public ProductMaster getProductById(int id) {
-        List<ProductMaster> products = this.repository.findById(id);
-        return products.isEmpty() ? null : products.get(0);
+        return this.repository.findById(id);
     }
 
     @Override
@@ -67,13 +66,18 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public List<ProductMaster> findById(int id) {
+    public ProductMaster findById(int id) {
         return this.repository.findById(id);
     }
 
     @Override
-    public void delete(int id) {
-        this.repository.deleteById(id);
+    public String findNameById(int id) {
+        return this.repository.findNameById(id);
+    }
+
+    @Override
+    public int delete(int id) {
+        return this.repository.deleteById(id);
     }
 
     @Override
@@ -146,7 +150,7 @@ public class ProductServiceImpl implements ProductService {
     @Override
     public ProductImg findByImgId(int productImgId) {
         return this.productImgRepository.findById(productImgId);
-        return repository.findByAmountNot(-1, pageable);
+//        return repository.findByAmountNot(-1, pageable);
     }
 
     public Page<ProductMaster> getPagedProductsByCategory(int categoryId, int page, int size) {
@@ -234,5 +238,16 @@ public class ProductServiceImpl implements ProductService {
 
         this.repository.save(product);
 
+    }
+
+    @Override
+    public int uploadImg(String img) {
+        ProductImg productImg = ProductImg.builder()
+                .imgPath("/images/products/sample.webp")
+                .build();
+
+        productImgRepository.save(productImg);
+
+        return productImg.getId();
     }
 }

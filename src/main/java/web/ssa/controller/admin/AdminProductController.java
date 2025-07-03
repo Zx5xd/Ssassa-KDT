@@ -18,7 +18,7 @@ import web.ssa.entity.products.ProductMaster;
 import web.ssa.entity.products.ProductReview;
 import web.ssa.mapper.ConvertToDTO;
 import web.ssa.service.categories.CategoryService;
-import web.ssa.service.products.ProductReviewServImpl;
+import web.ssa.service.products.ProductReviewServiceImpl;
 import web.ssa.service.products.ProductService;
 import web.ssa.service.products.ProductServiceImpl;
 import web.ssa.service.products.ProductVariantService;
@@ -30,12 +30,12 @@ import java.util.List;
 import java.io.IOException;
 
 @Controller
-@RequestMapping("/pd")
+@RequestMapping("/pdawww")
 @RequiredArgsConstructor
-public class ProductController {
+public class AdminProductController {
     private final ProductService productService;
     private final ProductServiceImpl pdServImpl;
-    private final ProductReviewServImpl pdReviewServImpl;
+    private final ProductReviewServiceImpl pdReviewServImpl;
     private final ProductVariantService productVariantService;
     private final CategoriesCache categoriesCache;
     private final ProductImgCache productImgCache;

@@ -21,11 +21,11 @@ public class CategoryChildServImpl implements CategoryChildServ {
 
     @Override
     public List<CategoriesChild> getCategoryChild(Categories id) {
-        return this.categoryChildRepository.findByCategory(id);
+        return this.categoryChildRepository.findByCategoryChildId(id);
     }
 
     @Override
     public List<CategoriesChild> getCategoryChild(Categories id, String name) {
-        return this.categoryChildRepository.findByCategoryAndCode(id, name);
+        return this.categoryChildRepository.findByCategoryChildIdAndCode(id, name);
     }
 }

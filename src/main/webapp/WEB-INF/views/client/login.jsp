@@ -1,5 +1,13 @@
+<%@ page import="java.nio.charset.StandardCharsets" %>
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%
+    String redirect = request.getParameter("redirect");
+    String action = "/login";
+    if (redirect != null && !redirect.isEmpty()) {
+        action += "?redirect=" + java.net.URLEncoder.encode(redirect, StandardCharsets.UTF_8);
+    }
+%>
 <!DOCTYPE html>
 <html lang="ko">
 <head>
@@ -54,7 +62,7 @@
         </div>
 
         <!--  로그인 폼 -->
-        <form id="form-box" method="post" action="/login">
+        <form id="form-box" method="post" action="<%= action %>">
             <div class="form-item">
                 <div class="form-label">이메일</div>
                 <div class="form-input">

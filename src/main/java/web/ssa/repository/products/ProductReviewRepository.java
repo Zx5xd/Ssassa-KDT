@@ -3,6 +3,7 @@ package web.ssa.repository.products;
 import jakarta.transaction.Transactional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -18,6 +19,11 @@ public interface ProductReviewRepository extends JpaRepository<ProductReview, In
 
     void deleteById(int id);
 
-    Page<ProductReview> findByProductId(int productId, Pageable pageable);
+    @EntityGraph(attributePaths = "recommendList")
+    Page<ProductReview> findByProductId(@Param("product_id") ProductMaster productId, Pageable pageable);
+
+    @EntityGraph(attributePaths = "recommendList")
+    Page<ProductReview> findByProductIdAndProductVariantId(@Param("product_id") ProductMaster productId, int productVariant_id, Pageable pageable);
+
 
 }

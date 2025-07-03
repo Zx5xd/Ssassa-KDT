@@ -82,7 +82,7 @@ nav {
     #logo{
         width: 64px;
         height: 64px;
-        background: url("./assets/logo_main.png");
+        background: url("../assets/logo_main.png");
         background-size: cover;
         cursor: pointer;
         user-select: none;

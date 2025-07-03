@@ -35,12 +35,13 @@ public class LoginController {
     // 로그인 처리
     @PostMapping("/login")
     public String login(@RequestParam("email") String email,
-            @RequestParam("password") String password,
-            @RequestParam(value = "rememberEmail", required = false) String rememberEmail,
-            HttpServletResponse response,
-            HttpServletRequest request,
-            HttpSession session,
-            Model model) {
+                        @RequestParam("password") String password,
+                        @RequestParam(value = "rememberEmail", required = false) String rememberEmail,
+                        @RequestParam(value = "redirect", required = false) String redirect, // ✅ 추가
+                        HttpServletResponse response,
+                        HttpServletRequest request,
+                        HttpSession session,
+                        Model model) {
 
         try {
             User user = memberService.login(email, password);
@@ -67,6 +68,11 @@ public class LoginController {
             rememberCookie.setMaxAge("on".equals(rememberEmail) ? 60 * 60 * 24 * 30 : 0);
             rememberCookie.setPath("/");
             response.addCookie(rememberCookie);
+
+            // ✅ redirect 파라미터가 있으면 해당 경로로 이동
+            if (redirect != null && !redirect.isBlank()) {
+                return "redirect:" + redirect;
+            }
 
             // 관리자 여부에 따라 리디렉션
             if ("ADMIN".equals(user.getRole())) {

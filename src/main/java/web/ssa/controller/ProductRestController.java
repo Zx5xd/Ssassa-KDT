@@ -41,10 +41,9 @@ public class ProductRestController {
     public ResponseEntity<byte[]> getImage(@PathVariable("id") int id) {
         ProductImg productImg = this.productService.findByImgId(id);
         if (productImg == null) {
-            return ResponseEntity.notFound().build();
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         }
         try {
-            System.out.println(productImg.getImgPath());
             String imageUrl = "https://web.hyproz.myds.me/ssa_shop/img/"+productImg.getImgPath();
             URL url = new URL(imageUrl);
             InputStream in = url.openStream();
