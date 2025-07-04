@@ -67,6 +67,10 @@ const getCurrentUser = async () => {
             reviewInput.author = userData.nickname || userData.name || '사용자';
             reviewInput.userId = userData.id || userData.email; // ID가 있으면 ID, 없으면 이메일
         }
+        // 리뷰 뷰어 컴포넌트에 현재 사용자 ID 설정 (수정/삭제 버튼 표시용)
+        if (comp) {
+            comp.currentUserId = userData.id || userData.email;
+        }
 
         console.log('현재 사용자 정보:', userData);
         return userData;
@@ -114,6 +118,9 @@ const loadReviews = async (page = 0, size = 10) => {
         if (response.status === 200) {
             const reviews = response.data;
             console.log('리뷰 목록 로드 성공:', reviews);
+
+            // 항상 최신 사용자 정보로 comp.currentUserId를 갱신
+            await getCurrentUser();
 
             // 리뷰 컴포넌트에 데이터 전달
             if (comp && reviews.content) {
@@ -187,12 +194,12 @@ const renderSpecTable = (specData) => {
     specContainer.innerHTML = html;
 };
 
-window.addEventListener("DOMContentLoaded", () => {
+window.addEventListener("DOMContentLoaded", async () => {
     // 페이지 로드 시 현재 사용자 정보 가져오기 (로그인 안되어있어도 무시)
-    getCurrentUser();
+    await getCurrentUser();
 
     // 페이지 로드 시 리뷰 목록 불러오기
-    loadReviews();
+    await loadReviews();
 
     // specData 렌더링 (전역 변수로 선언된 specData 사용)
     if (typeof specData !== 'undefined') {

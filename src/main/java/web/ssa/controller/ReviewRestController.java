@@ -38,6 +38,9 @@ public class ReviewRestController {
     @Autowired
     private ProductVariantService productVariantService;
 
+    @Autowired
+    private WebDAVService webDAVService;
+
     @GetMapping("list")
     public ResponseEntity<Page<CommentTypeDTO>> getPageReview(
             @RequestParam(value = "pid") int pid,
@@ -103,7 +106,7 @@ public class ReviewRestController {
         }
 
         List<Integer> imgId = new ArrayList<>();
-        WebDAVService webDAVService = new WebDAVService();
+
         ObjectMapper mapper = new ObjectMapper();
 
         try {
@@ -123,7 +126,8 @@ public class ReviewRestController {
                         System.out.println(convertedFile.getOriginalFilename());
                         String name = webDAVService.uploadFile(convertedFile);
                         System.out.println("WebDAV upload result: " + name);
-                        int uploadedImgId = this.productService.uploadImg(name);
+                        String[] parts = name.split("/");
+                        int uploadedImgId = this.productService.uploadImg(parts[parts.length - 1]);
                         System.out.println("Image uploaded with ID: " + uploadedImgId);
                         imgId.add(uploadedImgId);
                     } else {

@@ -243,7 +243,7 @@ public class ProductServiceImpl implements ProductService {
     @Override
     public int uploadImg(String img) {
         ProductImg productImg = ProductImg.builder()
-                .imgPath("/images/products/sample.webp")
+                .imgPath(img)
                 .build();
 
         productImgRepository.save(productImg);
