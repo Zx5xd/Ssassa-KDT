@@ -16,6 +16,8 @@ import web.ssa.mapper.ConvertToDTO;
 import web.ssa.service.KakaoPayService;
 import web.ssa.service.products.ProductService;
 import web.ssa.repository.products.ProductVariantRepository;
+import web.ssa.repository.PaymentRepository;
+import web.ssa.util.FormatUtil;
 
 import java.util.*;
 
@@ -26,6 +28,8 @@ public class PayController {
     private final KakaoPayService kakaoPayService;
     private final ProductService productService;
     private final ProductVariantRepository productVariantRepository;
+    private final PaymentRepository paymentRepository;
+    private final FormatUtil formatUtil = new FormatUtil();
 
     // 장바구니 복수 상품 결제
     @PostMapping("/cart/checkout")
@@ -134,7 +138,10 @@ public class PayController {
                 kakaoPayService.savePayment(payment);
             }
 
+            payment = kakaoPayService.getPaymentByTid(payment.getTid());
+
             model.addAttribute("payment", payment);
+            model.addAttribute("formatUtil", formatUtil);
             return "pay/paySuccess";
         } catch (Exception e) {
             model.addAttribute("error", "결제 처리 중 오류가 발생했습니다: " + e.getMessage());
@@ -149,9 +156,9 @@ public class PayController {
         return "pay/payFail";
     }
 
-    // 마이페이지에서 환불 요청
-    @PostMapping("/refund")
-    public String requestRefund(@RequestParam("paymentId") Long paymentId,
+    // 환불 요청 페이지로 이동
+    @GetMapping("/refund/request")
+    public String refundRequestPage(@RequestParam("paymentId") Long paymentId,
             HttpSession session,
             Model model) {
         Object obj = session.getAttribute("loginUser");
@@ -160,13 +167,93 @@ public class PayController {
         }
 
         try {
-            kakaoPayService.requestRefund(paymentId);
-            model.addAttribute("message", "환불 요청이 완료되었습니다.");
+            Payment payment = kakaoPayService.getPaymentById(paymentId);
+            if (payment == null) {
+                model.addAttribute("error", "결제 정보를 찾을 수 없습니다.");
+                return "redirect:/mypage";
+            }
+
+            // 본인의 결제인지 확인
+            if (!payment.getUserEmail().equals(user.getEmail())) {
+                model.addAttribute("error", "본인의 결제만 환불 요청할 수 있습니다.");
+                return "redirect:/mypage";
+            }
+
+            // 이미 환불 요청된 결제인지 확인
+            if ("REFUND_REQUEST".equals(payment.getStatus()) || "REFUNDED".equals(payment.getStatus())) {
+                model.addAttribute("error", "이미 환불 요청이 완료되었거나 환불된 결제입니다.");
+                return "redirect:/mypage";
+            }
+
+            model.addAttribute("payment", payment);
+            model.addAttribute("formatUtil", formatUtil);
+            return "pay/refundRequest";
+        } catch (Exception e) {
+            model.addAttribute("error", "결제 정보를 불러오는 중 오류가 발생했습니다.");
+            return "redirect:/mypage";
+        }
+    }
+
+    // 환불 요청 처리
+    @PostMapping("/refund/request")
+    public String requestRefund(@RequestParam("paymentId") Long paymentId,
+            @RequestParam("refundReason") String refundReason,
+            @RequestParam("refundDetail") String refundDetail,
+            @RequestParam(value = "refundAccount", required = false) String refundAccount,
+            @RequestParam(value = "agreePolicy", required = false) String agreePolicy,
+            HttpSession session,
+            Model model) {
+        Object obj = session.getAttribute("loginUser");
+        if (!(obj instanceof User user)) {
+            return "redirect:/login";
+        }
+
+        if (agreePolicy == null || !agreePolicy.equals("on")) {
+            model.addAttribute("error", "환불 정책에 동의해주세요.");
+            return "redirect:/refund/request?paymentId=" + paymentId;
+        }
+
+        try {
+            Payment payment = kakaoPayService.getPaymentById(paymentId);
+            if (payment == null) {
+                model.addAttribute("error", "결제 정보를 찾을 수 없습니다.");
+                return "redirect:/mypage";
+            }
+
+            // 본인의 결제인지 확인
+            if (!payment.getUserEmail().equals(user.getEmail())) {
+                model.addAttribute("error", "본인의 결제만 환불 요청할 수 있습니다.");
+                return "redirect:/mypage";
+            }
+
+            // 환불 요청 처리
+            payment.setStatus("REFUND_REQUEST");
+            kakaoPayService.savePayment(payment);
+
+            model.addAttribute("message", "환불 요청이 완료되었습니다. 관리자 검토 후 처리됩니다.");
         } catch (Exception e) {
             model.addAttribute("error", "환불 요청 중 오류가 발생했습니다.");
         }
 
         return "redirect:/mypage";
+    }
+
+    // 결제내역 페이지
+    @GetMapping("/payments")
+    public String showPayments(HttpSession session, Model model) {
+        Object obj = session.getAttribute("loginUser");
+        if (!(obj instanceof User user)) {
+            return "redirect:/login";
+        }
+
+        try {
+            List<Payment> payments = paymentRepository.findByUserEmail(user.getEmail());
+            model.addAttribute("payments", payments);
+        } catch (Exception e) {
+            model.addAttribute("payments", List.of());
+        }
+
+        return "client/payments";
     }
 
     // 관리자 환불 처리

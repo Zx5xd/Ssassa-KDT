@@ -14,10 +14,14 @@ public class TokenCleanupService {
 
     private final MemberRepository memberRepository;
 
-    // 1분마다 실행 (60000ms)
-    @Scheduled(fixedRate = 60000)
+    /**
+     * 1분마다 실행
+     * - DB에서 자동 로그인 토큰이 존재하는 사용자 조회
+     * - 유효하지 않은 토큰은 초기화
+     */
+    @Scheduled(fixedRate = 60000) // 60,000ms = 1분
     public void removeExpiredTokens() {
-        List<User> users = memberRepository.findAll();
+        List<User> users = memberRepository.findByLoginTokenIsNotNull();
 
         for (User user : users) {
             if (!user.isLoginTokenValid()) {

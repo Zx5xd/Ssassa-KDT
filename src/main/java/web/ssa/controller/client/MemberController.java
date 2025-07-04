@@ -1,4 +1,4 @@
-package web.ssa.controller.client;
+package web.ssa.controller;
 
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.*;
 import web.ssa.dto.member.MemberDTO;
 import web.ssa.service.member.MemberService;
 
+import java.security.SecureRandom;
 import java.time.LocalDateTime;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -46,13 +47,8 @@ public class MemberController {
 
         // 인증 코드 유효성 검사
         EmailAuth auth = emailAuthMap.get(email);
-        if (auth == null || auth.getCreatedAt().plusMinutes(5).isBefore(LocalDateTime.now())) {
-            model.addAttribute("error", "이메일 인증을 먼저 완료해주세요. (유효시간 5분)");
-            return "client/register";
-        }
-
-        if (!auth.getCode().equals(code)) {
-            model.addAttribute("error", "인증 코드가 일치하지 않습니다.");
+        if (!isValidCode(auth, code)) {
+            model.addAttribute("error", "이메일 인증을 먼저 완료하거나 인증 코드가 일치하지 않습니다. (유효시간 5분)");
             return "client/register";
         }
 
@@ -77,7 +73,8 @@ public class MemberController {
             return "이미 가입된 이메일입니다.";
         }
 
-        String code = String.valueOf((int) (Math.random() * 900000) + 100000); // 6자리 코드
+        SecureRandom random = new SecureRandom();
+        String code = String.format("%06d", random.nextInt(1000000)); // 000000 ~ 999999
 
         EmailAuth auth = new EmailAuth();
         auth.setCode(code);
@@ -88,7 +85,12 @@ public class MemberController {
         message.setTo(email);
         message.setSubject("회원가입 인증 코드");
         message.setText("인증 코드는: " + code + "\n(5분 이내에 입력해주세요)");
-        mailSender.send(message);
+
+        try {
+            mailSender.send(message);
+        } catch (Exception e) {
+            return "메일 전송에 실패했습니다. 다시 시도해주세요.";
+        }
 
         return "인증 코드가 이메일로 전송되었습니다.";
     }
@@ -97,14 +99,9 @@ public class MemberController {
     @GetMapping("/verify-code")
     @ResponseBody
     public boolean verifyCode(@RequestParam("email") String email,
-            @RequestParam("code") String code) {
-
+                              @RequestParam("code") String code) {
         EmailAuth auth = emailAuthMap.get(email);
-        if (auth == null)
-            return false;
-        if (auth.getCreatedAt().plusMinutes(5).isBefore(LocalDateTime.now()))
-            return false;
-        return code.equals(auth.getCode());
+        return isValidCode(auth, code);
     }
 
     // 닉네임 중복 확인
@@ -113,6 +110,13 @@ public class MemberController {
     public String checkNickname(@RequestParam("nickname") String nickname) {
         boolean exists = memberService.existsByUsername(nickname);
         return String.valueOf(exists); // "true" or "false"
+    }
+
+    // 이메일 인증 코드 유효성 검사 (공통 메소드)
+    private boolean isValidCode(EmailAuth auth, String code) {
+        if (auth == null) return false;
+        if (auth.getCreatedAt().plusMinutes(5).isBefore(LocalDateTime.now())) return false;
+        return auth.getCode().equals(code);
     }
 
     // 이메일 인증 정보 클래스

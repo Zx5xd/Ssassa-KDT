@@ -2,6 +2,7 @@ package web.ssa.entity.products;
 
 import jakarta.persistence.*;
 import lombok.*;
+import web.ssa.entity.member.User;
 
 @Entity
 @Table(name = "REVIEW_RECOMMEND")
@@ -15,8 +16,9 @@ public class ReviewRecommend {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
-    @Column(nullable = false)
-    private String writer;
+    @ManyToOne
+    @JoinColumn(name="writer", nullable = false)
+    private User writer;
 
     @ManyToOne
     @JoinColumn(name = "REVIEW_ID", nullable = false)

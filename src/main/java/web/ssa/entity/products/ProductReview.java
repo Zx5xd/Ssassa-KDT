@@ -2,6 +2,7 @@ package web.ssa.entity.products;
 
 import jakarta.persistence.*;
 import lombok.*;
+import web.ssa.entity.member.User;
 
 import java.util.List;
 
@@ -14,8 +15,9 @@ public class ProductReview {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
-    @Column(nullable = false)
-    private String writer;
+    @ManyToOne
+    @JoinColumn(nullable = false, name = "writer")
+    private User writer;
 
     @Column(columnDefinition = "text", nullable = false)
     private String content;

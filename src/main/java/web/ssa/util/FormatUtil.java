@@ -2,6 +2,8 @@ package web.ssa.util;
 
 import java.text.SimpleDateFormat;
 import java.text.NumberFormat;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.Date;
 import java.util.Locale;
 
@@ -33,6 +35,13 @@ public class FormatUtil {
         }
         SimpleDateFormat formatter = new SimpleDateFormat("yyyy.MM.dd HH:mm");
         return formatter.format(date);
+    }
+
+    public static Date LocalDateTimeToDate(LocalDateTime localDateTime) {
+        if (localDateTime == null) {
+            return null;
+        }
+        return Date.from(localDateTime.atZone(ZoneId.systemDefault()).toInstant());
     }
 
     /**

@@ -117,7 +117,7 @@ public class AdminProductController {
     public String newProductForm(Model model, HttpSession session) {
         model.addAttribute("category", categoriesCache.getCachedCategories());
         if (adminController.isAdmin(session)) {
-            return "admin/productForm";
+            return "admin/product/productForm";
         } else {
             return "redirect:/login";
         }

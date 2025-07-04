@@ -224,6 +224,7 @@
                           <td>${item.id}</td>
                           <input type="hidden" name="fieldId" value="${item.id}" />
                           <td>${item.categoryId}</td>
+                          <input type="hidden" name="categoryId" value="${item.categoryId}" />
                           <td>${item.categoryChildId}</td>
                           <td>${item.attributeKey}</td>
                           <td>${item.displayName}</td>

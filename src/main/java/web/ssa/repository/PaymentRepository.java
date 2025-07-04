@@ -12,4 +12,6 @@ public interface PaymentRepository extends JpaRepository<Payment, Long> {
 
     // 마이페이지 사용자 결제 내역 조회용
     List<Payment> findByUserEmail(String userEmail);
+
+    Payment findByTid(String tid);
 }

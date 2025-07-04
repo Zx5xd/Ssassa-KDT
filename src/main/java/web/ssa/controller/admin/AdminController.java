@@ -7,7 +7,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Controller;
@@ -15,6 +14,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import web.ssa.cache.CategoriesCache;
+import web.ssa.entity.Inquiry.Inquiry;
 import web.ssa.entity.categories.Categories;
 import web.ssa.entity.categories.CategoriesChild;
 import web.ssa.entity.member.User;
@@ -60,7 +60,7 @@ public class AdminController {
         if (!isAdmin(session))
             return "redirect:/login";
         model.addAttribute("refunds", kakaoPayService.getPendingRefunds());
-        model.addAttribute("inquiries", inquiryService.getAll());
+        model.addAttribute("inquiries", inquiryService.getAllInquiries());
         return "admin/adminRefunds"; // 수정 완료
     }
 
@@ -74,7 +74,7 @@ public class AdminController {
     // 문의사항 삭제
     @PostMapping("/inquiry/delete")
     public String deleteInquiry(@RequestParam("id") Long id) {
-        inquiryService.delete(id);
+        inquiryService.deleteInquiry(id);
         return "redirect:/admin/refunds";
     }
 
@@ -206,8 +206,39 @@ public class AdminController {
     public String manageInquiries(HttpSession session, Model model) {
         if (!isAdmin(session))
             return "redirect:/login";
-        model.addAttribute("inquiries", inquiryService.getAll());
+        model.addAttribute("inquiries", inquiryService.getAllInquiries());
         return "admin/user/inquiryList"; // /WEB-INF/views/admin/inquiryList.jsp
+    }
+
+    //  문의 상세 보기 (추가된 기능)
+    @GetMapping("/inquiry/detail/{id}")
+    public String adminInquiryDetail(@PathVariable Long id, HttpSession session, Model model) {
+        if (!isAdmin(session)) return "redirect:/login";
+
+        // 기존 목록 유지하면서 선택된 문의 추가
+        model.addAttribute("refunds", kakaoPayService.getPendingRefunds());
+        model.addAttribute("inquiries", inquiryService.getAllInquiries());
+        model.addAttribute("selectedInquiry", inquiryService.getInquiryById(id));
+
+        return "admin/adminRefunds"; // 같은 페이지에서 상세보기
+    }
+
+    // 답변 등록 처리 (추가된 기능)
+    @PostMapping("/inquiry/reply")
+    public String replyToInquiry(@RequestParam("id") Long id,
+                                 @RequestParam("adminComment") String adminComment,
+                                 HttpSession session) {
+        if (!isAdmin(session)) return "redirect:/login";
+
+        Inquiry inquiry = inquiryService.getInquiryById(id);
+        if (inquiry != null) {
+            inquiry.setAdminComment(adminComment);
+            inquiry.setHasReply(true);
+            inquiry.setStatus("ANSWERED");
+            inquiryService.saveInquiry(inquiry);
+        }
+
+        return "redirect:/admin/inquiry/detail/" + id;
     }
 
     // 카테고리 관리 메인 페이지

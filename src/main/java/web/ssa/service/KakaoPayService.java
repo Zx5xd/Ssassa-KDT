@@ -200,4 +200,8 @@ public class KakaoPayService {
     public List<Payment> getPaymentsByUser(String email) {
         return paymentRepository.findByUserEmail(email);
     }
+
+    public Payment getPaymentByTid(String tid) {
+        return paymentRepository.findByTid(tid);
+    }
 }

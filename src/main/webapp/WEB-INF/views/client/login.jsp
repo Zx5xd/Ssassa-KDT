@@ -54,12 +54,16 @@
         </div>
 
         <!--  로그인 폼 -->
-        <form id="form-box" method="post" action="/login">
+        <form id="form-box" method="post" action="/login" autocomplete="off">
             <div class="form-item">
                 <div class="form-label">이메일</div>
                 <div class="form-input">
-                    <input type="email" name="email" required
-                           value="${cookie.rememberEmail.value}" />
+                    <input type="email"
+                           name="email"
+                           required
+                           value="<c:out value='${cookie.rememberEmail.value}'/>"
+                           autocomplete="off"
+                           placeholder="이메일을 입력해주세요" />
                 </div>
             </div>
 

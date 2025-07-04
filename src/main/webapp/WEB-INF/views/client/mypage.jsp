@@ -87,6 +87,96 @@
       background-color: #999;
       color: white;
     }
+    
+    /* 버튼 그룹 스타일 */
+    .button-group {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 15px;
+      margin-top: 30px;
+    }
+    
+    .btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 12px 20px;
+      font-size: 14px;
+      font-weight: 500;
+      border-radius: 8px;
+      text-decoration: none;
+      border: none;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      min-height: 44px;
+    }
+    
+    .btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    }
+    
+    .btn-primary {
+      background-color: var(--brand);
+      color: white;
+    }
+    
+    .btn-primary:hover {
+      background-color: #d4a574;
+    }
+    
+    .btn-secondary {
+      background-color: #6c757d;
+      color: white;
+    }
+    
+    .btn-secondary:hover {
+      background-color: #5a6268;
+    }
+    
+    .btn-info {
+      background-color: #17a2b8;
+      color: white;
+    }
+    
+    .btn-info:hover {
+      background-color: #138496;
+    }
+    
+    .btn-warning {
+      background-color: #ffc107;
+      color: #212529;
+    }
+    
+    .btn-warning:hover {
+      background-color: #e0a800;
+    }
+    
+    .btn-danger {
+      background-color: #dc3545;
+      color: white;
+    }
+    
+    .btn-danger:hover {
+      background-color: #c82333;
+    }
+    
+    .material-symbols-outlined {
+      font-size: 18px;
+    }
+    
+    @media (max-width: 768px) {
+      .button-group {
+        grid-template-columns: 1fr;
+        gap: 12px;
+      }
+      
+      .btn {
+        font-size: 16px;
+        padding: 14px 20px;
+      }
+    }
   </style>
 </head>
 
@@ -174,15 +264,38 @@
         </c:choose>
       </p>
 
-      <form method="get" action="/mypage/edit" style="display: inline;">
-        <button type="submit" class="btn">정보 수정</button>
-      </form>
 
-      <form method="post" action="/withdraw" onsubmit="return confirm('정말 탈퇴하시겠습니까?')" style="display: inline;">
-        <button type="submit" class="btn danger">회원 탈퇴</button>
-      </form>
-
-      <a href="/logout" class="btn" style="background-color: #555;">로그아웃</a>
+      </div>
+      <div>
+              <!-- 버튼 그룹 -->
+      <div class="button-group">
+        <a href="/mypage/edit" class="btn btn-primary">
+          <span class="material-symbols-outlined">edit</span>
+          정보 수정
+        </a>
+        
+        <a href="/payments" class="btn btn-secondary">
+          <span class="material-symbols-outlined">receipt_long</span>
+          결제내역 보기
+        </a>
+        
+        <a href="/inquiry/list" class="btn btn-info">
+          <span class="material-symbols-outlined">support_agent</span>
+          문의사항
+        </a>
+        
+        <a href="/logout" class="btn btn-warning">
+          <span class="material-symbols-outlined">logout</span>
+          로그아웃
+        </a>
+        
+        <form method="post" action="/withdraw" onsubmit="return confirm('정말 탈퇴하시겠습니까?\n\n탈퇴 시 모든 데이터가 삭제되며 복구할 수 없습니다.')" style="display: inline;">
+          <button type="submit" class="btn btn-danger">
+            <span class="material-symbols-outlined">delete_forever</span>
+            회원 탈퇴
+          </button>
+        </form>
+      </div>
     </div>
   </div>
 </main>

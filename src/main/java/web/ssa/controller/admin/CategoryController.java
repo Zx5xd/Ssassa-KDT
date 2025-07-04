@@ -88,7 +88,7 @@ public class CategoryController {
             String msg = "[ 순서 변경 실패 ] " + e.getMessage();
             model.addAttribute("resultMsg", msg);
         }
-        return "admin/category/reDisplayorder";
+        return "redirect:/cat/displayOrder/" + orderDTO.getCategoryId();
     }
 
     @GetMapping("displayOrder-All")
@@ -111,27 +111,6 @@ public class CategoryController {
     @GetMapping("displayOrder-All/{id}")
     public String displayOrderAllById(Model model, @PathVariable("id") int id) {
 
-        // Categories category = new Categories();
-        // List<CategoriesChild> child = null;
-        // if (id == 5 || id == 8 || id == 9) {
-        // category = this.categoriesCache.getCachedCategories().stream()
-        // .filter(cat -> cat.getId() == id)
-        // .findFirst()
-        // .orElseThrow(() -> new IllegalArgumentException("카테고리 없음"));
-
-        // child = this.categoryChildServ.getCategoryChild(category);
-        // }
-        // System.out.println("id : " + id);
-        // List<CategoryFieldsDTO> dtoList = switch (id) {
-        // case 5, 8, 9 ->
-        // this.categoryFieldServ.getCategoryFieldsByChildId(id,
-        // child);
-        // default -> this.categoryFieldServ.getCategoryFieldsByCategoryId(id);
-        // };
-        // dtoList.forEach(dto -> {
-        // System.out.println("dto.getAttributeKey() : " + dto.getAttributeKey());
-        // });
-
         model.addAttribute("category", categoriesCache.getCachedCategories());
         model.addAttribute("dtoList", this.categoryFieldServ.getCatFieldsByCategoryId(id));
 
@@ -139,8 +118,9 @@ public class CategoryController {
     }
 
     @PostMapping("set/displayOrder-All")
-    public String allReorder(@RequestParam List<Integer> fieldId,
-            @RequestParam List<Integer> orderNum,
+    public String allReorder(@RequestParam("fieldId") List<Integer> fieldId,
+            @RequestParam("orderNum") List<Integer> orderNum,
+            @RequestParam("categoryId") int categoryId,
             Model model) {
         try {
             this.categoryFieldServ.allReorder(fieldId, orderNum);
@@ -149,7 +129,7 @@ public class CategoryController {
             String msg = "[ 순서 변경 실패 ] " + e.getMessage();
             model.addAttribute("resultMsg", msg);
         }
-        return "admin/category/reDisplayorderAll";
+        return "redirect:/cat/displayOrder-All/" + categoryId;
     }
 
     // 하위 카테고리 목록 조회 API
@@ -227,7 +207,7 @@ public class CategoryController {
             CategoryFieldsDTO field = categoryFieldServ.getCategoryFieldById(fieldId);
             if (field == null) {
                 model.addAttribute("errorMsg", "필드를 찾을 수 없습니다.");
-                return "admin/reDisplayorderAll";
+                return "redirect:/cat/displayOrder-All";
             }
 
             // valueList를 Map으로 변환
@@ -236,10 +216,10 @@ public class CategoryController {
             model.addAttribute("field", field);
             model.addAttribute("valueListMap", valueListMap);
 
-            return "admin/valueListEdit";
+            return "admin/category/valueListEdit";
         } catch (Exception e) {
             model.addAttribute("errorMsg", "오류가 발생했습니다: " + e.getMessage());
-            return "admin/category/reDisplayorderAll";
+            return "redirect:/cat/displayOrder-All";
         }
     }
 

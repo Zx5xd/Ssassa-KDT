@@ -315,8 +315,8 @@
             text-decoration: none;
             border-radius: 6px;
             transition: background-color 0.3s;
-            margin-left: auto;
-            margin-right: 50px;
+            margin-left: 48px;
+            margin-right: 30px;
           }
 
           .add-product-btn:hover {

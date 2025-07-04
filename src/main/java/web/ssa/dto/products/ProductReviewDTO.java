@@ -3,6 +3,7 @@ package web.ssa.dto.products;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.Data;
+import web.ssa.entity.member.User;
 import web.ssa.entity.products.ProductReview;
 import web.ssa.entity.products.ReviewRecommend;
 import web.ssa.util.DTOUtil;
@@ -14,7 +15,7 @@ import java.util.stream.Collectors;
 @Data
 public class ProductReviewDTO {
     private int id;
-    private String writer;
+    private User writer;
     private String content;
     private Map<String, Map<String, String>> userImgs;
     private int productId;
@@ -40,7 +41,7 @@ public class ProductReviewDTO {
     public String toString() {
         return "ProductReviewDTO{" +
                 "id=" + id +
-                ", writer='" + writer + '\'' +
+                ", writer='" + writer.getNickname() + '\'' +
                 ", content='" + content + '\'' +
                 ", userImgs=" + userImgs +
                 ", productId=" + productId +

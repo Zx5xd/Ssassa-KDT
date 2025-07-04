@@ -79,8 +79,6 @@ public class MypageController {
         user.setNickname(nickname);
         user.setPhone(phone);
 
-        System.out.println("[ MypageController ] user : " + user);
-
         if (password != null && !password.trim().isEmpty()) {
             user.setPassword(password);
         }
@@ -117,15 +115,11 @@ public class MypageController {
 
                 // 기존 이미지 삭제
                 if (user.getProfileImage() != null) {
-                    System.out.println("[ MypageController ] profildImage 삭제 시작");
                     String oldFilename = user.getProfileImage()
                             .substring(user.getProfileImage().lastIndexOf("/") + 1);
                     File oldFile = new File(UPLOAD_DIR + oldFilename);
                     Files.deleteIfExists(oldFile.toPath());
-                    System.out.println("[ MypageController ] profildImage 삭제 완료");
                 }
-
-                System.out.println("[ MypageController ] 새 이미지 저장 시작");
 
                 // 새 이미지 저장
                 String newFilename = UUID.randomUUID() + "_" + profileImage.getOriginalFilename();
