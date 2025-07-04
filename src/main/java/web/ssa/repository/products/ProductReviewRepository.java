@@ -11,6 +11,8 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import web.ssa.entity.products.ProductMaster;
 import web.ssa.entity.products.ProductReview;
+import web.ssa.entity.products.ProductVariant;
+import web.ssa.entity.member.User;
 
 @Repository
 public interface ProductReviewRepository extends JpaRepository<ProductReview, Integer> {
@@ -19,11 +21,14 @@ public interface ProductReviewRepository extends JpaRepository<ProductReview, In
 
     void deleteById(int id);
 
-    @EntityGraph(attributePaths = "recommendList")
+    @EntityGraph(attributePaths = {"writer", "recommendList"})
     Page<ProductReview> findByProductId(@Param("product_id") ProductMaster productId, Pageable pageable);
 
-    @EntityGraph(attributePaths = "recommendList")
+    @EntityGraph(attributePaths = {"writer", "recommendList"})
     Page<ProductReview> findByProductIdAndProductVariantId(@Param("product_id") ProductMaster productId, int productVariant_id, Pageable pageable);
 
-
+    // 중복 체크 메서드
+    boolean existsByWriterAndProductIdAndProductVariant(User writer, ProductMaster productId, ProductVariant productVariant);
+    
+    boolean existsByWriterAndProductIdAndProductVariantAndReviewType(User writer, ProductMaster productId, ProductVariant productVariant, int reviewType);
 }

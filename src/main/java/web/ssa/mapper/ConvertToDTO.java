@@ -146,24 +146,24 @@ public class ConvertToDTO {
                 .collect(Collectors.toList());
     }
 
-    public static List<ProductReviewDTO> productReviewDTOList(List<ProductReview> entities) {
-        return entities.stream()
-                .map(entity -> {
-                    ProductReviewDTO dto = new ProductReviewDTO();
-                    dto.setId(entity.getId());
-                    dto.setWriter(entity.getWriter());
-                    dto.setContent(entity.getContent());
-                    dto.setProductId(entity.getProductId().getId());
-                    dto.setUserImgs(dtoUtil.stringToMapping(entity.getUserImgs()));
-                    dto.setRecommendCount(entity.getRecommendCount());
-                    dto.setReviewType(entity.getReviewType());
-                    dto.setProductVariantId(entity.getProductVariant().getId());
-                    dto.setRecommendList(entity.getRecommendList());
-
-                    return dto;
-                })
-                .collect(Collectors.toList());
-    }
+//    public static List<ProductReviewDTO> productReviewDTOList(List<ProductReview> entities) {
+//        return entities.stream()
+//                .map(entity -> {
+//                    ProductReviewDTO dto = new ProductReviewDTO();
+//                    dto.setId(entity.getId());
+//                    dto.setWriter(entity.getWriter());
+//                    dto.setContent(entity.getContent());
+//                    dto.setProductId(entity.getProductId().getId());
+//                    dto.setUserImgs(dtoUtil.stringToMapping(entity.getUserImgs()));
+//                    dto.setRecommendCount(entity.getRecommendCount());
+//                    dto.setReviewType(entity.getReviewType());
+//                    dto.setProductVariantId(entity.getProductVariant().getId());
+//                    dto.setRecommendList(entity.getRecommendList());
+//
+//                    return dto;
+//                })
+//                .collect(Collectors.toList());
+//    }
 
     public static List<ProductVariantDTO> productVariantDTOList(List<ProductVariant> entities) {
         return entities.stream()

@@ -1,5 +1,6 @@
 package web.ssa.entity.member;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import lombok.Data;
 import org.hibernate.annotations.CreationTimestamp;
@@ -80,8 +81,10 @@ public class User {
     }
 
     @OneToMany(mappedBy = "writer", cascade = CascadeType.ALL)
-    private List<ProductReview> reviewer;
+    @JsonBackReference
+    private List<ProductReview> wrtier;
 
     @OneToMany(mappedBy = "writer", cascade = CascadeType.ALL)
-    private List<ReviewRecommend> recommender;
+    @JsonBackReference
+    private List<ReviewRecommend> reviewRecommendations;
 }

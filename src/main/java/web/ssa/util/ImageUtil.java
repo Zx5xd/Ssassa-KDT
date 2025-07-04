@@ -22,20 +22,38 @@ public class ImageUtil {
         }
 
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        
+        // WebP 형식으로 변환 시도
         boolean result = ImageIO.write(image, "webp", baos);
         if (!result) {
-            throw new IOException("WebP 형식으로 저장할 수 없습니다.");
+            // WebP 변환 실패 시 JPEG로 대체
+            System.out.println("WebP 변환 실패, JPEG로 대체합니다.");
+            baos.reset();
+            result = ImageIO.write(image, "jpeg", baos);
+            if (!result) {
+                throw new IOException("이미지 형식 변환에 실패했습니다.");
+            }
         }
 
-        return baos.toByteArray(); // webp 이미지 byte[]
+        return baos.toByteArray();
     }
 
-    public static MultipartFile toMultipartFile(byte[] webpBytes, String originalFilenameWithoutExt) {
+    public static MultipartFile toMultipartFile(byte[] imageBytes, String originalFilenameWithoutExt) {
+        // 파일 확장자 결정 (WebP 변환 성공 여부에 따라)
+        String extension = "webp";
+        String contentType = "image/webp";
+        
+        // JPEG로 대체된 경우 확장자 변경
+        if (imageBytes.length > 0 && imageBytes[0] == (byte) 0xFF && imageBytes[1] == (byte) 0xD8) {
+            extension = "jpg";
+            contentType = "image/jpeg";
+        }
+        
         return new ByteArrayMultipartFile(
-                webpBytes,
+                imageBytes,
                 "images",  // form field name
-                originalFilenameWithoutExt + ".webp",
-                "image/webp"
+                originalFilenameWithoutExt + "." + extension,
+                contentType
         );
     }
 }

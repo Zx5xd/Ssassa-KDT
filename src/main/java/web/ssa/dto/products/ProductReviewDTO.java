@@ -15,7 +15,7 @@ import java.util.stream.Collectors;
 @Data
 public class ProductReviewDTO {
     private int id;
-    private User writer;
+    private User writer;;
     private String content;
     private Map<String, Map<String, String>> userImgs;
     private int productId;
@@ -41,7 +41,7 @@ public class ProductReviewDTO {
     public String toString() {
         return "ProductReviewDTO{" +
                 "id=" + id +
-                ", writer='" + writer.getNickname() + '\'' +
+                ", writer='" + writer + '\'' +
                 ", content='" + content + '\'' +
                 ", userImgs=" + userImgs +
                 ", productId=" + productId +
