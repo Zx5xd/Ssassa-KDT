@@ -63,8 +63,10 @@ const getCurrentUser = async () => {
         const userData = response.data;
 
         // 리뷰 입력 컴포넌트에 사용자 정보 설정
-        reviewInput.author = userData.nickname;
-        reviewInput.userId = userData.email; // 또는 적절한 사용자 ID 필드
+        if (reviewInput) {
+            reviewInput.author = userData.nickname || userData.name || '사용자';
+            reviewInput.userId = userData.id || userData.email; // ID가 있으면 ID, 없으면 이메일
+        }
 
         console.log('현재 사용자 정보:', userData);
         return userData;
@@ -213,68 +215,111 @@ reviewInput.addEventListener('review-submitted', async (e) => {
             return;
         }
 
-        // 로그인이 되어있으면 리뷰 또는 질문 추가
-        let newId;
-        if (type === 'review') {
-            newId = comp.addReview(author, content, imageUrls, userId);
+        // URL에서 제품 ID와 변형 ID 추출
+        const urlParts = window.location.pathname.split('/');
+        const lastPart = urlParts[urlParts.length - 1] || '1';
+
+        let pid, pvid;
+        if (lastPart.includes('_')) {
+            const [pidPart, pvidPart] = lastPart.split('_');
+            pid = parseInt(pidPart) || 1;
+            pvid = parseInt(pvidPart) || -1;
         } else {
-            newId = comp.addQuestion(author, content, imageUrls, userId);
+            pid = parseInt(lastPart) || 1;
+            pvid = -1;
         }
 
-        alert('성공적으로 등록되었습니다!');
-        console.log('새로운 ' + (type === 'review' ? '리뷰' : '질문') + ' 등록:', { newId, content, imageUrls });
+        // FormData 생성
+        const formData = new FormData();
+        formData.append('type', type);
+        formData.append('content', content);
+        formData.append('pid', pid);
+        formData.append('pvid', pvid);
+
+        // 이미지 파일 추가
+        if (imageUrls && imageUrls.length > 0) {
+            const files = await convertImagesToFiles(imageUrls);
+            if (files.length > 0) {
+                files.forEach((file, index) => {
+                    formData.append('images', file);
+                });
+            } else {
+                console.warn('유효한 이미지 파일이 없습니다.');
+            }
+        }
+
+        // 서버에 리뷰 제출
+        const response = await axios.post('/review/submit', formData, {
+            headers: {
+                'Content-Type': 'multipart/form-data'
+            }
+        });
+
+        if (response.status === 200) {
+            alert('성공적으로 등록되었습니다!');
+            console.log('리뷰 등록 성공:', response.data);
+            
+            // 리뷰 목록 새로고침
+            await loadReviews();
+        }
     } catch (error) {
         console.error('리뷰 제출 중 오류 발생:', error);
-        alert('리뷰 등록 중 오류가 발생했습니다.');
+        if (error.response && error.response.status === 401) {
+            alert('로그인이 필요합니다.');
+            const currentUrl = encodeURIComponent(window.location.href);
+            window.location.href = `/login?redirect=${currentUrl}`;
+        } else {
+            alert('리뷰 등록 중 오류가 발생했습니다.');
+        }
     }
 });
 
-// 초기 댓글 데이터 (변수로 분리하여 수정 가능하게 함)
-let commentsData = [
-    {
-        id: 1,
-        author: '홍길동',
-        content: '이 제품 너무 좋아요!',
-        type: 'review',
-        createdAt: '2024-01-15T10:30:00Z',
-        images: [],
-        replies: []
-    },
-    {
-        id: 2,
-        author: '이몽룡',
-        content: '이거 호환되나요? mawkldml awdawdawdawdawwadwadwadwadwadawdawdwadawdwadawdwadawdawawmdlkm awlkmd alwkwmalkmwa dmalkwmd dla',
-        type: 'question',
-        createdAt: '2024-01-14T15:45:00Z',
-        images: [],
-        replies: [
-            {
-                id: 3,
-                author: '성춘향',
-                content: '네 호환 잘 됩니다.',
-                type: 'answer',
-                createdAt: '2024-01-14T16:20:00Z',
-                images: [],
-                replies: []
-            }
-        ]
-    }
-];
+// 초기 댓글 데이터 (서버에서 로드하므로 제거)
+// let commentsData = [
+//     {
+//         id: 1,
+//         author: '홍길동',
+//         content: '이 제품 너무 좋아요!',
+//         type: 'review',
+//         createdAt: '2024-01-15T10:30:00Z',
+//         images: [],
+//         replies: []
+//     },
+//     {
+//         id: 2,
+//         author: '이몽룡',
+//         content: '이거 호환되나요? mawkldml awdawdawdawdawwadwadwadwadwadawdawdwadawdwadawdwadawdawawmdlkm awlkmd alwkwmalkmwa dmalkwmd dla',
+//         type: 'question',
+//         createdAt: '2024-01-14T15:45:00Z',
+//         images: [],
+//         replies: [
+//             {
+//                 id: 3,
+//                 author: '성춘향',
+//                 content: '네 호환 잘 됩니다.',
+//                 type: 'answer',
+//                 createdAt: '2024-01-14T16:20:00Z',
+//                 images: [],
+//                 replies: []
+//             }
+//         ]
+//     }
+// ];
 
-// 댓글 데이터를 컴포넌트에 설정
-comp.comments = commentsData;
-comp.currentUserId = 1;
+// 댓글 데이터를 컴포넌트에 설정 (서버에서 로드하므로 제거)
+// comp.comments = commentsData;
+// comp.currentUserId = 1;
 
 comp.addEventListener('request-reply-open', async e => {
     const { commentId } = e.detail;
 
     try {
         // 서버에 로그인 상태 확인 요청
-        const response = await axios.get('/api/auth/check-login', {
+        const response = await axios.get('/api/me', {
             withCredentials: true // 쿠키 포함
         });
 
-        if (response.data.isLoggedIn) {
+        if (response.data) {
             comp.allowReply(commentId);
         } else {
             if (confirm('로그인이 필요합니다. 로그인 페이지로 이동하시겠습니까?')) {
@@ -283,7 +328,9 @@ comp.addEventListener('request-reply-open', async e => {
         }
     } catch (error) {
         console.error('로그인 상태 확인 중 오류:', error);
-        alert('로그인 상태를 확인할 수 없습니다. 다시 시도해주세요.');
+        if (confirm('로그인이 필요합니다. 로그인 페이지로 이동하시겠습니까?')) {
+            window.location.href = '/login';
+        }
     }
 });
 
@@ -292,49 +339,107 @@ comp.addEventListener('request-reply-close', e => {
     comp.closeReply(commentId);
 });
 
-comp.addEventListener('reply-submitted', e => {
+comp.addEventListener('reply-submitted', async (e) => {
     const { commentId, content, images } = e.detail;
 
-    // 새로운 답글 ID 생성 (실제로는 서버에서 생성)
-    const newReplyId = Date.now();
+    try {
+        // 로그인 상태 확인
+        const userData = await getCurrentUser();
+        if (!userData) {
+            alert('답변을 작성하려면 로그인이 필요합니다.');
+            const currentUrl = encodeURIComponent(window.location.href);
+            window.location.href = `/login?redirect=${currentUrl}`;
+            return;
+        }
 
-    // 이미지 URL 배열 생성 (실제로는 서버에 업로드 후 URL을 받아와야 함)
-    const imageUrls = images.map((file, index) => {
-        // 실제로는 서버에 업로드하고 URL을 받아와야 함
-        // 여기서는 임시로 File URL을 사용
-        return URL.createObjectURL(file);
-    });
+        // URL에서 제품 ID와 변형 ID 추출
+        const urlParts = window.location.pathname.split('/');
+        const lastPart = urlParts[urlParts.length - 1] || '1';
 
-    // 답글 데이터 생성
-    const newReply = {
-        id: newReplyId,
-        author: '현재 사용자', // 실제로는 로그인된 사용자 정보
-        userId: comp.currentUserId,
-        content: content,
-        type: 'answer',
-        createdAt: new Date().toISOString(),
-        images: imageUrls,
-        replies: []
-    };
+        let pid, pvid;
+        if (lastPart.includes('_')) {
+            const [pidPart, pvidPart] = lastPart.split('_');
+            pid = parseInt(pidPart) || 1;
+            pvid = parseInt(pvidPart) || -1;
+        } else {
+            pid = parseInt(lastPart) || 1;
+            pvid = -1;
+        }
 
-    // 해당 댓글에 답글 추가
-    const commentIndex = comp.comments.findIndex(comment => comment.id === commentId);
-    if (commentIndex !== -1) {
-        comp.comments[commentIndex].replies.push(newReply);
+        // FormData 생성 (답변용)
+        const formData = new FormData();
+        formData.append('type', 'answer');
+        formData.append('content', content);
+        formData.append('pid', pid);
+        formData.append('pvid', pvid);
+        formData.append('parentReviewId', commentId); // 부모 리뷰 ID 추가
 
-        // 컴포넌트 데이터 업데이트 (새로운 배열로 설정하여 리렌더링 트리거)
-        comp.comments = [...comp.comments];
+        // 이미지 파일 추가
+        if (images && images.length > 0) {
+            const files = await convertImagesToFiles(images);
+            if (files.length > 0) {
+                files.forEach((file, index) => {
+                    formData.append('images', file);
+                });
+            } else {
+                console.warn('유효한 이미지 파일이 없습니다.');
+            }
+        }
 
-        // 성공 메시지
-        alert('답글이 성공적으로 등록되었습니다!');
-        console.log('답글 등록 완료:', {
-            commentId,
-            content,
-            images,
-            newReply
+        // 서버에 답변 제출
+        const response = await axios.post('/review/submit', formData, {
+            headers: {
+                'Content-Type': 'multipart/form-data'
+            }
         });
-    } else {
-        alert('댓글을 찾을 수 없습니다.');
-        console.error('댓글을 찾을 수 없음:', { commentId, comments: comp.comments });
+
+        if (response.status === 200) {
+            alert('답글이 성공적으로 등록되었습니다!');
+            console.log('답변 등록 성공:', response.data);
+            
+            // 리뷰 목록 새로고침
+            await loadReviews();
+        }
+    } catch (error) {
+        console.error('답변 제출 중 오류 발생:', error);
+        if (error.response && error.response.status === 401) {
+            alert('로그인이 필요합니다.');
+            const currentUrl = encodeURIComponent(window.location.href);
+            window.location.href = `/login?redirect=${currentUrl}`;
+        } else {
+            alert('답변 등록 중 오류가 발생했습니다.');
+        }
     }
 });
+
+// blob URL을 File 객체로 변환하는 함수
+const blobUrlToFile = async (blobUrl) => {
+    try {
+        const response = await fetch(blobUrl);
+        const blob = await response.blob();
+        return new File([blob], 'image.jpg', { type: blob.type || 'image/jpeg' });
+    } catch (error) {
+        console.error('blob URL을 File로 변환 중 오류:', error);
+        return null;
+    }
+};
+
+// 이미지 배열을 File 객체 배열로 변환하는 함수
+const convertImagesToFiles = async (imageUrls) => {
+    if (!imageUrls || imageUrls.length === 0) {
+        return [];
+    }
+    
+    const files = [];
+    for (const imageUrl of imageUrls) {
+        if (imageUrl instanceof File) {
+            files.push(imageUrl);
+        } else if (typeof imageUrl === 'string' && imageUrl.startsWith('blob:')) {
+            const file = await blobUrlToFile(imageUrl);
+            if (file) {
+                files.push(file);
+            }
+        }
+    }
+    return files;
+};

@@ -48,6 +48,7 @@ public class WebDAVService {
         // WebDAV URL 생성
         // String webdavFileUrl = webdavUrl + "/" + uploadFolder + "/" + newFileName;
         String webdavFileUrl = webdavUrl + "/" + uploadFolder + "/" + newFileName;
+        System.out.println("Uploading to WebDAV: " + webdavFileUrl);
 
         // HTTP 헤더 설정
         HttpHeaders headers = new HttpHeaders();

@@ -3,6 +3,9 @@ package web.ssa.entity.products;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Entity
 @Table(name = "PRODUCT_VARIANT")
 @Getter
@@ -33,4 +36,7 @@ public class ProductVariant {
 
     @Column
     private int amount;
+
+    @OneToMany(mappedBy = "productVariant", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<ProductReview> reviews = new ArrayList<>();
 }

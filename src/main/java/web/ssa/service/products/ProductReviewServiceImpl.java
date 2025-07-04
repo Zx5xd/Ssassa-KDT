@@ -7,8 +7,12 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import web.ssa.entity.products.ProductMaster;
 import web.ssa.entity.products.ProductReview;
+import web.ssa.entity.products.ReviewRecommend;
+import web.ssa.entity.products.ProductVariant;
+import web.ssa.entity.member.User;
 import web.ssa.repository.products.ProductRepository;
 import web.ssa.repository.products.ProductReviewRepository;
+import web.ssa.repository.products.ReviewRecommendRepository;
 
 import java.util.List;
 
@@ -19,6 +23,8 @@ public class ProductReviewServiceImpl implements ProductReviewService {
     private ProductRepository productRepository;
     @Autowired
     private ProductReviewRepository productReviewRepository;
+    @Autowired
+    private ReviewRecommendRepository reviewRecommendRepository;
 
     @Override
     public List<ProductReview> getProductReviews() {
@@ -31,10 +37,15 @@ public class ProductReviewServiceImpl implements ProductReviewService {
     }
 
     @Override
+    public ProductReview getProductReviewById(int id) {
+        return this.productReviewRepository.findById(id).orElse(null);
+    }
+
+    @Override
     public Page<ProductReview> getPageReviews(int pid, int pvid, Pageable pageRequest) {
         ProductMaster productMaster = this.productRepository.findById(pid);
         if (pvid != -1) {
-            return this.productReviewRepository.findByProductIdAndProductVariantId(productMaster,  pvid, pageRequest);
+            return this.productReviewRepository.findByProductIdAndProductVariantId(productMaster, pvid, pageRequest);
         }
         return this.productReviewRepository.findByProductId(productMaster, pageRequest);
     }
@@ -63,5 +74,22 @@ public class ProductReviewServiceImpl implements ProductReviewService {
         Pageable pageable = PageRequest.of(page, size);
         ProductMaster product = this.productRepository.findById(productId);
         return productReviewRepository.findByProductId(product, pageable);
+    }
+
+    @Override
+    public boolean saveReviewRecommend(ReviewRecommend reviewRecommend) {
+        ReviewRecommend saved = this.reviewRecommendRepository.save(reviewRecommend);
+        boolean exists = this.reviewRecommendRepository.existsById(saved.getId());
+        return exists;
+    }
+
+    @Override
+    public boolean existsByWriterAndProductIdAndProductVariant(User writer, ProductMaster productId, ProductVariant productVariant) {
+        return this.productReviewRepository.existsByWriterAndProductIdAndProductVariant(writer, productId, productVariant);
+    }
+
+    @Override
+    public boolean existsByWriterAndProductIdAndProductVariantAndReviewType(User writer, ProductMaster productId, ProductVariant productVariant, int reviewType) {
+        return this.productReviewRepository.existsByWriterAndProductIdAndProductVariantAndReviewType(writer, productId, productVariant, reviewType);
     }
 }
