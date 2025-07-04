@@ -92,7 +92,7 @@ public class CommentTypeDTO {
             List<Integer> imageIds = objectMapper.readValue(userImgs, new TypeReference<List<Integer>>() {});
             // 실제로는 이미지 ID를 URL로 변환해야 함
             return imageIds.stream()
-                    .map(id -> "http://localhost:8080/pdr/img/" + id) // 임시 URL 형식
+                    .map(id -> "/pdr/img/" + id) // 임시 URL 형식
                     .collect(Collectors.toList());
         } catch (Exception e) {
             return List.of();

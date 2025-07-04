@@ -87,7 +87,7 @@ const getCurrentUser = async () => {
 };
 
 // 리뷰 목록을 불러오는 함수
-const loadReviews = async (page = 0, size = 10) => {
+const loadReviews = async (page = 0, size = 10, filter = '') => {
     try {
         // URL에서 제품 ID와 변형 ID 추출
         const urlParts = window.location.pathname.split('/');
@@ -111,7 +111,8 @@ const loadReviews = async (page = 0, size = 10) => {
                 pid: pid,
                 pvid: pvid,
                 page: page,
-                size: size
+                size: size,
+                filter: filter || 'all'
             }
         });
 
@@ -206,6 +207,15 @@ window.addEventListener("DOMContentLoaded", async () => {
         renderSpecTable(specData);
     }
 })
+
+// 필터 변경 이벤트 처리
+comp.addEventListener('filter-changed', async (e) => {
+    const { filterValue } = e.detail;
+    console.log('필터 변경됨:', filterValue);
+    
+    // 필터에 따라 리뷰 목록 다시 로드
+    await loadReviews(0, 10, filterValue);
+});
 
 // 리뷰 제출 이벤트 처리
 reviewInput.addEventListener('review-submitted', async (e) => {

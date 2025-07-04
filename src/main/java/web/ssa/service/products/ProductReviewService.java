@@ -25,6 +25,9 @@ public interface ProductReviewService {
     // ReviewRecommend 관련 메서드
     boolean saveReviewRecommend(ReviewRecommend reviewRecommend);
     
+    // 기존 답글 조회 메서드
+    ReviewRecommend getReviewRecommendByWriterAndReviewId(User writer, ProductReview reviewId);
+    
     // 중복 체크 메서드
     boolean existsByWriterAndProductIdAndProductVariant(User writer, ProductMaster productId, ProductVariant productVariant);
     

@@ -11,7 +11,7 @@ import web.ssa.entity.member.User;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "REVIEW_RECOMMEND")
+@Table(name = "REVIEW_RECOMMEND", uniqueConstraints = {})
 @Getter
 @Setter
 @NoArgsConstructor
@@ -42,7 +42,7 @@ public class ReviewRecommend {
     @JsonIgnore
     private ProductMaster productId;
 
-    @OneToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "PRODUCT_VARIANT_ID", nullable = false)
     @JsonIgnore
     private ProductVariant productVariant;

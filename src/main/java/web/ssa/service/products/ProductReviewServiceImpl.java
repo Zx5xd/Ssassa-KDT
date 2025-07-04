@@ -78,9 +78,19 @@ public class ProductReviewServiceImpl implements ProductReviewService {
 
     @Override
     public boolean saveReviewRecommend(ReviewRecommend reviewRecommend) {
-        ReviewRecommend saved = this.reviewRecommendRepository.save(reviewRecommend);
-        boolean exists = this.reviewRecommendRepository.existsById(saved.getId());
-        return exists;
+        try {
+            ReviewRecommend saved = this.reviewRecommendRepository.save(reviewRecommend);
+            return this.reviewRecommendRepository.existsById(saved.getId());
+        } catch (Exception e) {
+            System.out.println("Error saving ReviewRecommend: " + e.getMessage());
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    @Override
+    public ReviewRecommend getReviewRecommendByWriterAndReviewId(User writer, ProductReview reviewId) {
+        return this.reviewRecommendRepository.findByWriterAndReviewId(writer, reviewId);
     }
 
     @Override
