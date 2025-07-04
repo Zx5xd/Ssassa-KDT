@@ -7,17 +7,21 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import web.ssa.util.*;
 import jakarta.servlet.http.HttpSession;
 import web.ssa.cache.CategoriesCache;
 import web.ssa.cache.ProductImgCache;
 import web.ssa.dto.products.ProductCreateDTO;
 import web.ssa.dto.products.ProductDTO;
 import web.ssa.dto.products.ProductVariantDTO;
+import web.ssa.entity.categories.CategoriesChild;
 import web.ssa.entity.products.ProductMaster;
 import web.ssa.entity.products.ProductReview;
 import web.ssa.entity.products.ProductVariant;
 import web.ssa.mapper.ConvertToDTO;
 import web.ssa.service.products.ProductReviewServImpl;
+import web.ssa.service.categories.CategoryService;
+import web.ssa.service.products.ProductReviewServiceImpl;
 import web.ssa.service.products.ProductService;
 import web.ssa.service.products.ProductServiceImpl;
 import web.ssa.service.products.ProductVariantService;
@@ -30,12 +34,11 @@ import java.io.IOException;
 import java.util.ArrayList;
 
 @Controller
-@RequestMapping("/pd")
 @RequiredArgsConstructor
 public class AdminProductController {
     private final ProductService productService;
     private final ProductServiceImpl pdServImpl;
-    private final ProductReviewServImpl pdReviewServImpl;
+    private final ProductReviewServiceImpl pdReviewServImpl;
     private final ProductVariantService productVariantService;
     private final CategoriesCache categoriesCache;
     private final ProductImgCache productImgCache;
@@ -50,13 +53,6 @@ public class AdminProductController {
             @RequestParam(value = "page", defaultValue = "1") int page,
             Model model,
             HttpSession session) {
-
-        // 로그인 체크
-        Object loginUser = session.getAttribute("loginUser");
-        if (loginUser == null) {
-            return "redirect:/login";
-        }
-
         int pageSize = 20;
 
         Page<ProductMaster> productPage;
@@ -215,10 +211,6 @@ public class AdminProductController {
             } catch (IOException e) {
                 e.printStackTrace();
             }
-        }
-
-        return "redirect:/pd/get/products";
-    }
 
     // 상품 상세 페이지 (고객용)
     @GetMapping("/get/product/{id}")

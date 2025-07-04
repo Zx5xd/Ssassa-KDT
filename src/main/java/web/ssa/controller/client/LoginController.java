@@ -31,6 +31,7 @@ public class LoginController {
     public String login(@RequestParam("email") String email,
                         @RequestParam("password") String password,
                         @RequestParam(value = "rememberEmail", required = false) String rememberEmail,
+                        @RequestParam(value = "redirect", required = false) String redirect,
                         HttpSession session,
                         HttpServletResponse response,
                         Model model) {
@@ -72,7 +73,17 @@ public class LoginController {
             response.addCookie(rememberCookie);
         }
 
-        return "redirect:/index";
+        // ✅ redirect 파라미터가 있으면 해당 경로로 이동
+        if (redirect != null && !redirect.isBlank()) {
+            return "redirect:" + redirect;
+        }
+
+        // 관리자 여부에 따라 리디렉션
+        if ("ADMIN".equals(user.getRole())) {
+            return "redirect:/admin";
+        } else {
+            return "redirect:/index";
+        }
     }
 
     @GetMapping("/logout")
@@ -135,6 +146,7 @@ public class LoginController {
         }
     }
 
+    // 비밀번호 재설정
     @PostMapping("/reset-password")
     public String resetPassword(@RequestParam String email,
                                 @RequestParam String newPassword,

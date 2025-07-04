@@ -7,13 +7,16 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import web.ssa.entity.products.ProductMaster;
 import web.ssa.entity.products.ProductReview;
+import web.ssa.repository.products.ProductRepository;
 import web.ssa.repository.products.ProductReviewRepository;
 
 import java.util.List;
 
 @Service
-public class ProductReviewServImpl implements ProductReviewServ {
+public class ProductReviewServiceImpl implements ProductReviewService {
 
+    @Autowired
+    private ProductRepository productRepository;
     @Autowired
     private ProductReviewRepository productReviewRepository;
 
@@ -25,6 +28,15 @@ public class ProductReviewServImpl implements ProductReviewServ {
     @Override
     public ProductReview getProductReview(ProductMaster productMaster) {
         return this.productReviewRepository.findProductReviewByProductId(productMaster);
+    }
+
+    @Override
+    public Page<ProductReview> getPageReviews(int pid, int pvid, Pageable pageRequest) {
+        ProductMaster productMaster = this.productRepository.findById(pid);
+        if (pvid != -1) {
+            return this.productReviewRepository.findByProductIdAndProductVariantId(productMaster,  pvid, pageRequest);
+        }
+        return this.productReviewRepository.findByProductId(productMaster, pageRequest);
     }
 
     @Override
@@ -49,6 +61,7 @@ public class ProductReviewServImpl implements ProductReviewServ {
 
     public Page<ProductReview> getPagedReviews(int productId, int page, int size) {
         Pageable pageable = PageRequest.of(page, size);
-        return productReviewRepository.findByProductId(productId, pageable);
+        ProductMaster product = this.productRepository.findById(productId);
+        return productReviewRepository.findByProductId(product, pageable);
     }
 }

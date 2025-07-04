@@ -9,7 +9,7 @@ import java.util.List;
 
 @Repository
 public interface CategoryChildRepository extends JpaRepository<CategoriesChild, Integer> {
-    List<CategoriesChild> findByCategoryChildId(Categories categoryId);
-    List<CategoriesChild> findByCode(String categoryName);
-    List<CategoriesChild> findByCategoryChildIdAndCode(Categories categoryId, String categoryName);
+    List<CategoriesChild> findByCode(String code);
+    List<CategoriesChild> findByCategoryChildId(Categories category);
+    List<CategoriesChild> findByCategoryChildIdAndCode(Categories category, String code);
 }

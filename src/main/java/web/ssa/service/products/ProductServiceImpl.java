@@ -5,6 +5,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import web.ssa.dto.products.SimpleProductDTO;
+import web.ssa.entity.products.ProductImg;
 
 import web.ssa.cache.ProductImgCache;
 import web.ssa.dto.products.ProductCreateDTO;
@@ -12,6 +14,7 @@ import web.ssa.dto.products.ProductDTO;
 import web.ssa.dto.products.ProductVariantDTO;
 import web.ssa.entity.products.ProductImg;
 import web.ssa.entity.products.ProductMaster;
+import web.ssa.repository.products.ProductImgRepository;
 import web.ssa.entity.products.ProductVariant;
 import web.ssa.mapper.ConvertToEntity;
 import web.ssa.repository.products.ProductImgRepository;
@@ -31,6 +34,8 @@ import java.util.Optional;
 public class ProductServiceImpl implements ProductService {
     @Autowired
     private ProductRepository repository;
+    @Autowired
+    private ProductImgRepository productImgRepository;
     @Autowired
     private ProductImgRepository imgRepository;
 
@@ -73,8 +78,13 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public void delete(int id) {
-        this.repository.deleteById(id);
+    public String findNameById(int id) {
+        return this.repository.findNameById(id);
+    }
+
+    @Override
+    public int delete(int id) {
+        return this.repository.deleteById(id);
     }
 
     @Override
@@ -125,7 +135,29 @@ public class ProductServiceImpl implements ProductService {
 
     public Page<ProductMaster> getPagedProducts(int page, int size) {
         Pageable pageable = PageRequest.of(page, size);
-        return repository.findByAmountNot(-1, pageable);
+        return this.repository.findAll(pageable);
+    }
+
+    @Override
+    public Page<ProductMaster> findByCategoryId(int categoryId, Pageable pageable) {
+        return this.repository.findByCategoryId(categoryId, pageable);
+    }
+
+    @Override
+    public Page<SimpleProductDTO> findBySimpleCategoryId(int categoryId, Pageable pageable) {
+        Page<ProductMaster> page = this.repository.findByCategoryId(categoryId, pageable);
+        return page.map(SimpleProductDTO::from);
+    }
+
+    @Override
+    public Page<ProductMaster> findByCategoryChildId(int categoryChildId, Pageable pageable) {
+        return this.repository.findByCategoryChildId(categoryChildId, pageable);
+    }
+
+    @Override
+    public ProductImg findByImgId(int productImgId) {
+        return this.productImgRepository.findById(productImgId);
+//        return repository.findByAmountNot(-1, pageable);
     }
 
     public Page<ProductMaster> getPagedProductsByCategory(int categoryId, int page, int size) {
@@ -213,6 +245,17 @@ public class ProductServiceImpl implements ProductService {
 
         this.repository.save(product);
 
+    }
+
+    @Override
+    public int uploadImg(String img) {
+        ProductImg productImg = ProductImg.builder()
+                .imgPath("/images/products/sample.webp")
+                .build();
+
+        productImgRepository.save(productImg);
+
+        return productImg.getId();
     }
 
     @Override

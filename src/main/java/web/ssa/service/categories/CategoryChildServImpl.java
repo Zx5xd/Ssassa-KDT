@@ -13,6 +13,7 @@ import java.util.List;
 @Service
 public class CategoryChildServImpl implements CategoryChildServ {
 
+    @Autowired
     private CategoryChildRepository categoryChildRepository;
 
     @Autowired
