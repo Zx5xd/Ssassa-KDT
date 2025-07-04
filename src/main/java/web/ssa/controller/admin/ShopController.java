@@ -43,7 +43,7 @@ public class ShopController {
         model.addAttribute("loginUser", loginUser);
         model.addAttribute("productService", productService); // JSP에서 사용할 수 있도록
         model.addAttribute("categoriesCache", categoriesCache); // 카테고리 캐시 추가
-        return "shop/productList"; // /WEB-INF/views/shop/productList.jsp
+        return "product/list"; // /WEB-INF/views/shop/productList.jsp
     }
 
     // 상품 상세 페이지 (로그인 필요)
@@ -69,6 +69,6 @@ public class ShopController {
         model.addAttribute("product", product);
         model.addAttribute("categoryName", categoryName);
         model.addAttribute("categoriesCache", categoriesCache);
-        return "shop/productDetail"; // /WEB-INF/views/shop/productDetail.jsp
+        return "product/detail"; // /WEB-INF/views/shop/productDetail.jsp
     }
 }

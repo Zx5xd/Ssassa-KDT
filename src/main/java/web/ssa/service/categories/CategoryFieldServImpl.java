@@ -108,7 +108,7 @@ public class CategoryFieldServImpl implements CategoryFieldServ {
         };
     }
 
-    public void setFilter(int categoryId) {
+    public Map<String, List<String>> setFilter(int categoryId) {
         // 1. 해당 카테고리의 Fields를 불러오기
         List<CategoryFieldsDTO> fields = getCatFieldsByCategoryId(categoryId);
 
@@ -131,7 +131,7 @@ public class CategoryFieldServImpl implements CategoryFieldServ {
             });
         });
 
-        // return fields;
+        return valueListMap;
     }
 
     @Override

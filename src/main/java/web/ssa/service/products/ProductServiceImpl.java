@@ -63,8 +63,7 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     public ProductMaster getProductById(int id) {
-        List<ProductMaster> products = this.repository.findById(id);
-        return products.isEmpty() ? null : products.get(0);
+        return this.repository.findById(id);
     }
 
     @Override
@@ -73,7 +72,7 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public List<ProductMaster> findById(int id) {
+    public ProductMaster findById(int id) {
         return this.repository.findById(id);
     }
 

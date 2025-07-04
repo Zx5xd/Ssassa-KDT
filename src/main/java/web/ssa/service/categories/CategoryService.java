@@ -17,6 +17,5 @@ public interface CategoryService {
     Categories getCategoryByName(String name);
 
     Map<Integer, PLCategoryDTO> getCategoryMap();
-    List<CategoryFieldsDTO> getCategoryFieldsByCategoryId(int id);
-    List<CategoryFieldsDTO> getCategoryFieldsByChildId(int categoryId, List<CategoriesChild> childId);
+
 }

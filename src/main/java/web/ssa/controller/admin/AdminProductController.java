@@ -19,8 +19,6 @@ import web.ssa.entity.products.ProductMaster;
 import web.ssa.entity.products.ProductReview;
 import web.ssa.entity.products.ProductVariant;
 import web.ssa.mapper.ConvertToDTO;
-import web.ssa.service.products.ProductReviewServImpl;
-import web.ssa.service.categories.CategoryService;
 import web.ssa.service.products.ProductReviewServiceImpl;
 import web.ssa.service.products.ProductService;
 import web.ssa.service.products.ProductServiceImpl;
@@ -211,7 +209,9 @@ public class AdminProductController {
             } catch (IOException e) {
                 e.printStackTrace();
             }
-
+        }
+        return "redirect:/pd/get/products";
+    }
     // 상품 상세 페이지 (고객용)
     @GetMapping("/get/product/{id}")
     public String showProductDetail(@PathVariable("id") int id, Model model, HttpSession session) {

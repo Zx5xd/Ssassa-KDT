@@ -264,9 +264,9 @@ public class CategoryController {
     }
 
     // Field명 | ValueList 테이블 테스트
-    @GetMapping("/testSimpleTable/{categoryId}/{childId}")
-    public String testSimpleTable(Model model, @PathVariable("categoryId") Integer categoryId,
-            @PathVariable(value = "childId", required = false) Integer childId) {
+    @GetMapping("/fieldFilter")
+    public String setFilter(Model model, @RequestParam(value = "categoryId", defaultValue = "1") Integer categoryId,
+            @RequestParam(value = "childId", required = false) Integer childId) {
         try {
             // CategoryFields 데이터 조회 (카테고리 ID 1번 기준)
             List<CategoryFieldsDTO> categoryFieldsDTOList = categoryFieldServ.getCategoryFieldsByCategoryId(categoryId);
@@ -275,11 +275,11 @@ public class CategoryController {
             }
 
             // 단순 Map 형태 (값만)
-            Map<String, List<String>> fieldsSimpleMap = dtoUtil
+            Map<String, List<String>> fieldFilter = dtoUtil
                     .processCategoryFieldsForFilterAsSimpleMap(categoryFieldsDTOList);
-            model.addAttribute("fieldsSimpleMap", fieldsSimpleMap);
+            model.addAttribute("filter", fieldFilter);
 
-            categoryFieldServ.setFilter(8);
+//            categoryFieldServ.setFilter(categoryId);
 
         } catch (Exception e) {
             e.printStackTrace();

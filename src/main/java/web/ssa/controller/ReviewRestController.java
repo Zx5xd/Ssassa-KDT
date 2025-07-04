@@ -64,7 +64,8 @@ public class ReviewRestController {
 
             String json = mapper.writeValueAsString(imgId);
             ProductReview productReview = ProductReview.builder()
-                    .writer(user.getNickname())
+//                    .writer(user.getNickname())
+                    .writer(user)
                     .content(dto.getContent())
                     .userImgs(json)
                     .build();

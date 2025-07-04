@@ -30,20 +30,17 @@ public class ProductController {
     private CategoryServiceImpl categoryService;
     @Autowired
     private CategoryChildServImpl categoryChildServ;
-
     @Autowired
     private ProductServiceImpl pdServImpl;
     @Autowired
     private ProductVariantServiceImpl pdVariantServImpl;
-
     @Autowired
     private ProductReviewServiceImpl pdReviewServImpl;
 
     @GetMapping
     public Page<ProductMaster> listProducts(
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size
-    ) {
+            @RequestParam(defaultValue = "10") int size) {
         return pdServImpl.getPagedProducts(page, size);
     }
 
@@ -51,8 +48,7 @@ public class ProductController {
     public Page<ProductReview> listReviews(
             @PathVariable int productId,
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "5") int size
-    ) {
+            @RequestParam(defaultValue = "5") int size) {
         return pdReviewServImpl.getPagedReviews(productId, page, size);
     }
 
@@ -63,9 +59,9 @@ public class ProductController {
 
     @GetMapping("list")
     public String listProducts(@RequestParam(value = "cid", defaultValue = "-1") int cid,
-                               @PageableDefault(page = 0, size = 30, sort = "id", direction = Sort.Direction.DESC)  Pageable pageable,
-                               Model model) {
-
+            @PageableDefault(page = 0, size = 30, sort = "id", direction = Sort.Direction.DESC) Pageable pageable,
+            Model model) {
+        System.out.println("[ list ] cid: " + cid);
         Map<Integer, PLCategoryDTO> categoryMap = categoryService.getCategoryMap();
 
         try {
@@ -77,20 +73,24 @@ public class ProductController {
             e.printStackTrace();
         }
 
-        Page<SimpleProductDTO> page = this.pdServImpl.findBySimpleCategoryId(cid,pageable);
-        model.addAttribute("page",page);
+        Page<SimpleProductDTO> page = this.pdServImpl.findBySimpleCategoryId(cid, pageable);
+        model.addAttribute("page", page);
         model.addAttribute("products", page.getContent());
         return "product/list";
     }
 
     @GetMapping("detail/{id}")
-    public String detail(@PathVariable String id, Model model) {
+    public String detail(@PathVariable("id") String id, Model model) {
         try {
             if (id.contains("_")) {
                 // 예: 11_5
                 String[] parts = id.split("_");
                 int pid = Integer.parseInt(parts[0]);
                 int pvid = Integer.parseInt(parts[1]);
+
+                if(pvid == -1){
+                    return "redirect:/pd/detail/" + pid;
+                }
 
                 // 🔍 ProductVariant만 조회
                 String name = this.pdServImpl.findNameById(pid);
@@ -125,8 +125,6 @@ public class ProductController {
             return "redirect:/error";
         }
     }
-
-
 
     // ManageMent
 
