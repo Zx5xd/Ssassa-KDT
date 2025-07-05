@@ -22,10 +22,13 @@ public interface ProductService {
     List<ProductMaster> findByName(String name);
 
     ProductMaster findById(int id);
+
     String findNameById(int id);
+
     int delete(int id);
 
     Page<ProductMaster> findByCategoryId(int categoryId, Pageable pageable);
+
     Page<ProductMaster> findByCategoryChildId(int categoryChildId, Pageable pageable);
 
     Page<SimpleProductDTO> findBySimpleCategoryId(int categoryId, Pageable pageable);

@@ -32,7 +32,7 @@ public class CommentTypeDTO {
         dto.setAuthor(review.getWriter().getNickname());
         dto.setUserId(review.getWriter().getEmail());
         dto.setContent(review.getContent());
-        
+
         // reviewType을 type으로 변환
         switch (review.getReviewType()) {
             case 1:
@@ -44,12 +44,12 @@ public class CommentTypeDTO {
             default:
                 dto.setType("review");
         }
-        
+
         dto.setCreatedAt(review.getCreated().toString());
-        
+
         // images 처리 (JSON 문자열을 List로 변환)
         dto.setImages(parseImages(review.getUserImgs()));
-        
+
         // replies 처리 (ReviewRecommend를 CommentTypeDTO로 변환)
         if (review.getRecommendList() != null) {
             dto.setReplies(review.getRecommendList().stream()
@@ -58,7 +58,7 @@ public class CommentTypeDTO {
         } else {
             dto.setReplies(List.of());
         }
-        
+
         return dto;
     }
 
@@ -71,13 +71,13 @@ public class CommentTypeDTO {
         dto.setContent(recommend.getContent());
         dto.setType("answer");
         dto.setCreatedAt(recommend.getCreated().toString());
-        
+
         // images 처리
         dto.setImages(parseImages(recommend.getUserImgs()));
-        
+
         // 답변은 replies가 없음
         dto.setReplies(List.of());
-        
+
         return dto;
     }
 
@@ -86,7 +86,7 @@ public class CommentTypeDTO {
         if (userImgs == null || userImgs.isEmpty()) {
             return List.of();
         }
-        
+
         try {
             // JSON 배열을 파싱하여 이미지 ID 리스트로 변환
             List<Integer> imageIds = objectMapper.readValue(userImgs, new TypeReference<List<Integer>>() {});
@@ -98,4 +98,4 @@ public class CommentTypeDTO {
             return List.of();
         }
     }
-} 
+}

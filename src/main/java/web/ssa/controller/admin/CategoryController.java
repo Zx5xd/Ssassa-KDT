@@ -274,12 +274,16 @@ public class CategoryController {
                 categoryFieldsDTOList = categoryFieldServ.getCategoryFieldsByChildId(categoryId, childId);
             }
 
-            // 단순 Map 형태 (값만)
-            Map<String, List<String>> fieldFilter = dtoUtil
+            // 단순 Map 형태 (값만) - catFilter로 이름 변경
+            Map<String, List<String>> catFilter = dtoUtil
                     .processCategoryFieldsForFilterAsSimpleMap(categoryFieldsDTOList);
-            model.addAttribute("filter", fieldFilter);
+            model.addAttribute("catFilter", catFilter);
 
-//            categoryFieldServ.setFilter(categoryId);
+            // 상품 목록도 함께 전달 (기본값)
+            List<ProductMaster> products = productService.findByCategoryId(categoryId,
+                    org.springframework.data.domain.PageRequest.of(0, 20)).getContent();
+            List<ProductDTO> productDTOs = web.ssa.mapper.ConvertToDTO.productDTOList(products);
+            model.addAttribute("products", productDTOs);
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -287,27 +291,6 @@ public class CategoryController {
             model.addAttribute("errorMsg", "테스트 중 오류가 발생했습니다: " + e.getMessage());
         }
 
-        return "admin/category/test/testSimpleTable";
-    }
-
-    // 동적 필터 AJAX 상품 검색
-    @GetMapping("/searchProductsAjax")
-    public String searchProductsAjax(@RequestParam MultiValueMap<String, String> params, Model model) {
-        // params: {RAM=[8GB,16GB], 저장공간=[512GB], ...}
-        Map<String, List<String>> filterMap = new HashMap<>(params);
-        List<ProductMaster> products = productService.searchByDynamicFilter(filterMap);
-        List<ProductDTO> productDTOs = web.ssa.mapper.ConvertToDTO.productDTOList(products);
-        // 동적으로 출력할 key 최대 5개 추출
-        Set<String> keySet = new LinkedHashSet<>();
-        for (ProductDTO p : productDTOs) {
-            if (p.getDetail() != null)
-                keySet.addAll(p.getDetail().keySet());
-            if (keySet.size() >= 5)
-                break;
-        }
-        List<String> productKeys = keySet.stream().limit(5).toList();
-        model.addAttribute("products", productDTOs);
-        model.addAttribute("productKeys", productKeys);
-        return "admin/category/test/productListPartial";
+        return "product/list";
     }
 }

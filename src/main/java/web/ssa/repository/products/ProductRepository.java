@@ -14,15 +14,15 @@ import java.util.List;
 public interface ProductRepository extends JpaRepository<ProductMaster, Integer> {
     List<ProductMaster> findByName(String name);
 
-//    List<ProductMaster> findById(int id);
+    // List<ProductMaster> findById(int id);
 
     ProductMaster findById(int id);
 
     @Query("SELECT p.name FROM ProductMaster p WHERE p.id = :id")
     String findNameById(@Param("id") int id);
 
-    @EntityGraph(attributePaths = {"variants"})
     Page<ProductMaster> findByCategoryId(int categoryId, Pageable pageable);
+
     Page<ProductMaster> findByCategoryChildId(int categoryChildId, Pageable pageable);
 
     int deleteById(int id);

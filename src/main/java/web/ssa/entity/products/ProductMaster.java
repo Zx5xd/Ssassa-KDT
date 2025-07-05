@@ -49,12 +49,12 @@ public class ProductMaster {
     @Column(nullable = false)
     private Date reg;
 
-    @OneToMany(mappedBy = "masterId", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "masterId", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     List<ProductVariant> variants;
 
-    @OneToMany(mappedBy = "productId", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "productId", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     List<ProductReview> reviews;
 
-    @OneToMany(mappedBy = "productId", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "productId", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     List<ReviewRecommend> commends;
 }

@@ -156,7 +156,7 @@ public class ProductServiceImpl implements ProductService {
     @Override
     public ProductImg findByImgId(int productImgId) {
         return this.productImgRepository.findById(productImgId);
-//        return repository.findByAmountNot(-1, pageable);
+        // return repository.findByAmountNot(-1, pageable);
     }
 
     public Page<ProductMaster> getPagedProductsByCategory(int categoryId, int page, int size) {

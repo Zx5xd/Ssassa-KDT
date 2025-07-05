@@ -39,7 +39,6 @@ public class SimpleProductDTO {
                 .setVariants(
                         product.getVariants() != null
                                 ? product.getVariants().stream().map(SimpleProductVariantDTO::from).toList()
-                                : List.of()
-                );
+                                : List.of());
     }
 }

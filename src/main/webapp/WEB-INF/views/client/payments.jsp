@@ -323,7 +323,7 @@
           <span class="material-symbols-outlined">receipt_long</span>
           <h3>결제 내역이 없습니다</h3>
           <p>아직 결제한 상품이 없습니다.<br>상품을 구매해보세요!</p>
-          <a href="/products" class="btn" style="background-color: var(--brand); color: white; margin-top: 20px;">
+          <a href="/pd/list" class="btn" style="background-color: var(--brand); color: white; margin-top: 20px;">
             상품 둘러보기
           </a>
         </div>

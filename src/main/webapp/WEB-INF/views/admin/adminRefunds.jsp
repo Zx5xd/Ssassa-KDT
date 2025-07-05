@@ -516,23 +516,23 @@
                                     
                                     <!-- 첫 번째 줄: 오른쪽 파트 (첨부파일) -->
                                     <div class="detail-right">
-                                        <c:if test="${not empty inq.fileName}">
+                                <c:if test="${not empty inq.fileName}">
                                             <div class="detail-item">
                                                 <strong>첨부파일:</strong>
-                                                <c:set var="lowerName" value="${fn:toLowerCase(inq.fileName)}" />
-                                                <c:choose>
-                                                    <c:when test="${fn:endsWith(lowerName, '.jpg') || fn:endsWith(lowerName, '.jpeg') || fn:endsWith(lowerName, '.png') || fn:endsWith(lowerName, '.gif') || fn:endsWith(lowerName, '.webp')}">
+                                        <c:set var="lowerName" value="${fn:toLowerCase(inq.fileName)}" />
+                                        <c:choose>
+                                            <c:when test="${fn:endsWith(lowerName, '.jpg') || fn:endsWith(lowerName, '.jpeg') || fn:endsWith(lowerName, '.png') || fn:endsWith(lowerName, '.gif') || fn:endsWith(lowerName, '.webp')}">
                                                         <img src="${inq.filePath}" class="preview-img" alt="첨부 이미지 미리보기"/>
-                                                    </c:when>
-                                                    <c:otherwise>
-                                                        <a href="${inq.filePath}" download>${inq.fileName}</a>
-                                                    </c:otherwise>
-                                                </c:choose>
+                                            </c:when>
+                                            <c:otherwise>
+                                                <a href="${inq.filePath}" download>${inq.fileName}</a>
+                                            </c:otherwise>
+                                        </c:choose>
                                             </div>
-                                        </c:if>
+                                </c:if>
                                     </div>
                                 </div>
-                                
+
                                 <!-- 두 번째 줄: 기존 답변 -->
                                 <c:if test="${inq.hasReply}">
                                     <div class="detail-reply">

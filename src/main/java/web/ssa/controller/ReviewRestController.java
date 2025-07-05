@@ -54,35 +54,35 @@ public class ReviewRestController {
         if (reviews == null) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         }
-        
+
         // ProductReview를 CommentTypeDTO로 변환
         Page<CommentTypeDTO> commentDTOs = reviews.map(CommentTypeDTO::fromProductReview);
-        
+
         // 필터링 적용
         if (filter != null && !filter.isEmpty()) {
             List<CommentTypeDTO> filteredContent = commentDTOs.getContent().stream()
-                .filter(comment -> {
-                    switch (filter) {
-                        case "review":
-                            return "review".equals(comment.getType());
-                        case "question":
-                            return "question".equals(comment.getType());
-                        default:
-                            return true; // 전체인 경우 모든 댓글 포함
-                    }
-                })
-                .collect(Collectors.toList());
-            
+                    .filter(comment -> {
+                        switch (filter) {
+                            case "review":
+                                return "review".equals(comment.getType());
+                            case "question":
+                                return "question".equals(comment.getType());
+                            default:
+                                return true; // 전체인 경우 모든 댓글 포함
+                        }
+                    })
+                    .collect(Collectors.toList());
+
             // 필터링된 결과로 새로운 Page 객체 생성
             Page<CommentTypeDTO> filteredPage = new PageImpl<>(
-                filteredContent,
-                pageable,
-                filteredContent.size()
+                    filteredContent,
+                    pageable,
+                    filteredContent.size()
             );
-            
+
             return ResponseEntity.ok(filteredPage);
         }
-        
+
         return ResponseEntity.ok(commentDTOs);
     }
 
@@ -134,19 +134,19 @@ public class ReviewRestController {
             }
 
             String json = mapper.writeValueAsString(imgId);
-            
+
             // 답변인 경우 ReviewRecommend에 저장, 그 외에는 ProductReview에 저장
             if (dto.isAnswer()) {
                 if (dto.getParentReviewId() <= 0) {
                     return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
                 }
-                
+
                 // 부모 리뷰 조회
                 ProductReview parentReview = this.productReviewService.getProductReviewById(dto.getParentReviewId());
                 if (parentReview == null) {
                     return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
                 }
-                
+
                 // ReviewRecommend 객체 생성
                 ReviewRecommend reviewRecommend = ReviewRecommend.builder()
                         .writer(user)
@@ -157,7 +157,7 @@ public class ReviewRestController {
                         .productVariant(productVariant)
                         .recommendCount(0)
                         .build();
-                
+
                 boolean saved = this.productReviewService.saveReviewRecommend(reviewRecommend);
                 if (saved) {
                     CommentTypeDTO commentDTO = CommentTypeDTO.fromReviewRecommend(reviewRecommend);
@@ -176,7 +176,7 @@ public class ReviewRestController {
                         .recommendCount(0)
                         .reviewType(dto.getReviewType())
                         .build();
-                
+
                 boolean saved = this.productReviewService.saveProductReview(productReview);
                 if (saved) {
                     CommentTypeDTO commentDTO = CommentTypeDTO.fromProductReview(productReview);

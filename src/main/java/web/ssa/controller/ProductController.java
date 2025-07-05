@@ -9,6 +9,7 @@ import org.springframework.data.web.PageableDefault;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import web.ssa.dto.categories.CategoryFieldsDTO;
 import web.ssa.dto.categories.PLCategoryDTO;
 import web.ssa.dto.products.IntegratedProductDTO;
 import web.ssa.dto.products.SimpleProductDTO;
@@ -16,11 +17,14 @@ import web.ssa.entity.products.ProductMaster;
 import web.ssa.entity.products.ProductReview;
 import web.ssa.entity.products.ProductVariant;
 import web.ssa.service.categories.CategoryChildServImpl;
+import web.ssa.service.categories.CategoryFieldServImpl;
 import web.ssa.service.categories.CategoryServiceImpl;
 import web.ssa.service.products.ProductReviewServiceImpl;
 import web.ssa.service.products.ProductServiceImpl;
 import web.ssa.service.products.ProductVariantServiceImpl;
+import web.ssa.util.DTOUtil;
 
+import java.util.List;
 import java.util.Map;
 
 @Controller
@@ -31,11 +35,15 @@ public class ProductController {
     @Autowired
     private CategoryChildServImpl categoryChildServ;
     @Autowired
+    private CategoryFieldServImpl categoryFieldServ;
+    @Autowired
     private ProductServiceImpl pdServImpl;
     @Autowired
     private ProductVariantServiceImpl pdVariantServImpl;
     @Autowired
     private ProductReviewServiceImpl pdReviewServImpl;
+
+    private final DTOUtil dtoUtil = new DTOUtil();
 
     @GetMapping
     public Page<ProductMaster> listProducts(
@@ -58,7 +66,8 @@ public class ProductController {
     }
 
     @GetMapping("list")
-    public String listProducts(@RequestParam(value = "cid", defaultValue = "-1") int cid,
+    public String listProducts(@RequestParam(value = "cid", defaultValue = "1") int cid,
+            @RequestParam(value = "childId", required = false) Integer childId,
             @PageableDefault(page = 0, size = 30, sort = "id", direction = Sort.Direction.DESC) Pageable pageable,
             Model model) {
         System.out.println("[ list ] cid: " + cid);
@@ -67,8 +76,19 @@ public class ProductController {
         try {
             ObjectMapper mapper = new ObjectMapper();
             String categoryJson = mapper.writeValueAsString(categoryMap);
+            System.out.println("[ list ] categoryJson: " + categoryJson);
+
+            List<CategoryFieldsDTO> categoryFieldsDTOList = categoryFieldServ.getCategoryFieldsByCategoryId(cid);
+            if (childId != null) {
+                categoryFieldsDTOList = categoryFieldServ.getCategoryFieldsByChildId(cid, childId);
+            }
+
+            // 단순 Map 형태 (값만)
+            Map<String, List<String>> fieldFilter = dtoUtil
+                    .processCategoryFieldsForFilterAsSimpleMap(categoryFieldsDTOList);
 
             model.addAttribute("categoryJson", categoryJson);
+            model.addAttribute("catFilter", fieldFilter);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -88,7 +108,7 @@ public class ProductController {
                 int pid = Integer.parseInt(parts[0]);
                 int pvid = Integer.parseInt(parts[1]);
 
-                if(pvid == -1){
+                if (pvid == -1) {
                     return "redirect:/pd/detail/" + pid;
                 }
 

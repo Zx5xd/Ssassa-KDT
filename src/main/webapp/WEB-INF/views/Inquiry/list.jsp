@@ -236,7 +236,7 @@
                         <div class="table-cell">작성일</div>
                     </div>
                     
-                    <c:forEach var="inq" items="${inquiries}">
+    <c:forEach var="inq" items="${inquiries}">
                         <div class="table-row">
                             <div class="table-cell" data-label="번호">${inq.id}</div>
                             <div class="table-cell title-cell" data-label="제목">
@@ -264,7 +264,7 @@
                                 pattern="yyyy년 MM월 dd일 HH:mm" />
                             </div>
                         </div>
-                    </c:forEach>
+    </c:forEach>
                 </c:when>
                 <c:otherwise>
                     <div class="empty-state">

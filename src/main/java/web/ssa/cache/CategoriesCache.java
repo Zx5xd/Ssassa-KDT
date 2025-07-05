@@ -3,13 +3,17 @@ package web.ssa.cache;
 import jakarta.annotation.PostConstruct;
 import lombok.Getter;
 import org.springframework.stereotype.Component;
+
+import web.ssa.dto.categories.CategoriesDTO;
 import web.ssa.entity.categories.Categories;
 import web.ssa.entity.categories.CategoriesChild;
 import web.ssa.enumf.CategoryType;
 import web.ssa.repository.categories.CategoryChildRepository;
 import web.ssa.repository.categories.CategoryRepository;
 
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Component
@@ -58,6 +62,7 @@ public class CategoriesCache {
                 .println("PC 주변기기 세부 카테고리 수: " + (cachedPeriperhalChilds != null ? cachedPeriperhalChilds.size() : 0));
         System.out
                 .println("PC 부품 세부 카테고리 수: " + (cachedPCComponentChilds != null ? cachedPCComponentChilds.size() : 0));
+
     }
 
     public void reload() {
@@ -99,4 +104,5 @@ public class CategoriesCache {
 
         return result != null ? result : List.of();
     }
+
 }

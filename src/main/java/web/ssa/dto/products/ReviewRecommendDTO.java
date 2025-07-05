@@ -17,4 +17,3 @@ public class ReviewRecommendDTO {
     private String userImgs;
     private Integer recommendCount;
 }
-
