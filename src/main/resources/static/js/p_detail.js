@@ -126,12 +126,12 @@ const loadReviews = async (page = 0, size = 10, filter = '') => {
             // 리뷰 컴포넌트에 데이터 전달
             if (comp && reviews.content) {
                 comp.comments = reviews.content;
-                // 페이지네이션 정보도 설정 (필요한 경우)
+                // 페이지네이션 정보도 설정 (PageResponse 구조에 맞게)
                 if (reviews.totalPages !== undefined) {
                     comp.totalPages = reviews.totalPages;
                 }
-                if (reviews.number !== undefined) {
-                    comp.currentPage = reviews.number;
+                if (reviews.page !== undefined) {
+                    comp.currentPage = reviews.page;
                 }
             }
 
@@ -461,14 +461,14 @@ const convertImagesToFiles = async (imageUrls) => {
     return files;
 };
 
-// 댓글/답글 수정 이벤트 처리
+/// 댓글/답글 수정 이벤트 처리
 comp.addEventListener('edit-submitted', async (e) => {
     console.log('🔍 edit-submitted 이벤트 수신됨:', e.detail);
     const { commentId, content, images } = e.detail;
 
     try {
         console.log('🔍 수정 시작 - commentId:', commentId, 'content:', content, 'images:', images);
-        
+
         // 로그인 상태 확인
         const userData = await getCurrentUser();
         console.log('🔍 현재 사용자 정보:', userData);
@@ -499,7 +499,7 @@ comp.addEventListener('edit-submitted', async (e) => {
         console.log('🔍 현재 댓글 목록:', comp.comments);
         const comment = comp.comments.find(c => c.id === commentId);
         // console.log('🔍 찾은 댓글:', comment);
-        
+
         let reply = null;
         if (!comment) {
             // 답글에서 찾기
@@ -534,7 +534,7 @@ comp.addEventListener('edit-submitted', async (e) => {
             pid: pid,
             pvid: pvid
         });
-        
+
         // FormData 내용 상세 로깅
         console.log('🔍 FormData 상세 내용:');
         for (let [key, value] of formData.entries()) {
@@ -563,7 +563,7 @@ comp.addEventListener('edit-submitted', async (e) => {
         for (let [key, value] of formData.entries()) {
             console.log(`  ${key}:`, value);
         }
-        
+
         const response = await axios.put('/review/update', formData, {
             headers: {
                 'Content-Type': 'multipart/form-data'
@@ -574,7 +574,7 @@ comp.addEventListener('edit-submitted', async (e) => {
         if (response.status === 200) {
             alert('수정이 완료되었습니다!');
             // console.log('댓글 수정 성공:', response.data);
-            
+
             // 리뷰 목록 새로고침
             await loadReviews();
         }
@@ -586,7 +586,7 @@ comp.addEventListener('edit-submitted', async (e) => {
             statusText: error.response?.statusText,
             data: error.response?.data
         });
-        
+
         if (error.response && error.response.status === 401) {
             alert('로그인이 필요합니다.');
             const currentUrl = encodeURIComponent(window.location.href);
@@ -606,7 +606,7 @@ comp.addEventListener('delete-submitted', async (e) => {
 
     try {
         // console.log('🔍 삭제 시작 - commentId:', commentId);
-        
+
         // 로그인 상태 확인
         const userData = await getCurrentUser();
         console.log('🔍 현재 사용자 정보:', userData);
@@ -621,7 +621,7 @@ comp.addEventListener('delete-submitted', async (e) => {
         // console.log('🔍 현재 댓글 목록:', comp.comments);
         const comment = comp.comments.find(c => c.id === commentId);
         // console.log('🔍 찾은 댓글:', comment);
-        
+
         let isAnswer = false;
         if (!comment) {
             // 답글에서 찾기
@@ -652,14 +652,14 @@ comp.addEventListener('delete-submitted', async (e) => {
         // console.log('🔍 삭제 요청 URL:', fullUrl);
         // console.log('🔍 삭제 요청 메서드: DELETE');
         // console.log('🔍 삭제 요청 파라미터: id =', commentId);
-        
+
         const response = await axios.delete(fullUrl);
 
         console.log('🔍 서버 응답:', response);
         if (response.status === 200) {
             alert('삭제가 완료되었습니다!');
             // console.log('댓글 삭제 성공:', response.data);
-            
+
             // 리뷰 목록 새로고침
             await loadReviews();
         }
@@ -671,7 +671,7 @@ comp.addEventListener('delete-submitted', async (e) => {
             statusText: error.response?.statusText,
             data: error.response?.data
         });
-        
+
         if (error.response && error.response.status === 401) {
             alert('로그인이 필요합니다.');
             const currentUrl = encodeURIComponent(window.location.href);

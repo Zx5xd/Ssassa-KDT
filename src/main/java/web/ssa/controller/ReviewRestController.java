@@ -12,6 +12,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.transaction.annotation.Transactional;
+import web.ssa.dto.PageResponse;
 import web.ssa.dto.products.CommentTypeDTO;
 import web.ssa.dto.products.ProductReviewFormDTO;
 import web.ssa.entity.member.User;
@@ -23,6 +25,7 @@ import web.ssa.service.WebDAVService;
 import web.ssa.service.products.ProductReviewServiceImpl;
 import web.ssa.service.products.ProductServiceImpl;
 import web.ssa.service.products.ProductVariantService;
+import web.ssa.repository.member.MemberRepository;
 import web.ssa.util.ImageUtil;
 
 import java.util.ArrayList;
@@ -30,7 +33,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @RestController
-@RequestMapping("/review/*")
+@RequestMapping("/review")
 public class ReviewRestController {
     @Autowired
     private ProductReviewServiceImpl productReviewService;
@@ -42,13 +45,15 @@ public class ReviewRestController {
     @Autowired
     private WebDAVService webDAVService;
 
+    @Autowired
+    private MemberRepository memberRepository;
+
     @GetMapping("list")
-    public ResponseEntity<Page<CommentTypeDTO>> getPageReview(
+    public ResponseEntity<PageResponse<CommentTypeDTO>> getPageReview(
             @RequestParam(value = "pid") int pid,
             @RequestParam(value = "pvid", defaultValue = "-1") int pvid,
             @RequestParam(value = "filter", defaultValue = "") String filter,
-            @PageableDefault(sort = "id", direction = Sort.Direction.DESC) Pageable pageable
-    ) {
+            @PageableDefault(sort = "id", direction = Sort.Direction.DESC) Pageable pageable) {
         Page<ProductReview> reviews = this.productReviewService.getPageReviews(pid, pvid, pageable);
         if (reviews == null) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
@@ -76,21 +81,49 @@ public class ReviewRestController {
             Page<CommentTypeDTO> filteredPage = new PageImpl<>(
                     filteredContent,
                     pageable,
-                    filteredContent.size()
-            );
+                    filteredContent.size());
 
-            return ResponseEntity.ok(filteredPage);
+            // PageResponse로 변환
+            PageResponse<CommentTypeDTO> response = new PageResponse<>(
+                    filteredPage.getContent(),
+                    filteredPage.getNumber(),
+                    filteredPage.getSize(),
+                    filteredPage.getTotalPages(),
+                    filteredPage.getTotalElements());
+
+            return ResponseEntity.ok(response);
         }
 
-        return ResponseEntity.ok(commentDTOs);
+        // PageResponse로 변환
+        PageResponse<CommentTypeDTO> response = new PageResponse<>(
+                commentDTOs.getContent(),
+                commentDTOs.getNumber(),
+                commentDTOs.getSize(),
+                commentDTOs.getTotalPages(),
+                commentDTOs.getTotalElements());
+
+        return ResponseEntity.ok(response);
     }
 
     @PostMapping("submit")
+    @Transactional
     public ResponseEntity<Object> uploadReview(@ModelAttribute ProductReviewFormDTO dto, HttpSession session) {
-        User user = (User) session.getAttribute("loginUser");
-        if (user == null) {
+        User sessionUser = (User) session.getAttribute("loginUser");
+        System.out.println("submit dto : " + dto.toString());
+
+        if (sessionUser == null) {
+            System.out.println("user is null");
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
+
+        // 세션의 User 객체 대신 DB에서 다시 조회하여 지연 로딩 문제 해결
+        User user = memberRepository.findByEmail(sessionUser.getEmail()).orElse(null);
+        if (user == null) {
+            System.out.println("user not found in DB");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+
+        System.out.println("user Not NULL : " + user.toString());
 
         // ProductMaster와 ProductVariant 조회
         ProductMaster productMaster = this.productService.getProductById(dto.getPid());
@@ -98,18 +131,29 @@ public class ReviewRestController {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
         }
 
+        productMaster.getVariants().forEach(variant -> {
+            System.out.println("variant : " + variant.getId() + ", " + variant.getName());
+        });
+        System.out.println("master after");
         ProductVariant productVariant;
+        System.out.println("--------------------------------");
+        System.out.println("dto.getPvid() : " + dto.getPvid());
         if (dto.getPvid() > 0) {
+            System.out.println("pvid not 0 : " + dto.getPvid());
             productVariant = this.productVariantService.getVariantById(dto.getPvid());
             if (productVariant == null) {
                 return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
             }
+            System.out.println("product Variant not NULL : " + productVariant.toString());
         } else {
+            System.out.println("pvid is 0");
             // 기본 variant 사용
             productVariant = this.productVariantService.getVariantById(productMaster.getDefaultVariantId());
+            System.out.println("productVariant Default : " + productVariant.toString());
             if (productVariant == null) {
                 return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
             }
+            System.out.println("product DefaultVariant not NULL : " + productVariant.toString());
         }
 
         List<Integer> imgId = new ArrayList<>();
@@ -118,9 +162,12 @@ public class ReviewRestController {
         try {
             // 이미지 처리
             if (dto.getImages() != null && !dto.getImages().isEmpty()) {
+                System.out.println("images not NULL : " + dto.getImages().toString());
                 for (int i = 0; i < dto.getImages().size(); i++) {
                     MultipartFile img = dto.getImages().get(i);
                     if (img != null && !img.isEmpty()) {
+                        System.out.println("image not NULL : " + img.getOriginalFilename());
+
                         String filename = img.getOriginalFilename();
                         byte[] imageBytes = ImageUtil.convertToWebP(img.getInputStream());
                         MultipartFile convertedFile = ImageUtil.toMultipartFile(imageBytes, filename);
@@ -133,6 +180,7 @@ public class ReviewRestController {
             }
 
             String json = mapper.writeValueAsString(imgId);
+            System.out.println("json : " + json);
 
             // 답변인 경우 ReviewRecommend에 저장, 그 외에는 ProductReview에 저장
             if (dto.isAnswer()) {
@@ -191,6 +239,7 @@ public class ReviewRestController {
     }
 
     @PutMapping("update")
+    @Transactional
     public ResponseEntity<Object> updateReview(@ModelAttribute ProductReviewFormDTO dto, HttpSession session) {
         System.out.println("🔍 PUT /review/update 요청 수신");
         System.out.println("🔍 받은 데이터: " + dto);
@@ -201,10 +250,17 @@ public class ReviewRestController {
         System.out.println("🔍 PVID: " + dto.getPvid());
         System.out.println("🔍 ParentReviewId: " + dto.getParentReviewId());
         System.out.println("🔍 Images: " + (dto.getImages() != null ? dto.getImages().size() : "null"));
-        
-        User user = (User) session.getAttribute("loginUser");
-        if (user == null) {
+
+        User sessionUser = (User) session.getAttribute("loginUser");
+        if (sessionUser == null) {
             System.out.println("🔍 사용자 로그인 정보 없음");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+
+        // 세션의 User 객체 대신 DB에서 다시 조회
+        User user = memberRepository.findByEmail(sessionUser.getEmail()).orElse(null);
+        if (user == null) {
+            System.out.println("🔍 사용자 DB 조회 실패");
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
 
@@ -213,7 +269,7 @@ public class ReviewRestController {
             if (dto.isAnswer()) {
                 System.out.println("🔍 답글 수정 시작 - ID: " + dto.getId());
                 // 답글 수정 시에는 parentReviewId가 필요하지 않으므로 조건 제거
-                
+
                 // ReviewRecommend 조회
                 System.out.println("🔍 ReviewRecommend 조회 시작 - ID: " + dto.getId());
                 ReviewRecommend reviewRecommend = this.productReviewService.getReviewRecommendById(dto.getId());
@@ -222,18 +278,19 @@ public class ReviewRestController {
                     return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
                 }
                 System.out.println("🔍 ReviewRecommend 찾음 - 작성자: " + reviewRecommend.getWriter().getEmail());
-                
+
                 // 작성자 권한 확인
                 if (!reviewRecommend.getWriter().getEmail().equals(user.getEmail())) {
-                    System.out.println("🔍 권한 없음 - 요청자: " + user.getEmail() + ", 작성자: " + reviewRecommend.getWriter().getEmail());
+                    System.out.println(
+                            "🔍 권한 없음 - 요청자: " + user.getEmail() + ", 작성자: " + reviewRecommend.getWriter().getEmail());
                     return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
                 }
                 System.out.println("🔍 권한 확인 완료");
-                
+
                 // 이미지 처리
                 List<Integer> imgId = new ArrayList<>();
                 ObjectMapper mapper = new ObjectMapper();
-                
+
                 if (dto.getImages() != null && !dto.getImages().isEmpty()) {
                     for (int i = 0; i < dto.getImages().size(); i++) {
                         MultipartFile img = dto.getImages().get(i);
@@ -248,13 +305,13 @@ public class ReviewRestController {
                         }
                     }
                 }
-                
+
                 String json = mapper.writeValueAsString(imgId);
-                
+
                 // ReviewRecommend 업데이트
                 reviewRecommend.setContent(dto.getContent());
                 reviewRecommend.setUserImgs(json);
-                
+
                 System.out.println("🔍 ReviewRecommend 업데이트 시작");
                 boolean updated = this.productReviewService.updateReviewRecommend(reviewRecommend);
                 if (updated) {
@@ -271,16 +328,16 @@ public class ReviewRestController {
                 if (productReview == null) {
                     return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
                 }
-                
+
                 // 작성자 권한 확인
                 if (!productReview.getWriter().getEmail().equals(user.getEmail())) {
                     return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
                 }
-                
+
                 // 이미지 처리
                 List<Integer> imgId = new ArrayList<>();
                 ObjectMapper mapper = new ObjectMapper();
-                
+
                 if (dto.getImages() != null && !dto.getImages().isEmpty()) {
                     for (int i = 0; i < dto.getImages().size(); i++) {
                         MultipartFile img = dto.getImages().get(i);
@@ -295,14 +352,14 @@ public class ReviewRestController {
                         }
                     }
                 }
-                
+
                 String json = mapper.writeValueAsString(imgId);
-                
+
                 // ProductReview 업데이트
                 productReview.setContent(dto.getContent());
                 productReview.setUserImgs(json);
                 productReview.setReviewType(dto.getReviewType());
-                
+
                 boolean updated = this.productReviewService.updateProductReview(productReview);
                 if (updated) {
                     CommentTypeDTO commentDTO = CommentTypeDTO.fromProductReview(productReview);
@@ -318,9 +375,10 @@ public class ReviewRestController {
     }
 
     @DeleteMapping("delete")
+    @Transactional
     public ResponseEntity<String> deleteReview(@RequestParam("id") int id, HttpSession session) {
         System.out.println("🔍 DELETE /review/delete 요청 수신 - id: " + id);
-        
+
         User user = (User) session.getAttribute("loginUser");
         if (user == null) {
             System.out.println("🔍 사용자 로그인 정보 없음");
@@ -360,6 +418,7 @@ public class ReviewRestController {
     }
 
     @DeleteMapping("delete-recommend")
+    @Transactional
     public ResponseEntity<String> deleteReviewRecommend(@RequestParam("id") int id, HttpSession session) {
         User user = (User) session.getAttribute("loginUser");
         if (user == null) {

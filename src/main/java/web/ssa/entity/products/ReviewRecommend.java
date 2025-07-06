@@ -23,7 +23,7 @@ public class ReviewRecommend {
     private int id;
 
     @ManyToOne
-    @JoinColumn(name="writer", nullable = false)
+    @JoinColumn(name = "writer", nullable = false)
     @JsonManagedReference
     private User writer;
 

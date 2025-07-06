@@ -5,6 +5,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import web.ssa.entity.products.ProductMaster;
 import web.ssa.entity.products.ProductReview;
 import web.ssa.entity.products.ReviewRecommend;
@@ -17,6 +18,7 @@ import web.ssa.repository.products.ReviewRecommendRepository;
 import java.util.List;
 
 @Service
+@Transactional
 public class ProductReviewServiceImpl implements ProductReviewService {
 
     @Autowired
@@ -53,7 +55,8 @@ public class ProductReviewServiceImpl implements ProductReviewService {
     @Override
     public boolean saveProductReview(ProductReview productReview) {
         ProductReview saved = this.productReviewRepository.save(productReview);
-        boolean exists = this.productReviewRepository.existsById(saved.getId());;
+        boolean exists = this.productReviewRepository.existsById(saved.getId());
+        ;
         return exists;
     }
 
@@ -65,9 +68,9 @@ public class ProductReviewServiceImpl implements ProductReviewService {
                 System.out.println("🔍 삭제할 ProductReview가 존재하지 않음 - id: " + id);
                 return false;
             }
-            
+
             this.productReviewRepository.deleteById(id);
-            
+
             // 삭제 후 존재하지 않는지 확인
             boolean stillExists = this.productReviewRepository.existsById(id);
             if (stillExists) {
@@ -87,7 +90,8 @@ public class ProductReviewServiceImpl implements ProductReviewService {
     @Override
     public boolean updateProductReview(ProductReview productReview) {
         ProductReview saved = this.productReviewRepository.save(productReview);
-        boolean exists = this.productReviewRepository.existsById(saved.getId());;
+        boolean exists = this.productReviewRepository.existsById(saved.getId());
+        ;
         return exists;
     }
 
@@ -100,13 +104,23 @@ public class ProductReviewServiceImpl implements ProductReviewService {
     @Override
     public boolean saveReviewRecommend(ReviewRecommend reviewRecommend) {
         try {
-            ReviewRecommend saved = this.reviewRecommendRepository.save(reviewRecommend);
-            return this.reviewRecommendRepository.existsById(saved.getId());
+            // 중복 체크: 같은 사용자가 같은 리뷰에 대해 이미 답글을 작성했는지 확인
+            ReviewRecommend existingRecommend = this.reviewRecommendRepository.findByWriterAndReviewId(
+                    reviewRecommend.getWriter(),
+                    reviewRecommend.getReviewId());
+
+            if (existingRecommend != null) {
+                System.out.println("Error: User " + reviewRecommend.getWriter().getEmail() +
+                        " already has a recommendation for review " + reviewRecommend.getReviewId().getId());
+                return false;
+            }
+
         } catch (Exception e) {
             System.out.println("Error saving ReviewRecommend: " + e.getMessage());
             e.printStackTrace();
             return false;
         }
+        return false;
     }
 
     @Override
@@ -115,13 +129,17 @@ public class ProductReviewServiceImpl implements ProductReviewService {
     }
 
     @Override
-    public boolean existsByWriterAndProductIdAndProductVariant(User writer, ProductMaster productId, ProductVariant productVariant) {
-        return this.productReviewRepository.existsByWriterAndProductIdAndProductVariant(writer, productId, productVariant);
+    public boolean existsByWriterAndProductIdAndProductVariant(User writer, ProductMaster productId,
+            ProductVariant productVariant) {
+        return this.productReviewRepository.existsByWriterAndProductIdAndProductVariant(writer, productId,
+                productVariant);
     }
 
     @Override
-    public boolean existsByWriterAndProductIdAndProductVariantAndReviewType(User writer, ProductMaster productId, ProductVariant productVariant, int reviewType) {
-        return this.productReviewRepository.existsByWriterAndProductIdAndProductVariantAndReviewType(writer, productId, productVariant, reviewType);
+    public boolean existsByWriterAndProductIdAndProductVariantAndReviewType(User writer, ProductMaster productId,
+            ProductVariant productVariant, int reviewType) {
+        return this.productReviewRepository.existsByWriterAndProductIdAndProductVariantAndReviewType(writer, productId,
+                productVariant, reviewType);
     }
 
     @Override

@@ -22,7 +22,7 @@ public class ImageUtil {
         }
 
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        
+
         // WebP 형식으로 변환 시도
         boolean result = ImageIO.write(image, "webp", baos);
         if (!result) {
