@@ -1,5 +1,6 @@
 package web.ssa.controller;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -81,17 +82,38 @@ public class ProductRestController {
 
     // Ajax 카테고리별 상품 및 필터 데이터 로드
     @GetMapping("list/ajax")
-    public ResponseEntity<Map<String, Object>> loadCategoryData(@RequestParam("cid") int cid) {
+    public ResponseEntity<Map<String, Object>> loadCategoryData(
+            @RequestParam(value="cid") int cid,
+            @RequestParam(value="childId", required = false) Integer childId
+
+    ) {
         try {
             Map<String, Object> response = new HashMap<>();
+            ObjectMapper mapper = new ObjectMapper();
 
             // 카테고리별 상품 데이터 로드
             Pageable pageable = PageRequest.of(0, 30); // 첫 페이지, 30개씩
+            Map<Integer, PLCategoryDTO> categoryMap = categoryService.getCategoryMap();
+
             Page<ProductMaster> page = this.productService.findByCategoryId(cid, pageable);
+
+            if (cid != -1)
+                if (categoryMap.get(cid).variants() != null) {
+                    String subCategoryJson = mapper.writeValueAsString(categoryMap.get(cid).variants());
+                    System.out.println("[ list ] subCategoryJson: " + subCategoryJson);
+                    response.put("subCategoryJson", subCategoryJson);
+                }
+
+            if(childId != null) {
+                page = productService.findByCategoryChildId(childId, pageable);
+            }
             List<SimpleProductDTO> products = page.getContent().stream().map(SimpleProductDTO::from).toList();
 
             // 카테고리 필터 데이터 로드
             List<CategoryFieldsDTO> categoryFieldsDTOList = categoryFieldServ.getCategoryFieldsByCategoryId(cid);
+            if (childId != null) {
+                categoryFieldsDTOList = categoryFieldServ.getCategoryFieldsByChildId(cid, childId);
+            }
             Map<String, List<String>> fieldFilter = dtoUtil
                     .processCategoryFieldsForFilterAsSimpleMap(categoryFieldsDTOList);
 

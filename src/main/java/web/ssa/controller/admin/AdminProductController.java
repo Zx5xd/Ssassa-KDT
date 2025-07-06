@@ -7,6 +7,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import web.ssa.service.categories.CategoryChildServImpl;
 import web.ssa.util.*;
 import jakarta.servlet.http.HttpSession;
 import web.ssa.cache.CategoriesCache;
@@ -42,22 +43,34 @@ public class AdminProductController {
     private final ProductImgCache productImgCache;
     private final AdminController adminController;
     private final WebDAVService webDAVService;
+    private final CategoryChildServImpl childServImpl;
 
     // 상품 목록 페이지 (카테고리별 필터링 지원)
     @GetMapping("/get/products")
     public String listProducts(
             @RequestParam(value = "categoryId", required = false) Integer categoryId,
+            @RequestParam(value = "categoryChildId", required = false) Integer categoryChildId,
             @RequestParam(value = "search", required = false) String search,
             @RequestParam(value = "page", defaultValue = "1") int page,
             Model model,
             HttpSession session) {
         int pageSize = 20;
 
+        if (categoryId != null) {
+            if (categoryId == 5 || categoryId == 8 || categoryId == 9) {
+                if (categoryChildId == null) {
+                    categoryChildId = childServImpl.getFirstCategoryChildID(categoryId);
+                }
+            }
+        }
+
         Page<ProductMaster> productPage;
 
         if (search != null && !search.trim().isEmpty()) {
             // 검색어가 있는 경우
             productPage = productService.searchProducts(search.trim(), page - 1, pageSize);
+        } else if (categoryChildId != null) {
+            productPage = productService.findByCategoryChildId(categoryChildId, page - 1, pageSize);
         } else if (categoryId != null) {
             // 카테고리 필터링
             productPage = productService.getPagedProductsByCategory(categoryId, page - 1, pageSize);
@@ -73,12 +86,14 @@ public class AdminProductController {
         model.addAttribute("formatUtil", new FormatUtil());
         model.addAttribute("productVariantService", productVariantService);
         model.addAttribute("productService", productService); // JSP에서 사용할 수 있도록 추가
+        model.addAttribute("selectedChildId", categoryChildId);
 
-        if (adminController.isAdmin(session)) {
-            return "admin/product/productList";
-        } else {
-            return "shop/productList";
+        if (categoryChildId != null) {
+            model.addAttribute("categoryChild", categoriesCache.getCategoryChildren(categoryId));
         }
+
+        return "admin/product/productList";
+
     }
 
     // 상품 삭제 (amount를 -1로 설정)
@@ -91,7 +106,7 @@ public class AdminProductController {
         // amount를 -1로 설정하여 논리적 삭제
         productService.softDeleteProduct(id);
 
-        String redirectUrl = "pd/get/products";
+        String redirectUrl = "get/products";
         if (categoryId != null) {
             redirectUrl += "?categoryId=" + categoryId;
         }
@@ -210,8 +225,9 @@ public class AdminProductController {
                 e.printStackTrace();
             }
         }
-        return "redirect:/pd/get/products";
+        return "redirect:/get/products";
     }
+
     // 상품 상세 페이지 (고객용)
     @GetMapping("/get/product/{id}")
     public String showProductDetail(@PathVariable("id") int id, Model model, HttpSession session) {
@@ -223,7 +239,7 @@ public class AdminProductController {
 
         ProductMaster product = productService.getProductById(id);
         if (product == null) {
-            return "redirect:/pd/get/products";
+            return "redirect:/get/products";
         }
 
         // 카테고리 이름 가져오기
@@ -329,7 +345,7 @@ public class AdminProductController {
             this.productService.updateProduct(id, cp, originalProduct);
         }
 
-        return "redirect:/pd/get/products";
+        return "redirect:/get/products";
     }
 
     // 상품 리뷰 목록 (API)

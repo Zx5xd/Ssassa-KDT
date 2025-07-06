@@ -154,6 +154,12 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
+    public Page<SimpleProductDTO> getPagedProductsByChildId(int categoryChildId, Pageable pageable) {
+        Page<ProductMaster> page = this.repository.findByCategoryChildId(categoryChildId, pageable);
+        return page.map(SimpleProductDTO::from);
+    }
+
+    @Override
     public ProductImg findByImgId(int productImgId) {
         return this.productImgRepository.findById(productImgId);
         // return repository.findByAmountNot(-1, pageable);
@@ -171,8 +177,14 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
+    public Page<ProductMaster> findByCategoryChildId(int categoryChildId, int page, int size) {
+        Pageable pageable = PageRequest.of(page, size);
+        return repository.findByCategoryChildId(categoryChildId, pageable);
+    }
+
+    @Override
     public Page<SimpleProductDTO> getPagedProductsByCategory(int categoryId, Pageable pageable) {
-        Page<ProductMaster> master =  repository.findByCategoryIdAndAmountNot(categoryId, -1, pageable);
+        Page<ProductMaster> master = repository.findByCategoryIdAndAmountNot(categoryId, -1, pageable);
         return master.map(SimpleProductDTO::from);
     }
 

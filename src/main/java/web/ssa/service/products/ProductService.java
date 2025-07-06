@@ -31,6 +31,8 @@ public interface ProductService {
 
     Page<ProductMaster> findByCategoryChildId(int categoryChildId, Pageable pageable);
 
+    Page<ProductMaster> findByCategoryChildId(int categoryChildId, int page, int size);
+
     Page<SimpleProductDTO> findBySimpleCategoryId(int categoryId, Pageable pageable);
 
     ProductImg findByImgId(int productImgId);
@@ -64,6 +66,8 @@ public interface ProductService {
 
     // 카테고리별 상품 페이지네이션
     Page<SimpleProductDTO> getPagedProductsByCategory(int categoryId, Pageable pageable);
+
+    Page<SimpleProductDTO> getPagedProductsByChildId(int categoryChildId, Pageable pageable);
 
     // 상품명으로 검색
     Page<SimpleProductDTO> searchProducts(String keyword, Pageable pageable);

@@ -18,7 +18,7 @@
         <body class="noto-sans-kr-regular">
             <main>
                 <div class="admin-container">
-                    <a href="/pd/get/products" class="back-link">← 상품 관리로 돌아가기</a>
+                    <a href="/get/products" class="back-link">← 상품 관리로 돌아가기</a>
 
                     <h2 class="admin-title">
                         <span class="material-symbols-outlined">add_shopping_cart</span>
@@ -41,7 +41,7 @@
                             </div>
                         </div>
 
-                        <form action="/pd/set/product/create" method="post" enctype="multipart/form-data"
+                        <form action="/set/product/create" method="post" enctype="multipart/form-data"
                             class="product-form">
                             <!-- 등록 방식 히든 필드 -->
                             <input type="hidden" id="registrationTypeField" name="registrationType" value="single">
@@ -117,7 +117,7 @@
                                     <span class="material-symbols-outlined">save</span>
                                     상품 등록
                                 </button>
-                                <a href="/pd/get/products" class="cancel-btn">취소</a>
+                                <a href="/get/products" class="cancel-btn">취소</a>
                             </div>
                         </form>
                     </div>

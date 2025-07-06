@@ -63,6 +63,18 @@
 
               </a>
             </div>
+            <c:if test="${selectedChildId != null}">
+              <div class="product-controls">
+                <div class="category-child-filter">
+                  <c:forEach items="${categoryChild}" var="childCat">
+                    <a href="/get/products?categoryId=${selectedCategoryId}&categoryChildId=${childCat.id}"
+                       class="category-link ${selectedChildId == childCat.id ? 'active' : ''}">
+                        ${childCat.name}
+                    </a>
+                  </c:forEach>
+                </div>
+              </div>
+            </c:if>
 
             <!-- 상품 목록 테이블 -->
             <div class="product-table-container">
@@ -284,6 +296,13 @@
           .category-filter {
             display: grid;
             grid-template-columns: repeat(5, 2fr);
+            row-gap: 10px;
+            column-gap: 20px;
+          }
+
+          .category-child-filter {
+            display: grid;
+            grid-template-columns: repeat(6, 1fr);
             row-gap: 10px;
             column-gap: 20px;
           }

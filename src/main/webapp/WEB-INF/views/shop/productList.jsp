@@ -371,7 +371,7 @@
                                     <c:forEach var="product" items="${productPage.content}" varStatus="status">
                                         <div class="product-card" data-product-id="${product.id}">
                                             <div class="product-image">
-                                                <a href="/pd/get/product/${product.id}" style="text-decoration: none; color: inherit;">
+                                                <a href="/get/product/${product.id}" style="text-decoration: none; color: inherit;">
                                                     <img src="${productService.getProductSimpleImg(product)}" 
                                                         alt="${product.name}"
                                                         onerror="handleImageError(this)">
@@ -380,7 +380,7 @@
 
                                             <div class="product-info">
                                                 <div class="product-name">
-                                                    <a href="/pd/get/product/${product.id}" style="text-decoration: none; color: inherit;">
+                                                    <a href="/get/product/${product.id}" style="text-decoration: none; color: inherit;">
                                                         ${product.name}
                                                     </a>
                                                 </div>

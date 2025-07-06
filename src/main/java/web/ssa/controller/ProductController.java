@@ -76,9 +76,30 @@ public class ProductController {
         Page<SimpleProductDTO> page = this.pdServImpl.findBySimpleCategoryId(
                 cid == -1 ? 1 : cid, pageable);
 
+        if (cid != -1) {
+            if (cid == 5 || cid == 8 || cid == 9) {
+                if (childId == null) {
+                    childId = categoryChildServ.getFirstCategoryChildID(cid);
+                }
+            }
+        }
+
+        // if (search != null && !search.trim().isEmpty()) {
+        // // 검색어가 있는 경우
+        // page = pdServImpl.searchProducts(search.trim(), pageable);
+        // } else if (cid != -1) {
+        // // 카테고리 필터링
+        // page = pdServImpl.getPagedProductsByCategory(cid, pageable);
+        // } else {
+        // // 전체 상품
+        // page = pdServImpl.getPagedProducts(pageable);
+        // }
+
         if (search != null && !search.trim().isEmpty()) {
             // 검색어가 있는 경우
             page = pdServImpl.searchProducts(search.trim(), pageable);
+        } else if (childId != null) {
+            page = pdServImpl.getPagedProductsByChildId(childId, pageable);
         } else if (cid != -1) {
             // 카테고리 필터링
             page = pdServImpl.getPagedProductsByCategory(cid, pageable);
@@ -91,6 +112,13 @@ public class ProductController {
             ObjectMapper mapper = new ObjectMapper();
             String categoryJson = mapper.writeValueAsString(categoryMap);
             System.out.println("[ list ] categoryJson: " + categoryJson);
+
+            if (cid != -1)
+                if (categoryMap.get(cid).variants() != null) {
+                    String subCategoryJson = mapper.writeValueAsString(categoryMap.get(cid).variants());
+                    System.out.println("[ list ] subCategoryJson: " + subCategoryJson);
+                    model.addAttribute("subCategoryJson", subCategoryJson);
+                }
 
             List<CategoryFieldsDTO> categoryFieldsDTOList = categoryFieldServ.getCategoryFieldsByCategoryId(cid);
             if (childId != null) {
@@ -107,6 +135,7 @@ public class ProductController {
             e.printStackTrace();
         }
 
+        model.addAttribute("childId", childId);
         model.addAttribute("page", page);
         model.addAttribute("products", page.getContent());
         return "product/list";
