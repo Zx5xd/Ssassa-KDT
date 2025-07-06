@@ -59,8 +59,29 @@ public class ProductReviewServiceImpl implements ProductReviewService {
 
     @Override
     public boolean deleteProductReview(int id) {
-        this.productReviewRepository.deleteById(id);
-        return this.productReviewRepository.existsById(id);
+        try {
+            // 삭제 전에 존재하는지 확인
+            if (!this.productReviewRepository.existsById(id)) {
+                System.out.println("🔍 삭제할 ProductReview가 존재하지 않음 - id: " + id);
+                return false;
+            }
+            
+            this.productReviewRepository.deleteById(id);
+            
+            // 삭제 후 존재하지 않는지 확인
+            boolean stillExists = this.productReviewRepository.existsById(id);
+            if (stillExists) {
+                System.out.println("🔍 ProductReview 삭제 실패 - 여전히 존재함 - id: " + id);
+                return false;
+            } else {
+                System.out.println("🔍 ProductReview 삭제 성공 - id: " + id);
+                return true;
+            }
+        } catch (Exception e) {
+            System.out.println("🔍 ProductReview 삭제 중 예외 발생: " + e.getMessage());
+            e.printStackTrace();
+            return false;
+        }
     }
 
     @Override
@@ -101,5 +122,34 @@ public class ProductReviewServiceImpl implements ProductReviewService {
     @Override
     public boolean existsByWriterAndProductIdAndProductVariantAndReviewType(User writer, ProductMaster productId, ProductVariant productVariant, int reviewType) {
         return this.productReviewRepository.existsByWriterAndProductIdAndProductVariantAndReviewType(writer, productId, productVariant, reviewType);
+    }
+
+    @Override
+    public ReviewRecommend getReviewRecommendById(int id) {
+        return this.reviewRecommendRepository.findById(id).orElse(null);
+    }
+
+    @Override
+    public boolean updateReviewRecommend(ReviewRecommend reviewRecommend) {
+        try {
+            ReviewRecommend saved = this.reviewRecommendRepository.save(reviewRecommend);
+            return this.reviewRecommendRepository.existsById(saved.getId());
+        } catch (Exception e) {
+            System.out.println("Error updating ReviewRecommend: " + e.getMessage());
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    @Override
+    public boolean deleteReviewRecommend(int id) {
+        try {
+            this.reviewRecommendRepository.deleteById(id);
+            return !this.reviewRecommendRepository.existsById(id);
+        } catch (Exception e) {
+            System.out.println("Error deleting ReviewRecommend: " + e.getMessage());
+            e.printStackTrace();
+            return false;
+        }
     }
 }

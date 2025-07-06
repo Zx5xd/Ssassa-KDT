@@ -33,4 +33,9 @@ public interface ProductReviewService {
     
     // reviewType을 포함한 중복 체크 메서드
     boolean existsByWriterAndProductIdAndProductVariantAndReviewType(User writer, ProductMaster productId, ProductVariant productVariant, int reviewType);
+    
+    // ReviewRecommend 수정/삭제 관련 메서드
+    ReviewRecommend getReviewRecommendById(int id);
+    boolean updateReviewRecommend(ReviewRecommend reviewRecommend);
+    boolean deleteReviewRecommend(int id);
 }

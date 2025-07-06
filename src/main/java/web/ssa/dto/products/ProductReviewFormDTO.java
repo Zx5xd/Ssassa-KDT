@@ -7,6 +7,7 @@ import java.util.List;
 
 @Data
 public class ProductReviewFormDTO {
+    private int id; // 수정 시 사용할 ID
     private String type;
     private String content;
     private int pid;

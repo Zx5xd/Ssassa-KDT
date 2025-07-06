@@ -411,8 +411,8 @@ comp.addEventListener('reply-submitted', async (e) => {
         });
 
         if (response.status === 200) {
-            alert('답글이 성공적으로 등록되었습니다!');
-            console.log('답변 등록 성공:', response.data);
+            // alert('답글이 성공적으로 등록되었습니다!');
+            // console.log('답변 등록 성공:', response.data);
             
             // 리뷰 목록 새로고침
             await loadReviews();
@@ -460,3 +460,228 @@ const convertImagesToFiles = async (imageUrls) => {
     }
     return files;
 };
+
+// 댓글/답글 수정 이벤트 처리
+comp.addEventListener('edit-submitted', async (e) => {
+    console.log('🔍 edit-submitted 이벤트 수신됨:', e.detail);
+    const { commentId, content, images } = e.detail;
+
+    try {
+        console.log('🔍 수정 시작 - commentId:', commentId, 'content:', content, 'images:', images);
+        
+        // 로그인 상태 확인
+        const userData = await getCurrentUser();
+        console.log('🔍 현재 사용자 정보:', userData);
+        if (!userData) {
+            alert('수정하려면 로그인이 필요합니다.');
+            const currentUrl = encodeURIComponent(window.location.href);
+            window.location.href = `/login?redirect=${currentUrl}`;
+            return;
+        }
+
+        // URL에서 제품 ID와 변형 ID 추출
+        const urlParts = window.location.pathname.split('/');
+        const lastPart = urlParts[urlParts.length - 1] || '1';
+
+        let pid, pvid;
+        if (lastPart.includes('_')) {
+            const [pidPart, pvidPart] = lastPart.split('_');
+            pid = parseInt(pidPart) || 1;
+            pvid = parseInt(pvidPart) || -1;
+        } else {
+            pid = parseInt(lastPart) || 1;
+            pvid = -1;
+        }
+
+        console.log('🔍 제품 정보 - pid:', pid, 'pvid:', pvid);
+
+        // 댓글 타입 확인
+        console.log('🔍 현재 댓글 목록:', comp.comments);
+        const comment = comp.comments.find(c => c.id === commentId);
+        // console.log('🔍 찾은 댓글:', comment);
+        
+        let reply = null;
+        if (!comment) {
+            // 답글에서 찾기
+            for (const c of comp.comments) {
+                reply = c.replies?.find(r => r.id === commentId);
+                if (reply) {
+                    console.log('🔍 찾은 답글:', reply);
+                    break;
+                }
+            }
+        }
+
+        const targetComment = comment || reply;
+        // console.log('🔍 대상 댓글/답글:', targetComment);
+        if (!targetComment) {
+            alert('수정할 댓글을 찾을 수 없습니다.');
+            return;
+        }
+
+        // FormData 생성
+        const formData = new FormData();
+        formData.append('id', commentId.toString());
+        formData.append('content', content);
+        formData.append('type', targetComment.type);
+        formData.append('pid', pid);
+        formData.append('pvid', pvid);
+
+        console.log('🔍 FormData 생성 완료:', {
+            id: commentId,
+            content: content,
+            type: targetComment.type,
+            pid: pid,
+            pvid: pvid
+        });
+        
+        // FormData 내용 상세 로깅
+        console.log('🔍 FormData 상세 내용:');
+        for (let [key, value] of formData.entries()) {
+            console.log(`  ${key}: ${value}`);
+        }
+
+        // 이미지 파일 추가
+        if (images && images.length > 0) {
+            // console.log('🔍 이미지 처리 시작:', images);
+            const files = await convertImagesToFiles(images);
+            // console.log('🔍 변환된 파일들:', files);
+            if (files.length > 0) {
+                files.forEach((file, index) => {
+                    formData.append('images', file);
+                    // console.log(`🔍 이미지 ${index} 추가됨:`, file.name);
+                });
+            }
+        } else {
+            console.log('🔍 이미지가 없습니다.');
+        }
+
+        // 서버에 수정 요청
+        // console.log('🔍 서버에 수정 요청 전송 중...');
+        // console.log('🔍 요청 URL:', '/review/update');
+        // console.log('🔍 FormData 내용:');
+        for (let [key, value] of formData.entries()) {
+            console.log(`  ${key}:`, value);
+        }
+        
+        const response = await axios.put('/review/update', formData, {
+            headers: {
+                'Content-Type': 'multipart/form-data'
+            }
+        });
+
+        console.log('🔍 서버 응답:', response);
+        if (response.status === 200) {
+            alert('수정이 완료되었습니다!');
+            // console.log('댓글 수정 성공:', response.data);
+            
+            // 리뷰 목록 새로고침
+            await loadReviews();
+        }
+    } catch (error) {
+        console.error('🔍 댓글 수정 중 오류 발생:', error);
+        console.error('🔍 오류 상세 정보:', {
+            message: error.message,
+            status: error.response?.status,
+            statusText: error.response?.statusText,
+            data: error.response?.data
+        });
+        
+        if (error.response && error.response.status === 401) {
+            alert('로그인이 필요합니다.');
+            const currentUrl = encodeURIComponent(window.location.href);
+            window.location.href = `/login?redirect=${currentUrl}`;
+        } else if (error.response && error.response.status === 403) {
+            alert('수정 권한이 없습니다.');
+        } else {
+            alert('수정 중 오류가 발생했습니다.');
+        }
+    }
+});
+
+// 댓글/답글 삭제 이벤트 처리
+comp.addEventListener('delete-submitted', async (e) => {
+    // console.log('🔍 delete-submitted 이벤트 수신됨:', e.detail);
+    const { commentId } = e.detail;
+
+    try {
+        // console.log('🔍 삭제 시작 - commentId:', commentId);
+        
+        // 로그인 상태 확인
+        const userData = await getCurrentUser();
+        console.log('🔍 현재 사용자 정보:', userData);
+        if (!userData) {
+            alert('삭제하려면 로그인이 필요합니다.');
+            const currentUrl = encodeURIComponent(window.location.href);
+            window.location.href = `/login?redirect=${currentUrl}`;
+            return;
+        }
+
+        // 댓글 타입 확인 (답글인지 확인)
+        // console.log('🔍 현재 댓글 목록:', comp.comments);
+        const comment = comp.comments.find(c => c.id === commentId);
+        // console.log('🔍 찾은 댓글:', comment);
+        
+        let isAnswer = false;
+        if (!comment) {
+            // 답글에서 찾기
+            for (const c of comp.comments) {
+                const reply = c.replies?.find(r => r.id === commentId);
+                if (reply) {
+                    console.log('🔍 찾은 답글:', reply);
+                    isAnswer = reply.type === 'answer';
+                    break;
+                }
+            }
+        } else {
+            isAnswer = comment.type === 'answer';
+        }
+
+        console.log('🔍 삭제 대상 타입 - isAnswer:', isAnswer);
+
+        // 삭제 확인
+        // if (!confirm('정말로 삭제하시겠습니까?')) {
+        //     console.log('🔍 사용자가 삭제를 취소했습니다.');
+        //     return;
+        // }
+
+        // 삭제 API 호출
+        const endpoint = isAnswer ? '/review/delete-recommend' : '/review/delete';
+        const fullUrl = `${endpoint}?id=${commentId}`;
+        // console.log('🔍 삭제 API 호출:', endpoint);
+        // console.log('🔍 삭제 요청 URL:', fullUrl);
+        // console.log('🔍 삭제 요청 메서드: DELETE');
+        // console.log('🔍 삭제 요청 파라미터: id =', commentId);
+        
+        const response = await axios.delete(fullUrl);
+
+        console.log('🔍 서버 응답:', response);
+        if (response.status === 200) {
+            alert('삭제가 완료되었습니다!');
+            // console.log('댓글 삭제 성공:', response.data);
+            
+            // 리뷰 목록 새로고침
+            await loadReviews();
+        }
+    } catch (error) {
+        console.error('🔍 댓글 삭제 중 오류 발생:', error);
+        console.error('🔍 오류 상세 정보:', {
+            message: error.message,
+            status: error.response?.status,
+            statusText: error.response?.statusText,
+            data: error.response?.data
+        });
+        
+        if (error.response && error.response.status === 401) {
+            alert('로그인이 필요합니다.');
+            const currentUrl = encodeURIComponent(window.location.href);
+            window.location.href = `/login?redirect=${currentUrl}`;
+        } else if (error.response && error.response.status === 403) {
+            alert('삭제 권한이 없습니다.');
+        } else if (error.response && error.response.status === 404) {
+            alert('삭제할 댓글을 찾을 수 없습니다.');
+        } else {
+            alert('삭제 중 오류가 발생했습니다.');
+        }
+    }
+});
