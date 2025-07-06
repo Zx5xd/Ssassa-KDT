@@ -59,6 +59,15 @@ public interface ProductService {
     // 상품명으로 검색
     Page<ProductMaster> searchProducts(String keyword, int page, int size);
 
+    // 상품 페이지네이션 (전체)
+    Page<SimpleProductDTO> getPagedProducts(Pageable pageable);
+
+    // 카테고리별 상품 페이지네이션
+    Page<SimpleProductDTO> getPagedProductsByCategory(int categoryId, Pageable pageable);
+
+    // 상품명으로 검색
+    Page<SimpleProductDTO> searchProducts(String keyword, Pageable pageable);
+
     void saveProductImg(String img, int imgId);
 
     void updateProduct(int id, ProductCreateDTO editProduct, ProductDTO originalProduct);

@@ -165,6 +165,24 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
+    public Page<SimpleProductDTO> getPagedProducts(Pageable pageable) {
+        Page<ProductMaster> master = this.repository.findAll(pageable);
+        return master.map(SimpleProductDTO::from);
+    }
+
+    @Override
+    public Page<SimpleProductDTO> getPagedProductsByCategory(int categoryId, Pageable pageable) {
+        Page<ProductMaster> master =  repository.findByCategoryIdAndAmountNot(categoryId, -1, pageable);
+        return master.map(SimpleProductDTO::from);
+    }
+
+    @Override
+    public Page<SimpleProductDTO> searchProducts(String keyword, Pageable pageable) {
+        Page<ProductMaster> master = repository.findByNameContainingAndAmountNot(keyword, -1, pageable);
+        return master.map(SimpleProductDTO::from);
+    }
+
+    @Override
     public Page<ProductMaster> searchProducts(String keyword, int page, int size) {
         Pageable pageable = PageRequest.of(page, size);
         return repository.findByNameContainingAndAmountNot(keyword, -1, pageable);
@@ -434,4 +452,5 @@ public class ProductServiceImpl implements ProductService {
     public List<ProductMaster> searchByDynamicFilter(Map<String, List<String>> filterMap) {
         return productRepositoryCustom.searchByDynamicFilter(filterMap);
     }
+
 }

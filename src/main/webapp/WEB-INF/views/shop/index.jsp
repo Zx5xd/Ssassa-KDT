@@ -106,10 +106,12 @@
     </a>
 
     <div id="searchBox">
+<%--        <form action="/pd/list" method="get">--%>
         <input type="text" id="searchInput" placeholder="검색할 제품을 입력해주세요">
-        <div class="searchBtn">
+        <div class="searchBtn" id="searchBtn">
             <span class="material-symbols-outlined">search</span>
         </div>
+<%--        </form>--%>
     </div>
 
     <div id="user-interface">
@@ -317,6 +319,20 @@
                 }
             });
         });
+    });
+
+    function performSearch() {
+        const keyword = document.getElementById('searchInput').value;
+        window.location.href = '/pd/list?search=' + encodeURIComponent(keyword);
+    }
+
+    document.getElementById("searchBtn").addEventListener('click', performSearch);
+
+    document.getElementById("searchInput").addEventListener('keydown', function(e) {
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            performSearch();
+        }
     });
 </script>
 

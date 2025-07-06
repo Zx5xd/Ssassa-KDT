@@ -28,7 +28,7 @@
 
             <!-- 검색 기능 -->
             <div class="search-container">
-              <form method="get" action="/pd/get/products" class="search-form">
+              <form method="get" action="/get/products" class="search-form">
                 <div class="search-input-group">
                   <input type="text" name="search" value="${searchKeyword}" placeholder="상품명을 입력하세요..."
                     class="search-input">
@@ -37,7 +37,7 @@
                   </button>
                 </div>
                 <c:if test="${not empty searchKeyword}">
-                  <a href="/pd/get/products" class="clear-search-btn">
+                  <a href="/get/products" class="clear-search-btn">
                     <span class="material-symbols-outlined">clear</span>
                     검색 초기화
                   </a>
@@ -48,17 +48,17 @@
             <!-- 카테고리 필터링 및 상품 등록 -->
             <div class="product-controls">
               <div class="category-filter">
-                <a href="/pd/get/products" class="category-link ${selectedCategoryId == null ? 'active' : ''}">
+                <a href="/get/products" class="category-link ${selectedCategoryId == null ? 'active' : ''}">
                   전체 상품
                 </a>
                 <c:forEach items="${category}" var="cat">
-                  <a href="/pd/get/products?categoryId=${cat.id}"
+                  <a href="/get/products?categoryId=${cat.id}"
                     class="category-link ${selectedCategoryId == cat.id ? 'active' : ''}">
                     ${cat.name}
                   </a>
                 </c:forEach>
               </div>
-              <a href="/pd/set/product/new" class="add-product-btn">
+              <a href="/set/product/new" class="add-product-btn">
                 <span class="material-symbols-outlined">add</span>
 
               </a>
@@ -161,12 +161,12 @@
                       <td>${formatUtil.formatKoreanDate(product.reg)}</td>
                       <td>
                         <div class="action-buttons">
-                          <a href="/pd/set/product/edit/${product.id}" class="edit-btn">
+                          <a href="/set/product/edit/${product.id}" class="edit-btn">
                             <span class="material-symbols-outlined">
                               edit
                             </span></a>
                           <c:if test="${product.amount != -1}">
-                            <form action="/pd/set/product/delete/${product.id}" method="post" style="display:inline;"
+                            <form action="/set/product/delete/${product.id}" method="post" style="display:inline;"
                               onsubmit="return confirm('정말 삭제하시겠습니까?');">
                               <input type="hidden" name="categoryId" value="${selectedCategoryId}" />
                               <input type="hidden" name="page" value="${productPage.number + 1}" />

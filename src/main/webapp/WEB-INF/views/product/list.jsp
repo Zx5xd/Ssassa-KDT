@@ -87,7 +87,7 @@
 
     <div id="searchBox">
         <input type="text" id="searchInput" placeholder="검색할 제품을 입력해주세요">
-        <div class="searchBtn">
+        <div class="searchBtn" id="searchBtn">
             <span class="material-symbols-outlined">search</span>
         </div>
     </div>
@@ -484,4 +484,32 @@
             menu.classList.add("hidden");
         }
     });
+
+    document.getElementById("searchBtn").addEventListener('click', function (){
+        const keyword = document.getElementById('searchInput').value;
+        searchFetch(keyword)
+    })
+
+    document.getElementById("searchInput").addEventListener('keydown', function(e){
+        if(e.key === 'Enter'){
+            e.preventDefault();
+
+            const keyword = document.getElementById('searchInput').value;
+            searchFetch(keyword)
+        }
+    })
+
+    function searchFetch(keyword){
+        fetch('/pdr/list?search='+keyword)
+            .then(res => res.json())
+            .then(data => {
+                if (data.error) {
+                    console.error('검색 오류:', data.error);
+                    return;
+                }
+
+                // 전달된 product 리스트를 JS로 렌더링할 수 있도록 JSON 문자열로 출력
+                list.products = data.content;
+            });
+    }
 </script>

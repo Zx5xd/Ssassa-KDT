@@ -7,6 +7,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.ui.Model;
 import org.springframework.util.MultiValueMap;
 import org.springframework.util.StreamUtils;
 import org.springframework.web.bind.annotation.*;
@@ -20,6 +21,7 @@ import web.ssa.service.categories.CategoryFieldServImpl;
 import web.ssa.service.categories.CategoryServiceImpl;
 import web.ssa.dto.categories.CategoryFieldsDTO;
 import web.ssa.dto.categories.PLCategoryDTO;
+import web.ssa.service.products.ProductServiceImpl;
 import web.ssa.util.DTOUtil;
 import web.ssa.mapper.ConvertToDTO;
 
@@ -38,6 +40,9 @@ public class ProductRestController {
     private ProductService productService;
 
     @Autowired
+    private ProductServiceImpl productServiceImpl;
+
+    @Autowired
     private CategoryServiceImpl categoryService;
 
     @Autowired
@@ -46,9 +51,26 @@ public class ProductRestController {
     private final DTOUtil dtoUtil = new DTOUtil();
 
     @GetMapping("list")
-    public PageResponse<SimpleProductDTO> listProducts(@RequestParam("cid") int cid, Pageable pageable) {
-        Page<ProductMaster> page = this.productService.findByCategoryId(cid, pageable);
+    public PageResponse<SimpleProductDTO> listProducts(@RequestParam(value = "cid", defaultValue = "-1") int cid,
+            Pageable pageable,
+            @RequestParam(value = "search", required = false) String search) {
+        Page<ProductMaster> page = cid == -1 ? this.productService.findByCategoryId(cid, pageable) : null;
+
+        if (search != null && !search.trim().isEmpty()) {
+            // 검색어가 있는 경우
+            page = productServiceImpl.searchProducts(search.trim(), pageable.getPageNumber(),
+                    pageable.getPageSize());
+        } else if (cid != -1) {
+            // 카테고리 필터링
+            page = productServiceImpl.getPagedProductsByCategory(cid, pageable.getPageNumber(),
+                    pageable.getPageSize());
+        } else {
+            // 전체 상품
+            page = productServiceImpl.getPagedProducts(pageable.getPageNumber() - 1, pageable.getPageSize());
+        }
+
         List<SimpleProductDTO> dtoList = page.getContent().stream().map(SimpleProductDTO::from).toList();
+
         return new PageResponse<>(
                 dtoList,
                 page.getNumber(),
