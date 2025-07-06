@@ -12,7 +12,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-import web.ssa.dto.PageResponse;
 import web.ssa.dto.products.CommentTypeDTO;
 import web.ssa.dto.products.ProductReviewFormDTO;
 import web.ssa.entity.member.User;
@@ -191,29 +190,197 @@ public class ReviewRestController {
         }
     }
 
+    @PutMapping("update")
+    public ResponseEntity<Object> updateReview(@ModelAttribute ProductReviewFormDTO dto, HttpSession session) {
+        System.out.println("🔍 PUT /review/update 요청 수신");
+        System.out.println("🔍 받은 데이터: " + dto);
+        System.out.println("🔍 ID: " + dto.getId());
+        System.out.println("🔍 Type: " + dto.getType());
+        System.out.println("🔍 Content: " + dto.getContent());
+        System.out.println("🔍 PID: " + dto.getPid());
+        System.out.println("🔍 PVID: " + dto.getPvid());
+        System.out.println("🔍 ParentReviewId: " + dto.getParentReviewId());
+        System.out.println("🔍 Images: " + (dto.getImages() != null ? dto.getImages().size() : "null"));
+        
+        User user = (User) session.getAttribute("loginUser");
+        if (user == null) {
+            System.out.println("🔍 사용자 로그인 정보 없음");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+
+        try {
+            // 답변인 경우 ReviewRecommend 수정
+            if (dto.isAnswer()) {
+                System.out.println("🔍 답글 수정 시작 - ID: " + dto.getId());
+                // 답글 수정 시에는 parentReviewId가 필요하지 않으므로 조건 제거
+                
+                // ReviewRecommend 조회
+                System.out.println("🔍 ReviewRecommend 조회 시작 - ID: " + dto.getId());
+                ReviewRecommend reviewRecommend = this.productReviewService.getReviewRecommendById(dto.getId());
+                if (reviewRecommend == null) {
+                    System.out.println("🔍 ReviewRecommend를 찾을 수 없음 - ID: " + dto.getId());
+                    return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+                }
+                System.out.println("🔍 ReviewRecommend 찾음 - 작성자: " + reviewRecommend.getWriter().getEmail());
+                
+                // 작성자 권한 확인
+                if (!reviewRecommend.getWriter().getEmail().equals(user.getEmail())) {
+                    System.out.println("🔍 권한 없음 - 요청자: " + user.getEmail() + ", 작성자: " + reviewRecommend.getWriter().getEmail());
+                    return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+                }
+                System.out.println("🔍 권한 확인 완료");
+                
+                // 이미지 처리
+                List<Integer> imgId = new ArrayList<>();
+                ObjectMapper mapper = new ObjectMapper();
+                
+                if (dto.getImages() != null && !dto.getImages().isEmpty()) {
+                    for (int i = 0; i < dto.getImages().size(); i++) {
+                        MultipartFile img = dto.getImages().get(i);
+                        if (img != null && !img.isEmpty()) {
+                            String filename = img.getOriginalFilename();
+                            byte[] imageBytes = ImageUtil.convertToWebP(img.getInputStream());
+                            MultipartFile convertedFile = ImageUtil.toMultipartFile(imageBytes, filename);
+                            String name = webDAVService.uploadFile(convertedFile);
+                            String[] parts = name.split("/");
+                            int uploadedImgId = this.productService.uploadImg(parts[parts.length - 1]);
+                            imgId.add(uploadedImgId);
+                        }
+                    }
+                }
+                
+                String json = mapper.writeValueAsString(imgId);
+                
+                // ReviewRecommend 업데이트
+                reviewRecommend.setContent(dto.getContent());
+                reviewRecommend.setUserImgs(json);
+                
+                System.out.println("🔍 ReviewRecommend 업데이트 시작");
+                boolean updated = this.productReviewService.updateReviewRecommend(reviewRecommend);
+                if (updated) {
+                    System.out.println("🔍 ReviewRecommend 업데이트 성공");
+                    CommentTypeDTO commentDTO = CommentTypeDTO.fromReviewRecommend(reviewRecommend);
+                    return ResponseEntity.ok().body(commentDTO);
+                } else {
+                    System.out.println("🔍 ReviewRecommend 업데이트 실패");
+                    return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+                }
+            } else {
+                // ProductReview 조회
+                ProductReview productReview = this.productReviewService.getProductReviewById(dto.getId());
+                if (productReview == null) {
+                    return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+                }
+                
+                // 작성자 권한 확인
+                if (!productReview.getWriter().getEmail().equals(user.getEmail())) {
+                    return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+                }
+                
+                // 이미지 처리
+                List<Integer> imgId = new ArrayList<>();
+                ObjectMapper mapper = new ObjectMapper();
+                
+                if (dto.getImages() != null && !dto.getImages().isEmpty()) {
+                    for (int i = 0; i < dto.getImages().size(); i++) {
+                        MultipartFile img = dto.getImages().get(i);
+                        if (img != null && !img.isEmpty()) {
+                            String filename = img.getOriginalFilename();
+                            byte[] imageBytes = ImageUtil.convertToWebP(img.getInputStream());
+                            MultipartFile convertedFile = ImageUtil.toMultipartFile(imageBytes, filename);
+                            String name = webDAVService.uploadFile(convertedFile);
+                            String[] parts = name.split("/");
+                            int uploadedImgId = this.productService.uploadImg(parts[parts.length - 1]);
+                            imgId.add(uploadedImgId);
+                        }
+                    }
+                }
+                
+                String json = mapper.writeValueAsString(imgId);
+                
+                // ProductReview 업데이트
+                productReview.setContent(dto.getContent());
+                productReview.setUserImgs(json);
+                productReview.setReviewType(dto.getReviewType());
+                
+                boolean updated = this.productReviewService.updateProductReview(productReview);
+                if (updated) {
+                    CommentTypeDTO commentDTO = CommentTypeDTO.fromProductReview(productReview);
+                    return ResponseEntity.ok().body(commentDTO);
+                } else {
+                    return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+        }
+    }
+
     @DeleteMapping("delete")
     public ResponseEntity<String> deleteReview(@RequestParam("id") int id, HttpSession session) {
+        System.out.println("🔍 DELETE /review/delete 요청 수신 - id: " + id);
+        
+        User user = (User) session.getAttribute("loginUser");
+        if (user == null) {
+            System.out.println("🔍 사용자 로그인 정보 없음");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+
+        try {
+            System.out.println("🔍 ProductReview 조회 시작 - id: " + id);
+            // ProductReview 조회
+            ProductReview review = this.productReviewService.getProductReviewById(id);
+            if (review == null) {
+                System.out.println("🔍 ProductReview를 찾을 수 없음 - id: " + id);
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+            }
+            System.out.println("🔍 ProductReview 찾음 - 작성자: " + review.getWriter().getEmail());
+
+            // 작성자만 삭제 가능
+            if (!review.getWriter().getEmail().equals(user.getEmail())) {
+                System.out.println("🔍 권한 없음 - 요청자: " + user.getEmail() + ", 작성자: " + review.getWriter().getEmail());
+                return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+            }
+            System.out.println("🔍 권한 확인 완료");
+
+            boolean deleted = this.productReviewService.deleteProductReview(id);
+            if (deleted) {
+                System.out.println("🔍 삭제 성공");
+                return ResponseEntity.ok("Review deleted successfully");
+            } else {
+                System.out.println("🔍 삭제 실패");
+                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+            }
+        } catch (Exception e) {
+            System.out.println("🔍 삭제 중 예외 발생: " + e.getMessage());
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
+    @DeleteMapping("delete-recommend")
+    public ResponseEntity<String> deleteReviewRecommend(@RequestParam("id") int id, HttpSession session) {
         User user = (User) session.getAttribute("loginUser");
         if (user == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
 
         try {
-            // 리뷰 존재 여부 확인을 위해 ProductMaster로 조회
-            ProductMaster productMaster = this.productService.getProductById(1); // 임시로 1 사용, 실제로는 리뷰 ID로 조회해야 함
-            ProductReview review = this.productReviewService.getProductReview(productMaster);
-            if (review == null) {
+            // ReviewRecommend 조회
+            ReviewRecommend reviewRecommend = this.productReviewService.getReviewRecommendById(id);
+            if (reviewRecommend == null) {
                 return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
             }
 
-            // 작성자만 삭제 가능 (임시로 주석 처리)
-            // if (!review.getWriter().getId().equals(user.getId())) {
-            //     return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
-            // }
+            // 작성자만 삭제 가능
+            if (!reviewRecommend.getWriter().getEmail().equals(user.getEmail())) {
+                return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+            }
 
-            boolean deleted = this.productReviewService.deleteProductReview(id);
+            boolean deleted = this.productReviewService.deleteReviewRecommend(id);
             if (deleted) {
-                return ResponseEntity.ok("Review deleted successfully");
+                return ResponseEntity.ok("Review recommend deleted successfully");
             } else {
                 return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
             }
