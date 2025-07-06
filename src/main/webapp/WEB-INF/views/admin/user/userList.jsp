@@ -28,7 +28,7 @@
           <td>${user.name}</td>
           <td>${user.nickname}</td>
           <td>${user.phone}</td>
-          <td>${user.createdAt}</td>
+          <td>${format.formatKoreanDateTime(format.LocalDateTimeToDate(user.createdAt))}</td>
           <td>
             <form action="/admin/deleteUser" method="post" style="display:inline;">
               <input type="hidden" name="email" value="${user.email}" />

@@ -43,7 +43,7 @@ public class PayController {
         String[] selectedProductIds = request.getParameterValues("selectedProducts");
         if (selectedProductIds == null || selectedProductIds.length == 0) {
             model.addAttribute("error", "선택된 상품이 없습니다.");
-            return "redirect:/products";
+            return "redirect://pd/list";
         }
 
         List<SelectedProductDTO> selectedItems = new ArrayList<>();
@@ -67,12 +67,12 @@ public class PayController {
             }
         } catch (Exception e) {
             model.addAttribute("error", "상품 정보를 처리하는 중 오류가 발생했습니다.");
-            return "redirect:/products";
+            return "redirect:/pd/list";
         }
 
         if (selectedItems.isEmpty()) {
             model.addAttribute("error", "유효한 상품이 없습니다.");
-            return "redirect:/products";
+            return "redirect:/pd/list";
         }
 
         try {
@@ -80,7 +80,7 @@ public class PayController {
             return "redirect:" + redirectUrl;
         } catch (Exception e) {
             model.addAttribute("error", "결제 준비 중 오류가 발생했습니다: " + e.getMessage());
-            return "redirect:/products";
+            return "redirect:/pd/list";
         }
     }
 
@@ -99,7 +99,7 @@ public class PayController {
         ProductMaster productMaster = productService.getProductById(productId);
         if (productMaster == null) {
             model.addAttribute("error", "상품을 찾을 수 없습니다.");
-            return "redirect:/products";
+            return "redirect:/pd/list";
         }
 
         if (quantity <= 0)
@@ -121,7 +121,7 @@ public class PayController {
             return "redirect:" + redirectUrl;
         } catch (Exception e) {
             model.addAttribute("error", "결제 준비 중 오류가 발생했습니다: " + e.getMessage());
-            return "redirect:/products";
+            return "redirect:/pd/list";
         }
     }
 

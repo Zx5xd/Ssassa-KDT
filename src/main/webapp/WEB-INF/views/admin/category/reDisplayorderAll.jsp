@@ -192,6 +192,19 @@
               </div>
             </c:if>
 
+<%--            <c:if test="${selectedChildId != null}">--%>
+<%--              <div class="product-controls">--%>
+<%--                <div class="category-child-filter">--%>
+<%--                  <c:forEach items="${categoryChild}" var="childCat">--%>
+<%--                    <a href="/get/products?categoryId=${selectedCategoryId}&categoryChildId=${childCat.id}"--%>
+<%--                       class="category-link ${selectedChildId == childCat.id ? 'active' : ''}">--%>
+<%--                        ${childCat.name}--%>
+<%--                    </a>--%>
+<%--                  </c:forEach>--%>
+<%--                </div>--%>
+<%--              </div>--%>
+<%--            </c:if>--%>
+
             <!-- 값이 없을 때 -->
             <c:if test="${empty dtoList}">
               <div class="no-data">

@@ -24,6 +24,7 @@ import web.ssa.service.KakaoPayService;
 import web.ssa.service.member.MemberService;
 import web.ssa.dto.categories.CategoriesChildDTO;
 import web.ssa.cache.ProductImgCache;
+import web.ssa.util.FormatUtil;
 
 @Controller
 @RequestMapping("/admin")
@@ -36,6 +37,7 @@ public class AdminController {
     private final JavaMailSender mailSender;
     private final CategoriesCache categoriesCache;
     private final ProductImgCache productImgCache;
+    private final FormatUtil formatUtil = new FormatUtil();
 
     // 공통: 관리자 권한 확인 메서드
     public boolean isAdmin(HttpSession session) {
@@ -89,6 +91,7 @@ public class AdminController {
 
         model.addAttribute("activeUsers", activeUsers);
         model.addAttribute("deletedUsers", deletedUsers);
+        model.addAttribute("format", formatUtil);
         return "admin/user/userList"; // /WEB-INF/views/admin/userList.jsp
     }
 

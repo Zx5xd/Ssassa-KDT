@@ -106,7 +106,7 @@ public class AdminProductController {
         // amount를 -1로 설정하여 논리적 삭제
         productService.softDeleteProduct(id);
 
-        String redirectUrl = "get/products";
+        String redirectUrl = "/get/products";
         if (categoryId != null) {
             redirectUrl += "?categoryId=" + categoryId;
         }
@@ -277,6 +277,9 @@ public class AdminProductController {
         model.addAttribute("category", categoriesCache.getCachedCategories());
         model.addAttribute("productImgCache", this.productImgCache);
         model.addAttribute("existingVariants", existingVariants);
+
+        // 수정 페이지에 전달할 Data
+
 
         return "admin/product/productEditForm";
     }

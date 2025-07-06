@@ -1,4 +1,4 @@
-package web.ssa.controller;
+package web.ssa.controller.client;
 
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
@@ -22,19 +22,19 @@ public class LoginController {
 
     @GetMapping("/login")
     public String showLoginPage(@CookieValue(value = "rememberEmail", required = false) String rememberedEmail,
-                                Model model) {
+            Model model) {
         model.addAttribute("rememberedEmail", rememberedEmail);
         return "client/login";
     }
 
     @PostMapping("/login")
     public String login(@RequestParam("email") String email,
-                        @RequestParam("password") String password,
-                        @RequestParam(value = "rememberEmail", required = false) String rememberEmail,
-                        @RequestParam(value = "redirect", required = false) String redirect,
-                        HttpSession session,
-                        HttpServletResponse response,
-                        Model model) {
+            @RequestParam("password") String password,
+            @RequestParam(value = "rememberEmail", required = false) String rememberEmail,
+            @RequestParam(value = "redirect", required = false) String redirect,
+            HttpSession session,
+            HttpServletResponse response,
+            Model model) {
 
         User user = memberService.login(email, password);
 
@@ -116,8 +116,8 @@ public class LoginController {
 
     @PostMapping("/find-id")
     public String findId(@RequestParam String name,
-                         @RequestParam String phone,
-                         Model model) {
+            @RequestParam String phone,
+            Model model) {
         Optional<User> userOpt = memberService.findByNameAndPhone(name, phone);
         if (userOpt.isPresent()) {
             model.addAttribute("foundEmail", userOpt.get().getEmail());
@@ -134,8 +134,8 @@ public class LoginController {
 
     @PostMapping("/find-password")
     public String findPassword(@RequestParam String email,
-                               @RequestParam String phone,
-                               Model model) {
+            @RequestParam String phone,
+            Model model) {
         Optional<User> userOpt = memberService.findByEmailAndPhone(email, phone);
         if (userOpt.isPresent()) {
             model.addAttribute("email", email);
@@ -149,8 +149,8 @@ public class LoginController {
     // 비밀번호 재설정
     @PostMapping("/reset-password")
     public String resetPassword(@RequestParam String email,
-                                @RequestParam String newPassword,
-                                Model model) {
+            @RequestParam String newPassword,
+            Model model) {
         memberService.updatePassword(email, newPassword);
         model.addAttribute("message", "비밀번호가 성공적으로 변경되었습니다. 로그인해 주세요.");
         return "client/login";

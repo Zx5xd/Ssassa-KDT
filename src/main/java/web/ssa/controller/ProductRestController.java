@@ -204,6 +204,7 @@ public class ProductRestController {
         if (productImg == null) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         }
+
         try {
             String imageUrl = "https://web.hyproz.myds.me/ssa_shop/img/" + productImg.getImgPath();
             URL url = new URL(imageUrl);

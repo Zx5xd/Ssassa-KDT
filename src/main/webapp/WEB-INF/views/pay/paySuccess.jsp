@@ -263,7 +263,7 @@
                     <span class="material-symbols-outlined">account_circle</span>
                     마이페이지로 이동
                 </a>
-                <a href="/products" class="btn btn-secondary">
+                <a href="/pd/list" class="btn btn-secondary">
                     <span class="material-symbols-outlined">shopping_bag</span>
                     쇼핑 계속하기
                 </a>

@@ -89,15 +89,12 @@ public class ProductServiceImpl implements ProductService {
     @Override
     public void softDeleteProduct(int productId) {
         ProductMaster product = getProductById(productId);
-        System.out.println("softDeleteProduct : " + product.toString());
         product.setAmount(-1);
         this.repository.save(product);
     }
 
     @Override
     public void saveProduct(ProductCreateDTO createDto) {
-
-        System.out.println("saveProduct : " + createDto.toString());
 
         String simpleImg = "";
         String detailImg = "";

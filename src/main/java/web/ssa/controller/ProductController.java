@@ -71,7 +71,6 @@ public class ProductController {
             @PageableDefault(page = 0, size = 30, sort = "id", direction = Sort.Direction.DESC) Pageable pageable,
             @RequestParam(value = "search", required = false) String search,
             Model model) {
-        System.out.println("[ list ] cid: " + cid);
         Map<Integer, PLCategoryDTO> categoryMap = categoryService.getCategoryMap();
         Page<SimpleProductDTO> page = this.pdServImpl.findBySimpleCategoryId(
                 cid == -1 ? 1 : cid, pageable);
@@ -83,17 +82,6 @@ public class ProductController {
                 }
             }
         }
-
-        // if (search != null && !search.trim().isEmpty()) {
-        // // 검색어가 있는 경우
-        // page = pdServImpl.searchProducts(search.trim(), pageable);
-        // } else if (cid != -1) {
-        // // 카테고리 필터링
-        // page = pdServImpl.getPagedProductsByCategory(cid, pageable);
-        // } else {
-        // // 전체 상품
-        // page = pdServImpl.getPagedProducts(pageable);
-        // }
 
         if (search != null && !search.trim().isEmpty()) {
             // 검색어가 있는 경우
@@ -111,12 +99,10 @@ public class ProductController {
         try {
             ObjectMapper mapper = new ObjectMapper();
             String categoryJson = mapper.writeValueAsString(categoryMap);
-            System.out.println("[ list ] categoryJson: " + categoryJson);
 
             if (cid != -1)
                 if (categoryMap.get(cid).variants() != null) {
                     String subCategoryJson = mapper.writeValueAsString(categoryMap.get(cid).variants());
-                    System.out.println("[ list ] subCategoryJson: " + subCategoryJson);
                     model.addAttribute("subCategoryJson", subCategoryJson);
                 }
 
