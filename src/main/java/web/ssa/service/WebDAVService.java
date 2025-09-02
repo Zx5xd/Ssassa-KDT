@@ -15,7 +15,7 @@ import java.util.UUID;
 @Service
 public class WebDAVService {
 
-    @Value("${webdav.url:http://192.168.1.100:5005/webdav}")
+    @Value("${webdav.url:[Webdav URL]/webdav}")
     private String webdavUrl;
 
     @Value("${webdav.username:admin}")
