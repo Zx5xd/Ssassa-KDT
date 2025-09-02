@@ -21,7 +21,7 @@ import java.util.Map;
 public class KakaoPayService {
 
     private final PaymentRepository paymentRepository;
-    private static final String ADMIN_KEY = "KakaoAK 3abec9eb781aaddcb9e4d14a1b3f25d5";
+    private static final String ADMIN_KEY = /* KAKAO_PAY_KEY */;
 
     private String tid;
     private String partnerOrderId;
